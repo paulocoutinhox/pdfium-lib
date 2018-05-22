@@ -12,16 +12,16 @@ This project compile PDFium to mobile platforms. Current project compiles to:
 ## How to compile
 
 1. Get the source:  
-git clone github.com/prsolucoes/mobile-pdfium.git
+```git clone github.com/prsolucoes/mobile-pdfium.git```
 
 2. Get Google Depot Tools:  
-make build-depot-tools
+```make build-depot-tools```
 
 3. Get PDFium:  
-make build-pdfium
+```make build-pdfium```
 
 4. Compile for iOS:  
-make build-ios
+```make build-ios```
 
 ## Options inside GN file
 
