@@ -1,0 +1,23 @@
+# Build
+/build-ios
+/build-android
+
+# System
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea
+.iml
+.vscode
+.cmserver.*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Google
+.gclient*
+depot-tools
+pdfium
