@@ -1,6 +1,5 @@
 # Build
-/build-ios
-/build-android
+/build
 
 # System
 .DS_Store
@@ -21,3 +20,4 @@ __pycache__/
 .gclient*
 depot-tools
 pdfium
+chromium
