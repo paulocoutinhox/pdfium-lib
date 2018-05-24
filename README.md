@@ -47,7 +47,7 @@ Obs:
 
 ## Patchs
 
-1. Remove assert lines from libjpeg_turbo build files:  
+1. Remove assert lines from libjpeg_turbo build files about iOS check:  
 - pdfium/build/secondary/third_party/libjpeg_turbo/BUILD.gn  
 - chromium/build/secondary/third_party/libjpeg_turbo/BUILD.gn  
 - chromium/third_party/BUILD.gn  
