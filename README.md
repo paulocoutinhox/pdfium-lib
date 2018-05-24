@@ -22,22 +22,22 @@ or
 ```pip3 install -r requirements.txt --user``` 
 
 3. Get Google Depot Tools:  
-```python3 make.py build-depot-tools```  
+```python3 make.py run build-depot-tools```  
 
 4. Get Chromium:  
-```python3 make.py build-chromium```  
+```python3 make.py run build-chromium```  
 
 5. Get PDFium:  
-```python3 make.py build-pdfium```  
+```python3 make.py run build-pdfium```  
 
 6. Apply patchs:  
 ```Check **patchs** section of this file```  
 
 7. Compile for iOS:  
-```python3 make.py build-ios```  
+```python3 make.py run build-ios```  
   
 8. Install iOS libraries:  
-```python3 make.py install-ios```  
+```python3 make.py run install-ios```  
 
 
 Obs:
