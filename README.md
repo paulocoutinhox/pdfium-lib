@@ -41,7 +41,7 @@ or
 
 
 Obs:
-- The file **make.py** need be executed with python3 (python3 and pip3).  
+- The file **make.py** need be executed with python3.  
 - The steps 1, 2, 3, 4, 5 and 6 you only need make one time.  
 
 
