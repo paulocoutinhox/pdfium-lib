@@ -9,7 +9,7 @@ This project compile PDFium to mobile platforms. Current project compiles to:
 
 1. ninja (brew install ninja)  
 2. python3  
-3. pip3  
+3. pip (generally called pip3 for python3)  
 
 ## How to compile 
 
