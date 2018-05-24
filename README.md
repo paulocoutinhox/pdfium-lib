@@ -16,7 +16,7 @@ This project compile PDFium to mobile platforms. Current project compiles to:
 1. Get the source:  
 ```git clone github.com/prsolucoes/mobile-pdfium.git```  
 
-2. Install pip requirements
+2. Install pip requirements:  
 ```pip3 install -r requirements.txt``` 
 or  
 ```pip3 install -r requirements.txt --user``` 
