@@ -23,8 +23,6 @@ Tasks:
   - build-ios
   - build-depot-tools
   - build-chromium
-  
-
 """
 
 import os
@@ -152,7 +150,7 @@ def run_task_install_ios(ios_archs, ios_configurations):
         for arch in ios_archs:
             folder = os.path.join('pdfium', 'out', '{0}-{1}'.format(config, arch), 'obj', '**', '*.a')
             # skia_shared and pdfium_base have only a few object files and due to that there is no point in creating their own .a files.
-            # We can link the .o files directly.
+            # we can link the .o files directly.
             skia_o=os.path.join('pdfium', 'out', '{0}-{1}'.format(config, arch), 'obj', 'third_party', 'skia_shared', '*.o')
             base_o=os.path.join('pdfium', 'out', '{0}-{1}'.format(config, arch), 'obj', 'third_party', 'pdfium_base', '*.o')
             files = glob.glob(folder, recursive=True)
@@ -162,7 +160,7 @@ def run_task_install_ios(ios_archs, ios_configurations):
 
             lib_file_out = os.path.join('build', 'ios', config, 'libpdfium_{0}.a'.format(arch))
 
-            # We have removed symbols to squeeze final results. -no_warning_for_no_symbols will save us from useless warnings.
+            # we have removed symbols to squeeze final results. -no_warning_for_no_symbols will save us from useless warnings.
             command = ' '.join(['libtool', '-static -no_warning_for_no_symbols', files_str, '-o', lib_file_out])
             call(command, shell=True)
 
@@ -201,7 +199,8 @@ def run_task_build_ios(ios_archs, ios_configurations):
             debug('Generating files to arch "{0}" and configuration "{1}"...'.format(arch, config))
 
             arg_is_debug = ('true' if config == 'debug' else 'false')
-            # Adding symbol_level=0 will squeeze the final result significantly. But it is needed for debug builds.
+
+            # adding symbol_level=0 will squeeze the final result significantly, but it is needed for debug builds.
             args = 'target_os="ios" target_cpu="{0}" use_goma=false is_debug={1} pdf_use_skia=false pdf_use_skia_paths=false pdf_enable_xfa=false pdf_enable_v8=false pdf_is_standalone=true is_component_build=false clang_use_chrome_plugins=false ios_enable_code_signing=false enable_ios_bitcode=true {2}'.format(arch, arg_is_debug, 'symbol_level=0' if arg_is_debug else '')
             command = ' '.join([gn_tool, 'gen', 'out/{0}-{1}'.format(config, arch), '--args=\'{0}\''.format(args)])
             call(command, shell=True)
