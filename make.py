@@ -149,13 +149,16 @@ def run_task_install_ios(ios_archs, ios_configurations):
         # archs
         for arch in ios_archs:
             folder = os.path.join('pdfium', 'out', '{0}-{1}'.format(config, arch), 'obj', '**', '*.a')
+
             # skia_shared and pdfium_base have only a few object files and due to that there is no point in creating their own .a files.
             # we can link the .o files directly.
             skia_o=os.path.join('pdfium', 'out', '{0}-{1}'.format(config, arch), 'obj', 'third_party', 'skia_shared', '*.o')
             base_o=os.path.join('pdfium', 'out', '{0}-{1}'.format(config, arch), 'obj', 'third_party', 'pdfium_base', '*.o')
+            
             files = glob.glob(folder, recursive=True)
             files.append(skia_o)
             files.append(base_o)
+
             files_str = ' '.join(files)
 
             lib_file_out = os.path.join('build', 'ios', config, 'libpdfium_{0}.a'.format(arch))
@@ -174,7 +177,7 @@ def run_task_install_ios(ios_archs, ios_configurations):
         call(command, shell=True)
 
         # only to test in my machine
-        #copyfile(lib_file_out, '/Users/paulo/Downloads/UXReader-iOS/UXReader/UXReader/PDFium/libpdfium.a')
+        copyfile(lib_file_out, '/Users/paulo/Downloads/UXReader-iOS/UXReader/UXReader/PDFium/libpdfium.a')
 
 
 def run_task_build_ios(ios_archs, ios_configurations):

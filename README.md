@@ -31,7 +31,7 @@ or
 ```python3 make.py run build-pdfium```  
 
 6. Apply patchs:  
-```Check **patchs** section of this file```  
+```Check "patchs" section of this file```  
 
 7. Compile for iOS:  
 ```python3 make.py run build-ios```  
