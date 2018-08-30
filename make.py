@@ -177,7 +177,7 @@ def run_task_install_ios(ios_archs, ios_configurations):
         call(command, shell=True)
 
         # only to test in my machine
-        copyfile(lib_file_out, '/Users/paulo/Downloads/UXReader-iOS/UXReader/UXReader/PDFium/libpdfium.a')
+        #copyfile(lib_file_out, '/Users/paulo/Downloads/UXReader-iOS/UXReader/UXReader/PDFium/libpdfium.a')
 
 
 def run_task_build_ios(ios_archs, ios_configurations):
