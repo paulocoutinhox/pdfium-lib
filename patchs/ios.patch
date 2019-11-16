@@ -1,0 +1,27 @@
+diff --git a/core/fxcrt/fx_system.h b/core/fxcrt/fx_system.h
+index 8ad23a19c..f7cfc9f90 100644
+--- a/core/fxcrt/fx_system.h
++++ b/core/fxcrt/fx_system.h
+@@ -71,7 +71,8 @@
+ #endif  // _FX_PLATFORM_ == _FX_PLATFORM_WINDOWS_
+ 
+ #if _FX_PLATFORM_ == _FX_PLATFORM_APPLE_
+-#include <Carbon/Carbon.h>
++#include <CoreGraphics/CoreGraphics.h>
++#include <CoreFoundation/CFString.h>
+ #include <libkern/OSAtomic.h>
+ #endif  // _FX_PLATFORM_ == _FX_PLATFORM_APPLE_
+ 
+diff --git a/core/fxge/apple/apple_int.h b/core/fxge/apple/apple_int.h
+index c58e75ccc..678b37a8b 100644
+--- a/core/fxge/apple/apple_int.h
++++ b/core/fxge/apple/apple_int.h
+@@ -9,8 +9,6 @@
+ 
+ #include "core/fxcrt/fx_system.h"
+ 
+-#include <Carbon/Carbon.h>
+-
+ #include "core/fxge/cfx_gemodule.h"
+ #include "core/fxge/cfx_graphstatedata.h"
+ #include "core/fxge/cfx_pathdata.h"

@@ -1,0 +1,12 @@
+os: osx
+osx_image: xcode11.2
+language: python
+python: "3.7"
+script:
+  - pip3 install -r requirements.txt
+  - python3 make.py run build-depot-tools
+  - export PATH=$PATH:$PWD/depot-tools
+  - python3 make.py run build-pdfium
+  - python3 make.py run apply-patch-ios
+  - python3 make.py run build-ios
+  - python3 make.py run install-ios

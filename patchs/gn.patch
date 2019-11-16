@@ -1,0 +1,21 @@
+--- .gn	2019-11-16 16:23:57.000000000 -0300
++++ ../patchs/.gn_modified	2019-11-16 16:23:44.000000000 -0300
+@@ -14,8 +14,6 @@
+ 
+ check_targets = [
+   ":pdfium",
+-  ":pdfium_embeddertests",
+-  ":pdfium_unittests",
+   "//constants/*",
+   "//core/*",
+   "//fpdfsdk/*",
+@@ -23,9 +21,6 @@
+   "//fxjs/*",
+   "//samples/*",
+   "//skia/*",
+-  "//testing/:*",
+-  "//testing/fuzzers/*",
+-  "//testing/image_diff/*",
+   "//third_party:bigint",
+   "//third_party:fx_agg",
+   "//third_party:fx_freetype",

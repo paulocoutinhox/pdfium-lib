@@ -1,0 +1,35 @@
+# Copyright 2016 PDFium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+buildconfig = "//build/config/BUILDCONFIG.gn"
+
+default_args = {
+  v8_extra_library_files = []
+  v8_experimental_extra_library_files = []
+
+  # Turns on compiler optimizations in V8 in Debug build.
+  v8_optimized_debug = true
+}
+
+check_targets = [
+  ":pdfium",
+  ":pdfium_embeddertests",
+  ":pdfium_unittests",
+  "//constants/*",
+  "//core/*",
+  "//fpdfsdk/*",
+  "//fxbarcode/*",
+  "//fxjs/*",
+  "//samples/*",
+  "//skia/*",
+  "//testing/:*",
+  "//testing/fuzzers/*",
+  "//testing/image_diff/*",
+  "//third_party:bigint",
+  "//third_party:fx_agg",
+  "//third_party:fx_freetype",
+  "//third_party:pdfium_base",
+  "//third_party:skia_shared",
+  "//xfa/*",
+]

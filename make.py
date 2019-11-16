@@ -18,10 +18,11 @@ Examples:
   python make.py -h
 
 Tasks:
-  - build-pdfium
-  - install-ios
-  - build-ios
   - build-depot-tools
+  - build-pdfium
+  - apply-patch-ios
+  - build-ios
+  - install-ios
   - build-chromium
 """
 
@@ -69,17 +70,25 @@ def main(options):
     if not make_task:
         error('Task is invalid')
 
+    # build depot tools
+    if make_task == 'build-depot-tools':        
+        run_task_build_depot_tools()
+
     # build pdfium
-    if make_task == 'build-pdfium':
+    elif make_task == 'build-pdfium':
         run_task_build_pdfium()
+
+    # apply patch ios
+    elif make_task == 'apply-patch-ios':
+        run_task_apply_patch_ios()
+
+    # build infra
+    elif make_task == 'build-infra':
+        run_task_build_infra()
 
     # build chromium
     elif make_task == 'build-chromium':        
         run_task_build_chromium()
-
-    # build depot tools
-    elif make_task == 'build-depot-tools':        
-        run_task_build_depot_tools()
 
     # install ios
     elif make_task == 'install-ios':        
@@ -99,43 +108,76 @@ def main(options):
     debug('FINISHED!')
 
 
+def run_task_build_infra():
+    debug('Building Infra...')
+
+    remove_dir(os.path.join('infra'))
+    
+    command = ' '.join(['fetch', 'infra'])
+    call(command, shell=True)
+
+
 def run_task_build_pdfium():
     debug('Building PDFIUM...')
 
     remove_dir(os.path.join('pdfium'))
 
-    dtools_dir = os.path.join('depot-tools')
-    gclient_tool = os.path.join(dtools_dir, 'gclient')
-    
-    command = ' '.join([gclient_tool, 'config', '--unmanaged', 'https://pdfium.googlesource.com/pdfium.git'])
+    command = ' '.join(['gclient', 'config', '--unmanaged', 'https://pdfium.googlesource.com/pdfium.git'])
     call(command, shell=True)
 
-    command = ' '.join([gclient_tool, 'sync'])
+    command = ' '.join(['gclient', 'sync'])
     call(command, shell=True)
 
-    remove_dir(os.path.join('pdfium', 'testing', 'iossim'))
-    remove_dir(os.path.join('pdfium', 'testing', 'gtest_ios'))
+    cwd = 'pdfium'
+    command = ' '.join(['git', 'checkout', '96befae824837fbad3f164c602961756c7b0b1db'])
+    call(command, cwd=cwd, shell=True)
 
-    copytree(os.path.join('chromium', 'testing', 'iossim'), os.path.join('pdfium', 'testing', 'iossim'))
-    copytree(os.path.join('chromium', 'testing', 'gtest_ios'), os.path.join('pdfium', 'testing', 'gtest_ios'))
+    #remove_dir(os.path.join('pdfium', 'testing', 'iossim'))
+    #remove_dir(os.path.join('pdfium', 'testing', 'gtest_ios'))
+
+    #copytree(os.path.join('chromium', 'testing', 'iossim'), os.path.join('pdfium', 'testing', 'iossim'))
+    #copytree(os.path.join('chromium', 'testing', 'gtest_ios'), os.path.join('pdfium', 'testing', 'gtest_ios'))
 
 
 def run_task_build_chromium():
     debug('Building Chromium...')
 
-    remove_dir(os.path.join('chromium'))
+    remove_dir('chromium')
     
     command = ' '.join(['git', 'clone', 'https://github.com/chromium/chromium.git'])
     call(command, shell=True)
 
 
+def run_task_apply_patch_ios():
+    debug('Apply iOS patch...')
+    
+    cwd = 'pdfium'
+
+    command = ' '.join(['patch', '-p1', '--forward', '<', '../patchs/ios.patch'])
+    call(command, cwd=cwd, shell=True)
+
+    command = ' '.join(['patch', '-u', 'build/config/mac/sdk_info.py', '--forward', '-i', '../patchs/sdk-info.patch'])
+    call(command, cwd=cwd, shell=True)
+
+    command = ' '.join(['patch', '-u', 'build/mac/find_sdk.py', '--forward', '-i', '../patchs/find-sdk.patch'])
+    call(command, cwd=cwd, shell=True)
+
+    command = ' '.join(['patch', '-u', 'BUILD.gn', '--forward', '-i', '../patchs/build.patch'])
+    call(command, cwd=cwd, shell=True)
+
+    command = ' '.join(['patch', '-u', '.gn', '--forward', '-i', '../patchs/gn.patch'])
+    call(command, cwd=cwd, shell=True)
+
+
 def run_task_build_depot_tools():
     debug('Building Depot Tools...')
 
-    remove_dir(os.path.join('depot-tools'))
+    remove_dir('depot-tools')
     
     command = ' '.join(['git', 'clone', 'https://chromium.googlesource.com/chromium/tools/depot_tools.git', 'depot-tools'])
     call(command, shell=True)
+
+    debug('Execute on your terminal: export PATH=$PATH:$PWD/depot-tools')
 
 
 def run_task_install_ios(ios_archs, ios_configurations):
@@ -176,6 +218,9 @@ def run_task_install_ios(ios_archs, ios_configurations):
         command = ' '.join(['lipo', '-create', files_str, '-o', lib_file_out])
         call(command, shell=True)
 
+        command = ' '.join(['file', lib_file_out])
+        call(command, shell=True)
+
         # only to test in my machine
         #copyfile(lib_file_out, '/Users/paulo/Downloads/UXReader-iOS/UXReader/UXReader/PDFium/libpdfium.a')
 
@@ -184,8 +229,6 @@ def run_task_build_ios(ios_archs, ios_configurations):
     debug('Building iOS libraries...')
 
     current_dir = os.getcwd()
-    dtools_dir = os.path.join(current_dir, 'depot-tools')
-    gn_tool = os.path.join(dtools_dir, 'gn')
 
     # configs
     for config in ios_configurations:
@@ -196,7 +239,7 @@ def run_task_build_ios(ios_archs, ios_configurations):
             remove_dir(main_dir)
             create_dir(main_dir)
 
-            os.chdir(os.path.join('pdfium'))
+            os.chdir('pdfium')
 
             # generating files...
             debug('Generating files to arch "{0}" and configuration "{1}"...'.format(arch, config))
@@ -205,7 +248,7 @@ def run_task_build_ios(ios_archs, ios_configurations):
 
             # adding symbol_level=0 will squeeze the final result significantly, but it is needed for debug builds.
             args = 'target_os="ios" target_cpu="{0}" use_goma=false is_debug={1} pdf_use_skia=false pdf_use_skia_paths=false pdf_enable_xfa=false pdf_enable_v8=false pdf_is_standalone=true is_component_build=false clang_use_chrome_plugins=false ios_enable_code_signing=false enable_ios_bitcode=true {2}'.format(arch, arg_is_debug, 'symbol_level=0' if arg_is_debug else '')
-            command = ' '.join([gn_tool, 'gen', 'out/{0}-{1}'.format(config, arch), '--args=\'{0}\''.format(args)])
+            command = ' '.join(['gn', 'gen', 'out/{0}-{1}'.format(config, arch), '--args=\'{0}\''.format(args)])
             call(command, shell=True)
 
             # compiling...
