@@ -162,6 +162,9 @@ def run_task_apply_patch_ios():
     command = ' '.join(['patch', '-u', 'build/mac/find_sdk.py', '--forward', '-i', '../patchs/find-sdk.patch'])
     call(command, cwd=cwd, shell=True)
 
+    command = ' '.join(['patch', '-u', 'build/toolchain/mac/filter_libtool.py', '--forward', '-i', '../patchs/filter-libtool.patch'])
+    call(command, cwd=cwd, shell=True)
+
     command = ' '.join(['patch', '-u', 'BUILD.gn', '--forward', '-i', '../patchs/build.patch'])
     call(command, cwd=cwd, shell=True)
 
