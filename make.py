@@ -47,7 +47,8 @@ import urllib.parse as urlparse
 def main(options):    
     make_debug = False
     make_task = ''
-    ios_archs = ['arm64', 'arm', 'x86', 'x64']
+    #ios_archs = ['arm64', 'arm', 'x86', 'x64']
+    ios_archs = ['arm']
     ios_configurations = ['release'] #debug
 
     # show all params for debug
@@ -82,14 +83,6 @@ def main(options):
     elif make_task == 'apply-patch-ios':
         run_task_apply_patch_ios()
 
-    # build infra
-    elif make_task == 'build-infra':
-        run_task_build_infra()
-
-    # build chromium
-    elif make_task == 'build-chromium':        
-        run_task_build_chromium()
-
     # install ios
     elif make_task == 'install-ios':        
         run_task_install_ios(
@@ -108,15 +101,6 @@ def main(options):
     debug('FINISHED!')
 
 
-def run_task_build_infra():
-    debug('Building Infra...')
-
-    remove_dir(os.path.join('infra'))
-    
-    command = ' '.join(['fetch', 'infra'])
-    call(command, shell=True)
-
-
 def run_task_build_pdfium():
     debug('Building PDFIUM...')
 
@@ -131,21 +115,6 @@ def run_task_build_pdfium():
     cwd = 'pdfium'
     command = ' '.join(['git', 'checkout', '96befae824837fbad3f164c602961756c7b0b1db'])
     call(command, cwd=cwd, shell=True)
-
-    #remove_dir(os.path.join('pdfium', 'testing', 'iossim'))
-    #remove_dir(os.path.join('pdfium', 'testing', 'gtest_ios'))
-
-    #copytree(os.path.join('chromium', 'testing', 'iossim'), os.path.join('pdfium', 'testing', 'iossim'))
-    #copytree(os.path.join('chromium', 'testing', 'gtest_ios'), os.path.join('pdfium', 'testing', 'gtest_ios'))
-
-
-def run_task_build_chromium():
-    debug('Building Chromium...')
-
-    remove_dir('chromium')
-    
-    command = ' '.join(['git', 'clone', 'https://github.com/chromium/chromium.git'])
-    call(command, shell=True)
 
 
 def run_task_apply_patch_ios():
