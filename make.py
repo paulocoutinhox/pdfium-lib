@@ -48,6 +48,7 @@ def main(options):
     make_debug = False
     make_task = ''
     #ios_archs = ['arm64', 'arm', 'x86', 'x64']
+    # armv7 armv7s x86_64 i386
     ios_archs = ['arm']
     ios_configurations = ['release'] #debug
 
@@ -219,7 +220,7 @@ def run_task_build_ios(ios_archs, ios_configurations):
             arg_is_debug = ('true' if config == 'debug' else 'false')
 
             # adding symbol_level=0 will squeeze the final result significantly, but it is needed for debug builds.
-            args = 'target_os="ios" target_cpu="{0}" use_goma=false is_debug={1} pdf_use_skia=false pdf_use_skia_paths=false pdf_enable_xfa=false pdf_enable_v8=false pdf_is_standalone=true is_component_build=false clang_use_chrome_plugins=false ios_enable_code_signing=false enable_ios_bitcode=true {2}'.format(arch, arg_is_debug, 'symbol_level=0' if arg_is_debug else '')
+            args = 'target_os="ios" ios_deployment_target="9.0" target_cpu="{0}" use_goma=false is_debug={1} pdf_use_skia=false pdf_use_skia_paths=false pdf_enable_xfa=false pdf_enable_v8=false pdf_is_standalone=true is_component_build=false clang_use_chrome_plugins=false ios_enable_code_signing=false enable_ios_bitcode=true {2}'.format(arch, arg_is_debug, 'symbol_level=0' if arg_is_debug else '')
             command = ' '.join(['gn', 'gen', 'out/{0}-{1}'.format(config, arch), '--args=\'{0}\''.format(args)])
             call(command, shell=True)
 
