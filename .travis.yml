@@ -1,5 +1,5 @@
 os: osx
-osx_image: xcode11.2
+osx_image: xcode10.3
 script:
   - pip3 install -r requirements.txt --user
   - python3 make.py run build-depot-tools
