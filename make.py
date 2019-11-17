@@ -46,9 +46,7 @@ import urllib.parse as urlparse
 def main(options):
     make_debug = False
     make_task = ""
-    # ios_archs = ['arm64', 'arm', 'x86', 'x64']
-    # armv7 armv7s x86_64 i386
-    ios_archs = ["arm"]
+    ios_archs = ['arm', 'arm64', 'x64']
     ios_configurations = ["release"]  # debug
 
     # show all params for debug
@@ -124,7 +122,7 @@ def run_task_apply_patch_ios():
     debug("Apply iOS patch...")
 
     cwd = "pdfium"
-
+    
     command = " ".join(["patch", "-p1", "--forward", "<", "../patchs/ios.patch"])
     call(command, cwd=cwd, shell=True)
 
@@ -170,6 +168,18 @@ def run_task_apply_patch_ios():
     call(command, cwd=cwd, shell=True)
 
     command = " ".join(["patch", "-u", ".gn", "--forward", "-i", "../patchs/gn.patch"])
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "build_overrides/build.gni",
+            "--forward",
+            "-i",
+            "../patchs/build-override.patch",
+        ]
+    )
     call(command, cwd=cwd, shell=True)
 
 
