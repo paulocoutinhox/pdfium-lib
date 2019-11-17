@@ -1,7 +1,7 @@
 os: osx
 osx_image: xcode11.2
 script:
-  - pip3 install -r requirements.txt
+  - pip3 install -r requirements.txt --user
   - python3 make.py run build-depot-tools
   - export PATH=$PATH:$PWD/depot-tools
   - python3 make.py run build-pdfium
