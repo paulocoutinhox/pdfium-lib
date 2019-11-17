@@ -1,0 +1,11 @@
+--- BUILD.gn	2019-11-17 01:46:22.000000000 -0300
++++ ../../../patchs/libjpeg_turbo_modified.gn	2019-11-17 01:46:15.000000000 -0300
+@@ -10,7 +10,7 @@
+   import("//build/config/arm.gni")
+ }
+ 
+-assert(!is_ios, "This is not used on iOS, don't drag it in unintentionally")
++#assert(!is_ios, "This is not used on iOS, don't drag it in unintentionally")
+ 
+ source_set("libjpeg_headers") {
+   sources = [

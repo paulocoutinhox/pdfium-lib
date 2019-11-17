@@ -119,7 +119,7 @@ def run_task_build_pdfium():
 
 
 def run_task_apply_patch_ios():
-    debug("Apply iOS patch...")
+    debug("Apply iOS patchs...")
 
     cwd = "pdfium"
     
@@ -178,6 +178,18 @@ def run_task_apply_patch_ios():
             "--forward",
             "-i",
             "../patchs/build-override.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "third_party/libjpeg_turbo/BUILD.gn",
+            "--forward",
+            "-i",
+            "../patchs/libjpeg-turbo.patch",
         ]
     )
     call(command, cwd=cwd, shell=True)
