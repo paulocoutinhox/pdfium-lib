@@ -39,6 +39,9 @@ or
 7. Install iOS libraries:  
 ```python3 make.py run install-ios```  
 
+8. Check generated file:  
+```file build/ios/release/libpdfium.a```  
+
 
 Obs:
 - The file **make.py** need be executed with python3.  
