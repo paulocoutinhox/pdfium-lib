@@ -36,7 +36,7 @@ from docopt import docopt
 from slugify import slugify
 from tqdm import tqdm
 
-from subprocess import call
+from subprocess import call, check_call
 from shutil import copyfile, copytree
 
 import urllib.request as urllib2
@@ -108,14 +108,14 @@ def run_task_build_pdfium():
             "https://pdfium.googlesource.com/pdfium.git",
         ]
     )
-    call(command, shell=True)
+    check_call(command, shell=True)
 
     command = " ".join(["gclient", "sync"])
-    call(command, shell=True)
+    check_call(command, shell=True)
 
     cwd = "pdfium"
     command = " ".join(["git", "checkout", "96befae824837fbad3f164c602961756c7b0b1db"])
-    call(command, cwd=cwd, shell=True)
+    check_call(command, cwd=cwd, shell=True)
 
 
 def run_task_apply_patch_ios():
@@ -208,7 +208,7 @@ def run_task_build_depot_tools():
             "depot-tools",
         ]
     )
-    call(command, shell=True)
+    check_call(command, shell=True)
 
     debug("Execute on your terminal: export PATH=$PATH:$PWD/depot-tools")
 
@@ -270,7 +270,7 @@ def run_task_install_ios(ios_archs, ios_configurations):
                 ]
             )
 
-            call(command, shell=True)
+            check_call(command, shell=True)
 
         # universal
         folder = os.path.join("build", "ios", config, "*.a")
@@ -279,10 +279,10 @@ def run_task_install_ios(ios_archs, ios_configurations):
         lib_file_out = os.path.join("build", "ios", config, "libpdfium.a")
 
         command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
-        call(command, shell=True)
+        check_call(command, shell=True)
 
         command = " ".join(["file", lib_file_out])
-        call(command, shell=True)
+        check_call(command, shell=True)
 
         # only to test in my machine
         # copyfile(lib_file_out, '/Users/paulo/Downloads/UXReader-iOS/UXReader/UXReader/PDFium/libpdfium.a')
@@ -327,7 +327,7 @@ def run_task_build_ios(ios_archs, ios_configurations):
                 ]
             )
 
-            call(command, shell=True)
+            check_call(command, shell=True)
 
             # compiling...
             debug(
@@ -340,7 +340,7 @@ def run_task_build_ios(ios_archs, ios_configurations):
                 ["ninja", "-C", "out/{0}-{1}".format(config, arch), "pdfium"]
             )
 
-            call(command, shell=True)
+            check_call(command, shell=True)
 
             os.chdir(current_dir)
 
