@@ -49,3 +49,8 @@ Obs:
 - The file **make.py** need be executed with python3.  
 - The steps 1, 2, 3, 4 and 5 you only need make one time.  
 - If you change pdfium source code, execute steps 6 and 7 only.
+
+## Prebuilt binary
+
+You can download a prebuilt copy here:  
+https://www.dropbox.com/s/ilgr4cl4egeb110/libpdfium.a?dl=1

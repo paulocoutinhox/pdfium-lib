@@ -46,7 +46,7 @@ import urllib.parse as urlparse
 def main(options):
     make_debug = False
     make_task = ""
-    ios_archs = ['arm', 'arm64', 'x64']
+    ios_archs = ["arm", "arm64", "x64"]
     ios_configurations = ["release"]  # debug
 
     # show all params for debug
@@ -122,7 +122,7 @@ def run_task_apply_patch_ios():
     debug("Apply iOS patchs...")
 
     cwd = "pdfium"
-    
+
     command = " ".join(["patch", "-p1", "--forward", "<", "../patchs/ios.patch"])
     call(command, cwd=cwd, shell=True)
 
@@ -238,7 +238,7 @@ def run_task_install_ios(ios_archs, ios_configurations):
                 "skia_shared",
                 "*.o",
             )
-            
+
             base_o = os.path.join(
                 "pdfium",
                 "out",
