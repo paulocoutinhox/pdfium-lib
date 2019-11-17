@@ -1,5 +1,7 @@
 # Mobile PDFium
 
+[![Build Status](https://travis-ci.com/prsolucoes/mobile-pdfium.svg?branch=master)](https://travis-ci.com/prsolucoes/mobile-pdfium)
+
 This project compile PDFium to mobile platforms. Current project compiles to:  
 
 - [x] iOS  
