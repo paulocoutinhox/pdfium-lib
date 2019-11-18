@@ -114,7 +114,7 @@ def run_task_build_pdfium():
     check_call(command, shell=True)
 
     cwd = "pdfium"
-    command = " ".join(["git", "checkout", "96befae824837fbad3f164c602961756c7b0b1db"])
+    command = " ".join(["git", "checkout", "f86f81aa33dabb615273492885aa9de76a6ccf68"])
     check_call(command, cwd=cwd, shell=True)
 
 
@@ -315,7 +315,9 @@ def run_task_build_ios(ios_archs, ios_configurations):
 
             # adding symbol_level=0 will squeeze the final result significantly, but it is needed for debug builds.
             args = 'target_os="ios" ios_deployment_target="9.0" target_cpu="{0}" arm_use_neon=false use_goma=false is_debug={1} pdf_use_skia=false pdf_use_skia_paths=false pdf_enable_xfa=false pdf_enable_v8=false pdf_is_standalone=true is_component_build=false clang_use_chrome_plugins=false ios_enable_code_signing=false enable_ios_bitcode=true {2}'.format(
-                arch, arg_is_debug, "symbol_level=0" if arg_is_debug else ""
+                arch,
+                arg_is_debug,
+                "symbol_level=0" if arg_is_debug else ""
             )
 
             command = " ".join(
