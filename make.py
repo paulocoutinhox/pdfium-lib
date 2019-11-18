@@ -284,9 +284,11 @@ def run_task_install_ios(ios_archs, ios_configurations):
         command = " ".join(["file", lib_file_out])
         check_call(command, shell=True)
 
+        debug("File size...")
         command = " ".join(["ls", "-lh ", lib_file_out])
         check_call(command, shell=True)
 
+        debug("Check library symbols...")
         command = " ".join(
             ["nm", "-C ", lib_file_out, "|", "grep", "FPDF_CloseDocument"]
         )
