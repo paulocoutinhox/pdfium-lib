@@ -229,20 +229,6 @@ def run_task_install_ios(ios_archs, ios_configurations):
 
             files = glob.glob(folder, recursive=True)
 
-            # skia_shared and pdfium_base have only a few object files and due to that there is no point in creating their own .a files.
-            # we can link the .o files directly.
-            files.append(
-                os.path.join(
-                    "pdfium",
-                    "out",
-                    "{0}-{1}".format(config, arch),
-                    "obj",
-                    "third_party",
-                    "skia_shared",
-                    "*.o",
-                )
-            )
-
             files.append(
                 os.path.join(
                     "pdfium",
@@ -388,6 +374,19 @@ def run_task_install_ios(ios_archs, ios_configurations):
                     "core",
                     "fxge",
                     "fxge",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fdrm",
+                    "fdrm",
                     "*.o",
                 )
             )
@@ -473,6 +472,18 @@ def run_task_install_ios(ios_archs, ios_configurations):
                     "{0}-{1}".format(config, arch),
                     "obj",
                     "third_party",
+                    "skia_shared",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
                     "pdfium_base",
                     "*.o",
                 )
@@ -498,6 +509,19 @@ def run_task_install_ios(ios_archs, ios_configurations):
                     "obj",
                     "third_party",
                     "fx_libopenjpeg",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
+                    "zlib",
+                    "zlib_x86_simd",
                     "*.o",
                 )
             )
