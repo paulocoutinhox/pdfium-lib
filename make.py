@@ -227,31 +227,280 @@ def run_task_install_ios(ios_archs, ios_configurations):
                 "pdfium", "out", "{0}-{1}".format(config, arch), "obj", "**", "*.a"
             )
 
+            files = glob.glob(folder, recursive=True)
+
             # skia_shared and pdfium_base have only a few object files and due to that there is no point in creating their own .a files.
             # we can link the .o files directly.
-            skia_o = os.path.join(
-                "pdfium",
-                "out",
-                "{0}-{1}".format(config, arch),
-                "obj",
-                "third_party",
-                "skia_shared",
-                "*.o",
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
+                    "skia_shared",
+                    "*.o",
+                )
             )
 
-            base_o = os.path.join(
-                "pdfium",
-                "out",
-                "{0}-{1}".format(config, arch),
-                "obj",
-                "third_party",
-                "pdfium_base",
-                "*.o",
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdftext",
+                    "fpdftext",
+                    "*.o",
+                )
             )
 
-            files = glob.glob(folder, recursive=True)
-            files.append(skia_o)
-            files.append(base_o)
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fxcrt",
+                    "fxcrt",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdfapi",
+                    "page",
+                    "page",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdfapi",
+                    "render",
+                    "render",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdfapi",
+                    "parser",
+                    "parser",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdfapi",
+                    "edit",
+                    "edit",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdfapi",
+                    "cmaps",
+                    "cmaps",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdfapi",
+                    "font",
+                    "font",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fpdfdoc",
+                    "fpdfdoc",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fxcodec",
+                    "fxcodec",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "core",
+                    "fxge",
+                    "fxge",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "fxjs",
+                    "fxjs",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "fpdfsdk",
+                    "pwl",
+                    "pwl",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "fpdfsdk",
+                    "formfiller",
+                    "formfiller",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "fpdfsdk",
+                    "fpdfsdk",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
+                    "fx_freetype",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
+                    "fx_agg",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
+                    "pdfium_base",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
+                    "fx_lcms2",
+                    "*.o",
+                )
+            )
+
+            files.append(
+                os.path.join(
+                    "pdfium",
+                    "out",
+                    "{0}-{1}".format(config, arch),
+                    "obj",
+                    "third_party",
+                    "fx_libopenjpeg",
+                    "*.o",
+                )
+            )
 
             files_str = " ".join(files)
 
