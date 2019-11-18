@@ -284,6 +284,14 @@ def run_task_install_ios(ios_archs, ios_configurations):
         command = " ".join(["file", lib_file_out])
         check_call(command, shell=True)
 
+        command = " ".join(["ls", "-lh ", lib_file_out])
+        check_call(command, shell=True)
+
+        command = " ".join(
+            ["nm", "-C ", lib_file_out, "|", "grep", "FPDF_CloseDocument"]
+        )
+        call(command, shell=True)
+
         # only to test in my machine
         # copyfile(lib_file_out, '/Users/paulo/Downloads/UXReader-iOS/UXReader/UXReader/PDFium/libpdfium.a')
 
@@ -315,9 +323,7 @@ def run_task_build_ios(ios_archs, ios_configurations):
 
             # adding symbol_level=0 will squeeze the final result significantly, but it is needed for debug builds.
             args = 'target_os="ios" ios_deployment_target="9.0" target_cpu="{0}" arm_use_neon=false use_goma=false is_debug={1} pdf_use_skia=false pdf_use_skia_paths=false pdf_enable_xfa=false pdf_enable_v8=false pdf_is_standalone=true is_component_build=false clang_use_chrome_plugins=false ios_enable_code_signing=false enable_ios_bitcode=true {2}'.format(
-                arch,
-                arg_is_debug,
-                "symbol_level=0" if arg_is_debug else ""
+                arch, arg_is_debug, "symbol_level=0" if arg_is_debug else ""
             )
 
             command = " ".join(
