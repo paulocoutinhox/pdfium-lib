@@ -1,14 +1,23 @@
-os: osx
-osx_image: xcode10.3
-script:
-  - pip3 install -r requirements.txt --user
-  - python3 make.py run build-depot-tools
-  - export PATH=$PATH:$PWD/depot-tools
-  - python3 make.py run build-pdfium
-  - python3 make.py run apply-patch-ios
-  - python3 make.py run build-ios
-  - python3 make.py run install-ios
-  - python3 make.py run build-pdfium
-  - python3 make.py run build-macos
-  - python3 make.py run install-macos
-  - python3 make.py run sample
+jobs:
+  include:
+  - os: osx
+    osx_image: xcode10.3
+    script:
+      - pip3 install -r requirements.txt --user
+      - python3 make.py run build-depot-tools
+      - export PATH=$PATH:$PWD/depot-tools
+      - python3 make.py run build-pdfium
+      - python3 make.py run build-macos
+      - python3 make.py run install-macos
+      - python3 make.py run sample
+  - os: osx
+    osx_image: xcode10.3
+    script:
+      - pip3 install -r requirements.txt --user
+      - python3 make.py run build-depot-tools
+      - export PATH=$PATH:$PWD/depot-tools
+      - python3 make.py run build-pdfium
+      - python3 make.py run apply-patch-ios
+      - python3 make.py run build-ios
+      - python3 make.py run install-ios
+      - python3 make.py run build-pdfium

@@ -4,7 +4,7 @@
      "PNG_USE_READ_MACROS",
    ]
  
-+  if (is_ios || is_mac) {
++  if (is_ios) {
 +    defines += [ "MEMORY_TOOL_REPLACES_ALLOCATOR" ]
 +  }
 +

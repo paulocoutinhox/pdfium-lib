@@ -54,7 +54,7 @@ def main(options):
     make_debug = False
     make_task = ""
 
-    target_configurations = ["release"]  # debug
+    target_configurations = ["release"]  # release and/or debug
 
     targets_macos = [{"target_os": "mac", "target_cpu": "x64"}]
 
@@ -303,10 +303,17 @@ def run_task_build(targets, target_configurations):
             args.append("clang_use_chrome_plugins=false")
 
             if target["target_os"] == "ios":
-                args.append("arm_use_neon=false")
-                args.append("ios_enable_code_signing=false")
-                args.append("enable_ios_bitcode=true")
                 args.append('ios_deployment_target="9.0"')
+                args.append("ios_enable_code_signing=false")
+
+                if target["target_cpu"] == "x64":
+                    args.append("arm_use_neon=true")
+                elif target["target_cpu"] == "arm":
+                    args.append("arm_use_neon=false")
+                    args.append("enable_ios_bitcode=true")
+                elif target["target_cpu"] == "arm64":
+                    args.append("arm_use_neon=true")
+                    args.append("enable_ios_bitcode=true")
 
             if config == "release":
                 args.append("symbol_level=0")
