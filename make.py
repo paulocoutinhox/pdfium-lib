@@ -363,6 +363,8 @@ def run_task_install_ios(targets, target_configurations):
 
             files_str = " ".join(files)
 
+            print(files_str)
+
             lib_file_out = os.path.join(
                 "build", "ios", config, "libpdfium_{0}.a".format(target["target_cpu"])
             )
