@@ -71,4 +71,4 @@ Obs:
 ## Prebuilt binary
 
 You can download a prebuilt copy here:  
-https://www.dropbox.com/s/ilgr4cl4egeb110/libpdfium.a?dl=1
+https://www.dropbox.com/s/iuekzx24q99mr7t/libpdfium-2019-11-19.a?dl=1
