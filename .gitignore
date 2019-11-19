@@ -1,5 +1,6 @@
 # Build
 /build
+/sample/build
 
 # System
 .DS_Store

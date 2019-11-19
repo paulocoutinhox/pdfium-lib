@@ -1,0 +1,11 @@
+--- BUILD.gn	2019-11-18 22:56:11.000000000 -0300
++++ ../../../patchs/build_fxge_modified.gn	2019-11-18 22:55:39.000000000 -0300
+@@ -166,7 +166,7 @@
+     sources += [ "fx_ge_linux.cpp" ]
+   }
+ 
+-  if (is_mac) {
++  if (is_mac || is_ios) {
+     sources += [
+       "apple/apple_int.h",
+       "apple/fx_apple_platform.cpp",
