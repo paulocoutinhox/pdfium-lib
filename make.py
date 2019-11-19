@@ -37,6 +37,7 @@ import stat
 import sys
 import tarfile
 import glob
+import pwd
 
 from docopt import docopt
 from slugify import slugify
@@ -58,7 +59,6 @@ def main(options):
     targets_macos = [{"target_os": "mac", "target_cpu": "x64"}]
 
     targets_ios = [
-        {"target_os": "mac", "target_cpu": "x64"},
         {"target_os": "ios", "target_cpu": "arm"},
         {"target_os": "ios", "target_cpu": "arm64"},
         {"target_os": "ios", "target_cpu": "x64"},
