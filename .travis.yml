@@ -8,6 +8,7 @@ script:
   - python3 make.py run apply-patch-ios
   - python3 make.py run build-ios
   - python3 make.py run install-ios
+  - python3 make.py run build-pdfium
   - python3 make.py run build-macos
   - python3 make.py run install-macos
   - python3 make.py run sample
