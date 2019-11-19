@@ -443,6 +443,16 @@ def run_task_install_macos(targets, target_configurations):
 
             check_call(command, shell=True)
 
+        # universal
+        folder = os.path.join("build", "macos", config, "*.a")
+        files = glob.glob(folder)
+        files_str = " ".join(files)
+        lib_file_out = os.path.join("build", "macos", config, "libpdfium.a")
+
+        debug("Merging libraries (lipo)...")
+        command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
+        check_call(command, shell=True)
+
         debug("File data...")
         command = " ".join(["file", lib_file_out])
         check_call(command, shell=True)

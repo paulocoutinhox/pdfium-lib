@@ -13,7 +13,7 @@ This project compile PDFium to mobile platforms. Current project compiles to:
 2. python3  
 3. pip (generally called pip3 for python3)  
 
-## How to compile 
+## How to compile (general)
 
 1. Get the source:  
 ```git clone https://github.com/prsolucoes/mobile-pdfium.git```  
@@ -32,18 +32,36 @@ or
 
 5. Apply patchs:
 
-    For iOS:  
-    ```python3 make.py run apply-patch-ios```  
+```python3 make.py run apply-patch-ios```  
 
-6. Compile for iOS:  
+## How to compile for iOS
+
+1. Execute all **general** steps
+
+2. Compile:  
 ```python3 make.py run build-ios```  
   
-7. Install iOS libraries:  
+3. Install libraries:  
 ```python3 make.py run install-ios```  
 
-8. Check generated file:  
+4. Check generated file:  
 ```file build/ios/release/libpdfium.a```  
 
+## How to compile for macOS
+
+1. Execute all **general** steps
+
+2. Compile:  
+```python3 make.py run build-macos```  
+  
+3. Install libraries:  
+```python3 make.py run install-macos```  
+
+4. Check generated file:  
+```file build/macos/release/libpdfium.a```  
+
+4. Run sample (optional):  
+```python3 make.py run sample```  
 
 Obs:
 - The file **make.py** need be executed with python3.  
