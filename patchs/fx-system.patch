@@ -1,0 +1,12 @@
+--- fx_system.h	2019-11-19 17:43:19.000000000 -0300
++++ ../../../patchs/fx_system_modified.h	2019-11-19 17:44:19.000000000 -0300
+@@ -48,7 +48,8 @@
+ #endif  // _FX_PLATFORM_ == _FX_PLATFORM_WINDOWS_
+ 
+ #if _FX_PLATFORM_ == _FX_PLATFORM_APPLE_
+-#include <Carbon/Carbon.h>
++#include <CoreGraphics/CoreGraphics.h>
++#include <CoreFoundation/CFString.h>
+ #include <libkern/OSAtomic.h>
+ #endif  // _FX_PLATFORM_ == _FX_PLATFORM_APPLE_
+ 

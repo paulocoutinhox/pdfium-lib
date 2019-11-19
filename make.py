@@ -147,7 +147,7 @@ def run_task_build_pdfium():
     check_call(command, shell=True)
 
     cwd = "pdfium"
-    command = " ".join(["git", "checkout", "f86f81aa33dabb615273492885aa9de76a6ccf68"])
+    command = " ".join(["git", "checkout", "7740980a8de4915c8c8e55966647b01ced4c39ef"])
     check_call(command, cwd=cwd, shell=True)
 
 
@@ -156,7 +156,16 @@ def run_task_apply_patch_ios():
 
     cwd = "pdfium"
 
-    command = " ".join(["patch", "-p1", "--forward", "<", "../patchs/ios.patch"])
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "build/mac/find_sdk.py",
+            "--forward",
+            "-i",
+            "../patchs/find-sdk.patch",
+        ]
+    )
     call(command, cwd=cwd, shell=True)
 
     command = " ".join(
@@ -167,18 +176,6 @@ def run_task_apply_patch_ios():
             "--forward",
             "-i",
             "../patchs/sdk-info.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/mac/find_sdk.py",
-            "--forward",
-            "-i",
-            "../patchs/find-sdk.patch",
         ]
     )
     call(command, cwd=cwd, shell=True)
@@ -235,6 +232,30 @@ def run_task_apply_patch_ios():
             "--forward",
             "-i",
             "../patchs/build-fxge.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fxcrt/fx_system.h",
+            "--forward",
+            "-i",
+            "../patchs/fx-system.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fxge/apple/apple_int.h",
+            "--forward",
+            "-i",
+            "../patchs/apple-int.patch",
         ]
     )
     call(command, cwd=cwd, shell=True)

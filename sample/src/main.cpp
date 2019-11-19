@@ -4,6 +4,8 @@
 
 int main(int argc, char **argv)
 {
+    std::cout << "Opening PDF..." << std::endl;
+
     FPDF_LIBRARY_CONFIG config;
     config.version = 2;
     config.m_pUserFontPaths = nullptr;
@@ -53,8 +55,8 @@ int main(int argc, char **argv)
     }
 
     int pageCount = FPDF_GetPageCount(doc);
-    fprintf(stderr, "Total of pages: %d", pageCount);
-
+    std::cout << "Total of pages: " << pageCount << std::endl;
+    
     FPDF_CloseDocument(doc);
 
     FPDF_DestroyLibrary();
