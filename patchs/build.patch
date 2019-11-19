@@ -1,6 +1,14 @@
---- BUILD.gn	2019-11-16 16:19:09.000000000 -0300
-+++ ../patchs/BUILD_modified.gn	2019-11-16 16:18:41.000000000 -0300
-@@ -225,58 +225,6 @@
+--- BUILD.gn	2019-11-19 00:06:56.000000000 -0300
++++ ../patchs/BUILD_modified.gn	2019-11-19 00:07:17.000000000 -0300
+@@ -21,6 +21,7 @@
+   defines = [
+     "PNG_PREFIX",
+     "PNG_USE_READ_MACROS",
++    "MEMORY_TOOL_REPLACES_ALLOCATOR",
+   ]
+ 
+   if (!use_system_libopenjpeg2) {
+@@ -225,58 +226,6 @@
    ]
  }
  
@@ -59,7 +67,7 @@
  group("pdfium_embeddertest_deps") {
    testonly = true
    public_deps = [
-@@ -296,51 +244,6 @@
+@@ -296,51 +245,6 @@
    ]
  }
  
@@ -111,7 +119,7 @@
  executable("pdfium_diff") {
    testonly = true
    sources = [
-@@ -377,8 +280,6 @@
+@@ -377,8 +281,6 @@
    testonly = true
    deps = [
      ":pdfium_diff",

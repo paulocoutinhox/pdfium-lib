@@ -298,7 +298,7 @@ def run_task_build(targets, target_configurations):
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
-            args.append("pdf_is_standalone=true")
+            args.append("pdf_is_standalone=false")
             args.append("is_component_build=false")
             args.append("clang_use_chrome_plugins=false")
 
@@ -308,7 +308,7 @@ def run_task_build(targets, target_configurations):
                 args.append("enable_ios_bitcode=true")
                 args.append('ios_deployment_target="9.0"')
 
-            if config == "debug":
+            if config == "release":
                 args.append("symbol_level=0")
 
             args_str = " ".join(args)

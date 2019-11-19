@@ -21,6 +21,7 @@ config("pdfium_common_config") {
   defines = [
     "PNG_PREFIX",
     "PNG_USE_READ_MACROS",
+    "MEMORY_TOOL_REPLACES_ALLOCATOR",
   ]
 
   if (!use_system_libopenjpeg2) {
