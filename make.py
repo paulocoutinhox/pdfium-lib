@@ -25,6 +25,7 @@ Tasks:
   - build-ios
   - install-ios
   
+  - apply-patch-macos
   - build-macos
   - install-macos
 
@@ -108,6 +109,10 @@ def main(options):
             targets=targets_ios, target_configurations=target_configurations
         )
 
+    # apply patch macos
+    elif make_task == "apply-patch-macos":
+        run_task_apply_patch_macos()
+
     # build macos
     elif make_task == "build-macos":
         run_task_build(
@@ -147,7 +152,7 @@ def run_task_build_pdfium():
     check_call(command, shell=True)
 
     cwd = "pdfium"
-    command = " ".join(["git", "checkout", "7740980a8de4915c8c8e55966647b01ced4c39ef"])
+    command = " ".join(["git", "checkout", "bcdac2a1318b898813da55a488e49f2a9e38ad21"])
     check_call(command, cwd=cwd, shell=True)
 
 
@@ -256,6 +261,48 @@ def run_task_apply_patch_ios():
             "--forward",
             "-i",
             "../patchs/apple-int.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+
+def run_task_apply_patch_macos():
+    debug("Apply macos patchs...")
+
+    cwd = "pdfium"
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "build/mac/find_sdk.py",
+            "--forward",
+            "-i",
+            "../patchs/find-sdk.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "build/config/mac/sdk_info.py",
+            "--forward",
+            "-i",
+            "../patchs/sdk-info.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "build/toolchain/mac/filter_libtool.py",
+            "--forward",
+            "-i",
+            "../patchs/filter-libtool.patch",
         ]
     )
     call(command, cwd=cwd, shell=True)
