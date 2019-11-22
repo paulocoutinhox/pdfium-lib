@@ -34,8 +34,7 @@ or
 
 1. Execute all **general** steps
 
-2. Apply patchs:
-
+2. Apply patchs:  
 ```python3 make.py run apply-patch-ios```  
 
 3. Compile:  
@@ -51,16 +50,19 @@ or
 
 1. Execute all **general** steps
 
-2. Compile:  
+2. Apply patchs:  
+```python3 make.py run apply-patch-macos```  
+
+3. Compile:  
 ```python3 make.py run build-macos```  
   
-3. Install libraries:  
+4. Install libraries:  
 ```python3 make.py run install-macos```  
 
-4. Check generated file:  
+5. Check generated file:  
 ```file build/macos/release/libpdfium.a```  
 
-4. Run sample (optional):  
+6. Run sample (optional):  
 ```python3 make.py run sample```  
 
 Obs:
