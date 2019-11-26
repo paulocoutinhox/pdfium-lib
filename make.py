@@ -289,6 +289,18 @@ def run_task_apply_patch_ios():
     )
     call(command, cwd=cwd, shell=True)
 
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fxge/cfx_fontmapper.cpp",
+            "--forward",
+            "-i",
+            "../patchs/font-mapper.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
 
 def run_task_apply_patch_macos():
     debug("Apply macos patchs...")
@@ -351,6 +363,18 @@ def run_task_apply_patch_macos():
             "--forward",
             "-i",
             "../patchs/stream-parser.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fxge/cfx_fontmapper.cpp",
+            "--forward",
+            "-i",
+            "../patchs/font-mapper.patch",
         ]
     )
     call(command, cwd=cwd, shell=True)
