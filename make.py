@@ -152,7 +152,7 @@ def run_task_build_pdfium():
     check_call(command, shell=True)
 
     cwd = "pdfium"
-    command = " ".join(["git", "checkout", "bcdac2a1318b898813da55a488e49f2a9e38ad21"])
+    command = " ".join(["git", "checkout", "e87972e30da4cb87f0620baf32cea698f43dd093"])
     check_call(command, cwd=cwd, shell=True)
 
 
@@ -265,6 +265,30 @@ def run_task_apply_patch_ios():
     )
     call(command, cwd=cwd, shell=True)
 
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fpdfapi/parser/cpdf_syntax_parser.cpp",
+            "--forward",
+            "-i",
+            "../patchs/syntax-parser.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fpdfapi/page/cpdf_streamparser.cpp",
+            "--forward",
+            "-i",
+            "../patchs/stream-parser.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
 
 def run_task_apply_patch_macos():
     debug("Apply macos patchs...")
@@ -303,6 +327,30 @@ def run_task_apply_patch_macos():
             "--forward",
             "-i",
             "../patchs/filter-libtool.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fpdfapi/parser/cpdf_syntax_parser.cpp",
+            "--forward",
+            "-i",
+            "../patchs/syntax-parser.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "core/fpdfapi/page/cpdf_streamparser.cpp",
+            "--forward",
+            "-i",
+            "../patchs/stream-parser.patch",
         ]
     )
     call(command, cwd=cwd, shell=True)

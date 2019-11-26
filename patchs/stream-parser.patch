@@ -1,0 +1,110 @@
+diff --git a/cpdf_streamparser.cpp b/../../../../patchs/cpdf_streamparser_modified.cpp
+index 6b486ebea..55dea217b 100644
+--- a/cpdf_streamparser.cpp
++++ b/../../../../patchs/cpdf_streamparser_modified.cpp
+@@ -12,6 +12,7 @@
+ #include <memory>
+ #include <sstream>
+ #include <utility>
++#include <vector>
+ 
+ #include "constants/stream_dict_common.h"
+ #include "core/fpdfapi/page/cpdf_docpagedata.h"
+@@ -454,7 +455,7 @@ ByteString CPDF_StreamParser::ReadString() {
+     return ByteString();
+ 
+   uint8_t ch = m_pBuf[m_Pos++];
+-  std::ostringstream buf;
++  std::vector<char> buf;
+   int parlevel = 0;
+   int status = 0;
+   int iEscCode = 0;
+@@ -463,22 +464,20 @@ ByteString CPDF_StreamParser::ReadString() {
+       case 0:
+         if (ch == ')') {
+           if (parlevel == 0) {
+-            if (buf.tellp() <= 0)
++            if (buf.size() <= 0)
+               return ByteString();
+ 
+-            return ByteString(
+-                buf.str().c_str(),
+-                std::min(static_cast<size_t>(buf.tellp()), kMaxStringLength));
++            return ByteString(buf.data());
+           }
+           parlevel--;
+-          buf << ')';
++          buf.push_back(')');
+         } else if (ch == '(') {
+           parlevel++;
+-          buf << '(';
++          buf.push_back('(');
+         } else if (ch == '\\') {
+           status = 1;
+         } else {
+-          buf << static_cast<char>(ch);
++          buf.push_back(static_cast<char>(ch));
+         }
+         break;
+       case 1:
+@@ -494,17 +493,17 @@ ByteString CPDF_StreamParser::ReadString() {
+         if (ch == '\n') {
+           // Do nothing.
+         } else if (ch == 'n') {
+-          buf << '\n';
++          buf.push_back('\n');
+         } else if (ch == 'r') {
+-          buf << '\r';
++          buf.push_back('\r');
+         } else if (ch == 't') {
+-          buf << '\t';
++          buf.push_back('\t');
+         } else if (ch == 'b') {
+-          buf << '\b';
++          buf.push_back('\b');
+         } else if (ch == 'f') {
+-          buf << '\f';
++          buf.push_back('\f');
+         } else {
+-          buf << static_cast<char>(ch);
++          buf.push_back(static_cast<char>(ch));
+         }
+         status = 0;
+         break;
+@@ -514,7 +513,7 @@ ByteString CPDF_StreamParser::ReadString() {
+               iEscCode * 8 + FXSYS_DecimalCharToInt(static_cast<char>(ch));
+           status = 3;
+         } else {
+-          buf << static_cast<char>(iEscCode);
++          buf.push_back(static_cast<char>(iEscCode));
+           status = 0;
+           continue;
+         }
+@@ -523,10 +522,10 @@ ByteString CPDF_StreamParser::ReadString() {
+         if (FXSYS_IsOctalDigit(ch)) {
+           iEscCode =
+               iEscCode * 8 + FXSYS_DecimalCharToInt(static_cast<char>(ch));
+-          buf << static_cast<char>(iEscCode);
++          buf.push_back(static_cast<char>(iEscCode));
+           status = 0;
+         } else {
+-          buf << static_cast<char>(iEscCode);
++          buf.push_back(static_cast<char>(iEscCode));
+           status = 0;
+           continue;
+         }
+@@ -545,12 +544,10 @@ ByteString CPDF_StreamParser::ReadString() {
+   if (PositionIsInBounds())
+     ++m_Pos;
+ 
+-  if (buf.tellp() <= 0)
++  if (buf.size() <= 0)
+     return ByteString();
+ 
+-  return ByteString(
+-      buf.str().c_str(),
+-      std::min(static_cast<size_t>(buf.tellp()), kMaxStringLength));
++  return ByteString(buf.data());
+ }
+ 
+ ByteString CPDF_StreamParser::ReadHexString() {
