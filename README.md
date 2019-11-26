@@ -4,8 +4,10 @@
 
 This project compile PDFium to mobile platforms. Current project compiles to:  
 
-- [x] iOS  
-- [ ] Android  
+- [x] iOS device
+- [x] iOS simulator
+- [x] macOS
+- [ ] Android
 
 ## Requirements
 
@@ -30,6 +32,11 @@ or
 4. Get PDFium:  
 ```python3 make.py run build-pdfium```  
 
+Obs:
+- The file **make.py** need be executed with python3.  
+- These steps you only need make one time.  
+- If you change **pdfium** git commit revision on file **make.py** only execute step 4.
+
 ## How to compile for iOS
 
 1. Execute all **general** steps
@@ -45,6 +52,9 @@ or
 
 5. Check generated file:  
 ```file build/ios/release/libpdfium.a```  
+
+Obs:
+- The file **make.py** need be executed with python3.  
 
 ## How to compile for macOS
 
@@ -67,8 +77,6 @@ or
 
 Obs:
 - The file **make.py** need be executed with python3.  
-- The steps 1, 2, 3, 4 and 5 you only need make one time.  
-- If you change pdfium source code, execute steps 6 and 7 only.
 
 ## Prebuilt binary
 
