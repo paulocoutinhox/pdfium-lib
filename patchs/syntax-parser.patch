@@ -1,8 +1,6 @@
-diff --git a/cpdf_syntax_parser.cpp b/../../../../patchs/cpdf_syntax_parser_modified.cpp
-index f21b5e52b..836c5f2f7 100644
---- a/cpdf_syntax_parser.cpp
-+++ b/../../../../patchs/cpdf_syntax_parser_modified.cpp
-@@ -236,7 +236,8 @@ ByteString CPDF_SyntaxParser::ReadString() {
+--- cpdf_syntax_parser.cpp	2019-11-26 07:53:23.000000000 -0800
++++ ../../../../patchs/cpdf_syntax_parser_modified.cpp	2019-11-26 07:52:10.000000000 -0800
+@@ -236,7 +236,8 @@
    if (!GetNextChar(ch))
      return ByteString();
  
@@ -12,7 +10,7 @@ index f21b5e52b..836c5f2f7 100644
    int32_t parlevel = 0;
    ReadStatus status = ReadStatus::Normal;
    int32_t iEscCode = 0;
-@@ -245,7 +246,7 @@ ByteString CPDF_SyntaxParser::ReadString() {
+@@ -245,7 +246,7 @@
        case ReadStatus::Normal:
          if (ch == ')') {
            if (parlevel == 0)
@@ -21,7 +19,7 @@ index f21b5e52b..836c5f2f7 100644
            parlevel--;
          } else if (ch == '(') {
            parlevel++;
-@@ -253,7 +254,7 @@ ByteString CPDF_SyntaxParser::ReadString() {
+@@ -253,7 +254,7 @@
          if (ch == '\\')
            status = ReadStatus::Backslash;
          else
@@ -30,7 +28,7 @@ index f21b5e52b..836c5f2f7 100644
          break;
        case ReadStatus::Backslash:
          if (FXSYS_IsOctalDigit(ch)) {
-@@ -267,17 +268,17 @@ ByteString CPDF_SyntaxParser::ReadString() {
+@@ -267,17 +268,17 @@
            break;
          }
          if (ch == 'n') {
@@ -54,7 +52,7 @@ index f21b5e52b..836c5f2f7 100644
          }
          status = ReadStatus::Normal;
          break;
-@@ -287,7 +288,7 @@ ByteString CPDF_SyntaxParser::ReadString() {
+@@ -287,7 +288,7 @@
                iEscCode * 8 + FXSYS_DecimalCharToInt(static_cast<wchar_t>(ch));
            status = ReadStatus::FinishOctal;
          } else {
@@ -63,7 +61,7 @@ index f21b5e52b..836c5f2f7 100644
            status = ReadStatus::Normal;
            continue;
          }
-@@ -297,9 +298,9 @@ ByteString CPDF_SyntaxParser::ReadString() {
+@@ -297,9 +298,9 @@
          if (FXSYS_IsOctalDigit(ch)) {
            iEscCode =
                iEscCode * 8 + FXSYS_DecimalCharToInt(static_cast<wchar_t>(ch));
@@ -75,7 +73,7 @@ index f21b5e52b..836c5f2f7 100644
            continue;
          }
          break;
-@@ -315,7 +316,7 @@ ByteString CPDF_SyntaxParser::ReadString() {
+@@ -315,7 +316,7 @@
    }
  
    GetNextChar(ch);
@@ -84,3 +82,33 @@ index f21b5e52b..836c5f2f7 100644
  }
  
  ByteString CPDF_SyntaxParser::ReadHexString() {
+@@ -323,7 +324,7 @@
+   if (!GetNextChar(ch))
+     return ByteString();
+ 
+-  std::ostringstream buf;
++  std::vector<char> buf;
+   bool bFirst = true;
+   uint8_t code = 0;
+   while (1) {
+@@ -336,7 +337,7 @@
+         code = val * 16;
+       } else {
+         code += val;
+-        buf << static_cast<char>(code);
++        buf.push_back(static_cast<char>(code));
+       }
+       bFirst = !bFirst;
+     }
+@@ -345,9 +346,9 @@
+       break;
+   }
+   if (!bFirst)
+-    buf << static_cast<char>(code);
++    buf.push_back(static_cast<char>(code));
+ 
+-  return ByteString(buf);
++  return ByteString(buf.data());
+ }
+ 
+ void CPDF_SyntaxParser::ToNextLine() {

@@ -38,7 +38,6 @@
 namespace {
 
 const uint32_t kMaxNestedParsingLevel = 512;
-const size_t kMaxStringLength = 32767;
 
 const char kTrue[] = "true";
 const char kFalse[] = "false";
