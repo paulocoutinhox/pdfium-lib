@@ -554,7 +554,7 @@ ByteString CPDF_StreamParser::ReadHexString() {
   if (!PositionIsInBounds())
     return ByteString();
 
-  std::ostringstream buf;
+  std::vector<char> buf;
   bool bFirst = true;
   int code = 0;
   while (PositionIsInBounds()) {
@@ -571,19 +571,17 @@ ByteString CPDF_StreamParser::ReadHexString() {
       code = val * 16;
     } else {
       code += val;
-      buf << static_cast<uint8_t>(code);
+      buf.push_back(static_cast<uint8_t>(code));
     }
     bFirst = !bFirst;
   }
   if (!bFirst)
-    buf << static_cast<char>(code);
+    buf.push_back(static_cast<char>(code));
 
-  if (buf.tellp() <= 0)
+  if (buf.size() <= 0)
     return ByteString();
 
-  return ByteString(
-      buf.str().c_str(),
-      std::min(static_cast<size_t>(buf.tellp()), kMaxStringLength));
+  return ByteString(buf.data());
 }
 
 bool CPDF_StreamParser::PositionIsInBounds() const {

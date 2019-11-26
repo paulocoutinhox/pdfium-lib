@@ -55,13 +55,13 @@ def main(options):
     make_debug = False
     make_task = ""
 
-    target_configurations = ["release"]  # release and/or debug
+    target_configurations = ["debug"]  # release and/or debug
 
     targets_macos = [{"target_os": "mac", "target_cpu": "x64"}]
 
     targets_ios = [
-        {"target_os": "ios", "target_cpu": "arm"},
-        {"target_os": "ios", "target_cpu": "arm64"},
+        #{"target_os": "ios", "target_cpu": "arm"},
+        #{"target_os": "ios", "target_cpu": "arm64"},
         {"target_os": "ios", "target_cpu": "x64"},
     ]
 

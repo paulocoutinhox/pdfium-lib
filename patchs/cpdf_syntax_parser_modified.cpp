@@ -324,7 +324,7 @@ ByteString CPDF_SyntaxParser::ReadHexString() {
   if (!GetNextChar(ch))
     return ByteString();
 
-  std::ostringstream buf;
+  std::vector<char> buf;
   bool bFirst = true;
   uint8_t code = 0;
   while (1) {
@@ -337,7 +337,7 @@ ByteString CPDF_SyntaxParser::ReadHexString() {
         code = val * 16;
       } else {
         code += val;
-        buf << static_cast<char>(code);
+        buf.push_back(static_cast<char>(code));
       }
       bFirst = !bFirst;
     }
@@ -346,9 +346,9 @@ ByteString CPDF_SyntaxParser::ReadHexString() {
       break;
   }
   if (!bFirst)
-    buf << static_cast<char>(code);
+    buf.push_back(static_cast<char>(code));
 
-  return ByteString(buf);
+  return ByteString(buf.data());
 }
 
 void CPDF_SyntaxParser::ToNextLine() {
