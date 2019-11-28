@@ -368,10 +368,10 @@ def run_task_build(targets, target_configurations):
             args.append("pdf_enable_v8=false")
             args.append("pdf_is_standalone=false")
             args.append("is_component_build=false")
-            args.append("clang_use_chrome_plugins=false")
-            args.append("use_xcode_clang=true")
+            args.append("clang_use_chrome_plugins=false")            
 
             if target["target_os"] == "ios":
+                args.append("use_xcode_clang=true")
                 args.append('ios_deployment_target="9.0"')
                 args.append("ios_enable_code_signing=false")
 
