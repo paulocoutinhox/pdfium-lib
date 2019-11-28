@@ -265,42 +265,6 @@ def run_task_apply_patch_ios():
     )
     call(command, cwd=cwd, shell=True)
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fpdfapi/parser/cpdf_syntax_parser.cpp",
-            "--forward",
-            "-i",
-            "../patchs/syntax-parser.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fpdfapi/page/cpdf_streamparser.cpp",
-            "--forward",
-            "-i",
-            "../patchs/stream-parser.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fxge/cfx_fontmapper.cpp",
-            "--forward",
-            "-i",
-            "../patchs/font-mapper.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
 
 def run_task_apply_patch_macos():
     debug("Apply macos patchs...")
@@ -339,42 +303,6 @@ def run_task_apply_patch_macos():
             "--forward",
             "-i",
             "../patchs/filter-libtool.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fpdfapi/parser/cpdf_syntax_parser.cpp",
-            "--forward",
-            "-i",
-            "../patchs/syntax-parser.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fpdfapi/page/cpdf_streamparser.cpp",
-            "--forward",
-            "-i",
-            "../patchs/stream-parser.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fxge/cfx_fontmapper.cpp",
-            "--forward",
-            "-i",
-            "../patchs/font-mapper.patch",
         ]
     )
     call(command, cwd=cwd, shell=True)
@@ -441,6 +369,7 @@ def run_task_build(targets, target_configurations):
             args.append("pdf_is_standalone=false")
             args.append("is_component_build=false")
             args.append("clang_use_chrome_plugins=false")
+            args.append("use_xcode_clang=true")
 
             if target["target_os"] == "ios":
                 args.append('ios_deployment_target="9.0"')
@@ -488,6 +417,7 @@ def run_task_build(targets, target_configurations):
                         config, target["target_os"], target["target_cpu"]
                     ),
                     "pdfium",
+                    "-v",
                 ]
             )
 
