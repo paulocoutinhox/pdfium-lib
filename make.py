@@ -152,7 +152,7 @@ def run_task_build_pdfium():
     check_call(command, shell=True)
 
     cwd = "pdfium"
-    command = " ".join(["git", "checkout", "e87972e30da4cb87f0620baf32cea698f43dd093"])
+    command = " ".join(["git", "checkout", "a919e1bd9dd0ed0f8fa7534dfe6659c511fe7a1c"])
     check_call(command, cwd=cwd, shell=True)
 
 
