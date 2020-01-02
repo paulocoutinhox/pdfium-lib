@@ -82,3 +82,7 @@ Obs:
 
 You can download a prebuilt copy here:  
 https://www.dropbox.com/s/mp44ymlxza1gaga/libpdfium-2019-11-28.a?dl=1
+
+## How to include files and extend pdfium
+
+Check tutorial here: [How to include files](HOW_TO_INCLUDE_FILES.md)
