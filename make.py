@@ -307,6 +307,18 @@ def run_task_apply_patch_macos():
     )
     call(command, cwd=cwd, shell=True)
 
+    command = " ".join(
+        [
+            "patch",
+            "-u",
+            "build/toolchain/toolchain.gni",
+            "--forward",
+            "-i",
+            "../patchs/toolchain.patch",
+        ]
+    )
+    call(command, cwd=cwd, shell=True)
+
 
 def run_task_build_depot_tools():
     debug("Building Depot Tools...")
@@ -371,9 +383,9 @@ def run_task_build(targets, target_configurations):
             args.append("clang_use_chrome_plugins=false")            
 
             if target["target_os"] == "ios":
-                args.append("use_xcode_clang=true")
                 args.append('ios_deployment_target="9.0"')
                 args.append("ios_enable_code_signing=false")
+                args.append("use_xcode_clang=true")
 
                 if target["target_cpu"] == "x64":
                     args.append("arm_use_neon=true")
@@ -383,6 +395,8 @@ def run_task_build(targets, target_configurations):
                 elif target["target_cpu"] == "arm64":
                     args.append("arm_use_neon=true")
                     args.append("enable_ios_bitcode=true")
+            elif target["target_os"] == "mac":
+                args.append("use_xcode_clang=true")
 
             if config == "release":
                 args.append("symbol_level=0")
