@@ -8,6 +8,7 @@ jobs:
       - export PATH=$PATH:$PWD/depot-tools
       - python3 make.py run build-pdfium
       - python3 make.py run apply-patch-macos
+      - export FORCE_MAC_SDK_MIN=10.15            
       - python3 make.py run build-macos
       - python3 make.py run install-macos
       - python3 make.py run sample
@@ -19,5 +20,6 @@ jobs:
       - export PATH=$PATH:$PWD/depot-tools
       - python3 make.py run build-pdfium
       - python3 make.py run apply-patch-ios
+      - export FORCE_MAC_SDK_MIN=10.15            
       - python3 make.py run build-ios
       - python3 make.py run install-ios
