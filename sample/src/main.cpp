@@ -20,35 +20,37 @@ int main(int argc, char **argv)
     if (!doc)
     {
         unsigned long err = FPDF_GetLastError();
-        fprintf(stderr, "Load pdf docs unsuccessful: ");
+        std::cout << "Load pdf docs unsuccessful: ";
+
         switch (err)
         {
         case FPDF_ERR_SUCCESS:
-            fprintf(stderr, "Success");
+            std::cout << "Success" << std::endl;
             break;
         case FPDF_ERR_UNKNOWN:
-            fprintf(stderr, "Unknown error");
+            std::cout << "Unknown error" << std::endl;
             break;
         case FPDF_ERR_FILE:
-            fprintf(stderr, "File not found or could not be opened");
+            std::cout << "File not found or could not be opened" << std::endl;
             break;
         case FPDF_ERR_FORMAT:
-            fprintf(stderr, "File not in PDF format or corrupted");
+            std::cout << "File not in PDF format or corrupted" << std::endl;
             break;
         case FPDF_ERR_PASSWORD:
-            fprintf(stderr, "Password required or incorrect password");
+            std::cout << "Password required or incorrect password" << std::endl;
             break;
         case FPDF_ERR_SECURITY:
-            fprintf(stderr, "Unsupported security scheme");
+            std::cout << "Unsupported security scheme" << std::endl;
             break;
         case FPDF_ERR_PAGE:
-            fprintf(stderr, "Page not found or content error");
+            std::cout << "Page not found or content error" << std::endl;
             break;
         default:
-            fprintf(stderr, "Unknown error %ld", err);
+            std::cout << "Unknown error " << err << std::endl;
         }
 
-        fprintf(stderr, ".\n");
+        std::cout << std::endl;
+
         FPDF_DestroyLibrary();
 
         return EXIT_FAILURE;
@@ -56,7 +58,7 @@ int main(int argc, char **argv)
 
     int pageCount = FPDF_GetPageCount(doc);
     std::cout << "Total of pages: " << pageCount << std::endl;
-    
+
     FPDF_CloseDocument(doc);
 
     FPDF_DestroyLibrary();
