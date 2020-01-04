@@ -582,7 +582,7 @@ def run_task_sample():
 
     # copy assets
     copyfile(
-        os.path.join(sample_dir, "assets", "f2.pdf"), os.path.join(build_dir, "f1.pdf")
+        os.path.join(sample_dir, "assets", "f1.pdf"), os.path.join(build_dir, "f1.pdf")
     )
 
     # run
