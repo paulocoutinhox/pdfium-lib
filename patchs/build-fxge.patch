@@ -1,6 +1,8 @@
---- BUILD.gn	2019-11-18 22:56:11.000000000 -0300
-+++ ../../../patchs/build_fxge_modified.gn	2019-11-18 22:55:39.000000000 -0300
-@@ -166,7 +166,7 @@
+diff --git a/BUILD.gn b/../../../patchs/build_fxge_modified.gn
+index ebfe8abe3..bc35cfd39 100644
+--- a/BUILD.gn
++++ b/../../../patchs/build_fxge_modified.gn
+@@ -164,7 +164,7 @@ source_set("fxge") {
      sources += [ "fx_ge_linux.cpp" ]
    }
  

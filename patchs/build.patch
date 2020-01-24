@@ -1,6 +1,8 @@
---- BUILD.gn	2019-11-19 00:53:05.000000000 -0300
-+++ ../patchs/BUILD_modified.gn	2019-11-19 00:52:55.000000000 -0300
-@@ -23,6 +23,10 @@
+diff --git a/BUILD.gn b/../patchs/build_modified.gn
+index 38739d110..9af0aca61 100644
+--- a/BUILD.gn
++++ b/../patchs/build_modified.gn
+@@ -23,6 +23,10 @@ config("pdfium_common_config") {
      "PNG_USE_READ_MACROS",
    ]
  
@@ -11,7 +13,7 @@
    if (!use_system_libopenjpeg2) {
      defines += [ "OPJ_STATIC" ]
    }
-@@ -225,58 +229,6 @@
+@@ -223,57 +227,6 @@ group("pdfium_unittest_deps") {
    ]
  }
  
@@ -59,7 +61,6 @@
 -      "xfa/fde:unittests",
 -      "xfa/fgas:unittests",
 -      "xfa/fgas/layout:unittests",
--      "xfa/fwl:unittests",
 -      "xfa/fxfa:unittests",
 -      "xfa/fxfa/fm2js:unittests",
 -      "xfa/fxfa/parser:unittests",
@@ -70,7 +71,7 @@
  group("pdfium_embeddertest_deps") {
    testonly = true
    public_deps = [
-@@ -296,51 +248,6 @@
+@@ -293,51 +246,6 @@ group("pdfium_embeddertest_deps") {
    ]
  }
  
@@ -122,7 +123,7 @@
  executable("pdfium_diff") {
    testonly = true
    sources = [
-@@ -377,8 +284,6 @@
+@@ -374,8 +282,6 @@ group("pdfium_all") {
    testonly = true
    deps = [
      ":pdfium_diff",

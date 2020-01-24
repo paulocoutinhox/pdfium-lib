@@ -152,7 +152,7 @@ def run_task_build_pdfium():
     check_call(command, shell=True)
 
     cwd = "pdfium"
-    command = " ".join(["git", "checkout", "78a6a2c1b51b9f2e97c92d431e326da8c8ed3d2f"])
+    command = " ".join(["git", "checkout", "3c802bba9e43801d93204a1be62e05dbcc2677fd"])
     check_call(command, cwd=cwd, shell=True)
 
 
@@ -377,12 +377,12 @@ def run_task_build(targets, target_configurations):
             args.append("pdf_use_skia=false")
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
-            args.append("pdf_enable_v8=false")
-            args.append("pdf_is_standalone=false")
+            args.append("pdf_enable_v8=false")            
             args.append("is_component_build=false")
             args.append("clang_use_chrome_plugins=false")            
 
             if target["target_os"] == "ios":
+                args.append("pdf_is_standalone=false")
                 args.append('ios_deployment_target="9.0"')
                 args.append("ios_enable_code_signing=false")
                 args.append("use_xcode_clang=true")
@@ -396,7 +396,8 @@ def run_task_build(targets, target_configurations):
                     args.append("arm_use_neon=true")
                     args.append("enable_ios_bitcode=true")
             elif target["target_os"] == "mac":
-                args.append("use_xcode_clang=true")
+                args.append("pdf_is_standalone=true")
+                args.append("use_xcode_clang=false")
 
             if config == "release":
                 args.append("symbol_level=0")

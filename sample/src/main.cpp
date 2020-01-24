@@ -4,7 +4,7 @@
 
 int main(int argc, char **argv)
 {
-    std::cout << "Opening PDF..." << std::endl;
+    std::cout << "Starting..." << std::endl;
 
     FPDF_LIBRARY_CONFIG config;
     config.version = 2;
@@ -14,8 +14,12 @@ int main(int argc, char **argv)
 
     FPDF_InitLibraryWithConfig(&config);
 
+    std::cout << "Loading PDF..." << std::endl;
+
     FPDF_STRING testDoc = "f1.pdf";
     FPDF_DOCUMENT doc = FPDF_LoadDocument(testDoc, nullptr);
+
+    std::cout << "Checking PDF..." << std::endl;
 
     if (!doc)
     {

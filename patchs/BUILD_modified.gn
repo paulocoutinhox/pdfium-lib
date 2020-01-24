@@ -87,11 +87,9 @@ config("pdfium_core_config") {
   configs = [
     ":pdfium_common_config",
     ":pdfium_public_config",
+    "//build/config/compiler:noshadowing",
   ]
   defines = []
-  if (is_clang) {
-    cflags += [ "-Wshadow" ]
-  }
   if (is_linux) {
     if (current_cpu == "x64") {
       defines += [ "_FX_CPU_=_FX_X64_" ]

@@ -1,6 +1,7 @@
 # Build
 /build
 /sample/build
+_bad_scm
 
 # System
 .DS_Store
@@ -23,3 +24,4 @@ depot-tools
 pdfium
 chromium
 .cipd
+
