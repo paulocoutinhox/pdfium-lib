@@ -17,11 +17,3 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Google
-.gclient*
-depot-tools
-pdfium
-chromium
-.cipd
-

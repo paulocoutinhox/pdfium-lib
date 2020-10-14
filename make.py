@@ -57,13 +57,15 @@ def main(options):
 
     target_configurations = ["release"]  # release and/or debug
 
-    targets_macos = [{"target_os": "mac", "target_cpu": "x64"}]
+    targets_macos = [{"target_os": "macos", "target_cpu": "x64"}]
 
     targets_ios = [
-        {"target_os": "ios", "target_cpu": "arm"},
+        # {"target_os": "ios", "target_cpu": "arm"},
         {"target_os": "ios", "target_cpu": "arm64"},
         {"target_os": "ios", "target_cpu": "x64"},
     ]
+
+    targets = ["ios", "macos"]
 
     # show all params for debug
     if ("--debug" in options and options["--debug"]) or (
@@ -93,7 +95,7 @@ def main(options):
 
     # build pdfium
     elif make_task == "build-pdfium":
-        run_task_build_pdfium()
+        run_task_build_pdfium(targets=targets)
 
     # apply patch ios
     elif make_task == "apply-patch-ios":
@@ -133,198 +135,156 @@ def main(options):
     debug("FINISHED!")
 
 
-def run_task_build_pdfium():
+def run_task_build_pdfium(targets):
     debug("Building PDFIUM...")
 
-    remove_dir(os.path.join("pdfium"))
+    for target in targets:
+        build_dir = os.path.join("build", target)
+        create_dir(build_dir)
 
-    command = " ".join(
-        [
-            "gclient",
-            "config",
-            "--unmanaged",
-            "https://pdfium.googlesource.com/pdfium.git",
-        ]
-    )
-    check_call(command, shell=True)
+        target_dir = os.path.join(build_dir, "pdfium")
+        remove_dir(target_dir)
 
-    command = " ".join(["gclient", "sync"])
-    check_call(command, shell=True)
+        cwd = build_dir
+        command = " ".join(
+            [
+                "gclient",
+                "config",
+                "--unmanaged",
+                "https://pdfium.googlesource.com/pdfium.git",
+            ]
+        )
+        check_call(command, cwd=cwd, shell=True)
 
-    cwd = "pdfium"
-    command = " ".join(["git", "checkout", "3c802bba9e43801d93204a1be62e05dbcc2677fd"])
-    check_call(command, cwd=cwd, shell=True)
+        cwd = build_dir
+        command = " ".join(["gclient", "sync"])
+        check_call(command, cwd=cwd, shell=True)
+
+        cwd = target_dir
+        command = " ".join(
+            ["git", "checkout", "e21911cc1c77d39dbc51001845bbfce2783e6514"]
+        )
+        check_call(command, cwd=cwd, shell=True)
 
 
 def run_task_apply_patch_ios():
     debug("Apply iOS patchs...")
 
-    cwd = "pdfium"
+    source_dir = os.path.join("build", "ios", "pdfium")
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/mac/find_sdk.py",
-            "--forward",
-            "-i",
-            "../patchs/find-sdk.patch",
-        ]
+    # build gn
+    source_file = os.path.join(source_dir, "BUILD.gn")
+    if not file_line_has_content(source_file, 235, '#test("pdfium_unittests") {\n'):
+        file_line_comment_range(source_file, 235, 282)
+        file_line_comment_range(source_file, 375, 376)
+
+        debug("Applied: Build GN")
+    else:
+        debug("Skipped: Build GN")
+
+    # libjpeg
+    source_file = os.path.join(source_dir, "third_party", "libjpeg_turbo", "BUILD.gn")
+    if not file_line_has_content(
+        source_file,
+        13,
+        '#assert(!is_ios, "This is not used on iOS, don\'t drag it in unintentionally")\n',
+    ):
+        file_line_comment(source_file, 13)
+
+        debug("Applied: Lib JPEG")
+    else:
+        debug("Skipped: Lib JPEG")
+
+    # ios automatically manage certs
+    source_file = os.path.join(
+        source_dir, "build", "config", "ios", "ios_sdk_overrides.gni"
     )
-    call(command, cwd=cwd, shell=True)
+    if not file_has_content(source_file, "ios_automatically_manage_certs"):
+        append_to_file(
+            source_file, "if (is_ios) { ios_automatically_manage_certs = true }"
+        )
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/config/mac/sdk_info.py",
-            "--forward",
-            "-i",
-            "../patchs/sdk-info.patch",
-        ]
+        debug("Applied: iOS Automatically Manage Certs")
+    else:
+        debug("Skipped: iOS Automatically Manage Certs")
+
+    # compiler
+    source_file = os.path.join(source_dir, "build", "config", "compiler", "BUILD.gn")
+    if not file_line_has_content(
+        source_file, 1636, '#      "-Wimplicit-fallthrough",\n'
+    ):
+        file_line_comment(source_file, 1636)
+
+        debug("Applied: Compiler")
+    else:
+        debug("Skipped: Compiler")
+
+    # carbon
+    source_file = os.path.join(
+        source_dir, "core", "fxge", "apple", "fx_quartz_device.h"
     )
-    call(command, cwd=cwd, shell=True)
+    if not file_line_has_content(
+        source_file, 10, "#include <CoreGraphics/CoreGraphics.h>\n"
+    ):
+        replace_line_in_file(
+            source_file,
+            10,
+            "#include <CoreGraphics/CoreGraphics.h>\n#include <CoreFoundation/CFString.h>\n",
+        )
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/toolchain/mac/filter_libtool.py",
-            "--forward",
-            "-i",
-            "../patchs/filter-libtool.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
+        debug("Applied: Carbon")
+    else:
+        debug("Skipped: Carbon")
 
-    command = " ".join(
-        ["patch", "-u", "BUILD.gn", "--forward", "-i", "../patchs/build.patch"]
-    )
-    call(command, cwd=cwd, shell=True)
+    # ios simulator
+    source_file = os.path.join(source_dir, "build", "config", "ios", "rules.gni")
+    if not file_line_has_content(
+        source_file, 910, '#          data_deps += [ "//testing/iossim" ]\n'
+    ):
+        file_line_comment(source_file, 910)
 
-    command = " ".join(["patch", "-u", ".gn", "--forward", "-i", "../patchs/gn.patch"])
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build_overrides/build.gni",
-            "--forward",
-            "-i",
-            "../patchs/build-override.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "third_party/libjpeg_turbo/BUILD.gn",
-            "--forward",
-            "-i",
-            "../patchs/libjpeg-turbo.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fxge/BUILD.gn",
-            "--forward",
-            "-i",
-            "../patchs/build-fxge.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fxcrt/fx_system.h",
-            "--forward",
-            "-i",
-            "../patchs/fx-system.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
-
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "core/fxge/apple/apple_int.h",
-            "--forward",
-            "-i",
-            "../patchs/apple-int.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
+        debug("Applied: iOS Simulator")
+    else:
+        debug("Skipped: iOS Simulator")
 
 
 def run_task_apply_patch_macos():
     debug("Apply macos patchs...")
 
-    cwd = "pdfium"
+    source_dir = os.path.join("build", "macos", "pdfium")
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/mac/find_sdk.py",
-            "--forward",
-            "-i",
-            "../patchs/find-sdk.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
+    # shared library
+    source_file = os.path.join(source_dir, "BUILD.gn")
+    if not file_has_content(source_file, 'shared_library("pdfium")'):
+        replace_in_file(source_file, 'component("pdfium")', 'shared_library("pdfium")')
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/config/mac/sdk_info.py",
-            "--forward",
-            "-i",
-            "../patchs/sdk-info.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
+        debug("Applied: Shared Library")
+    else:
+        debug("Skipped: Shared Library")
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/toolchain/mac/filter_libtool.py",
-            "--forward",
-            "-i",
-            "../patchs/filter-libtool.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
+    pass
 
-    command = " ".join(
-        [
-            "patch",
-            "-u",
-            "build/toolchain/toolchain.gni",
-            "--forward",
-            "-i",
-            "../patchs/toolchain.patch",
-        ]
-    )
-    call(command, cwd=cwd, shell=True)
+    # fpdfview
+    source_file = os.path.join(source_dir, "public", "fpdfview.h")
+    if not file_line_has_content(source_file, 179, "//#if defined(COMPONENT_BUILD)\n"):
+        file_line_comment(source_file, 179, "//")
+        file_line_comment_range(source_file, 195, 197, "//")
+
+        debug("Applied: FPDFView")
+    else:
+        debug("Skipped: FPDFView")
 
 
 def run_task_build_depot_tools():
     debug("Building Depot Tools...")
 
-    remove_dir("depot-tools")
+    build_dir = os.path.join("build")
+    create_dir(build_dir)
 
+    tools_dir = os.path.join(build_dir, "depot-tools")
+    remove_dir(tools_dir)
+
+    cwd = build_dir
     command = " ".join(
         [
             "git",
@@ -333,9 +293,9 @@ def run_task_build_depot_tools():
             "depot-tools",
         ]
     )
-    check_call(command, shell=True)
+    check_call(command, cwd=cwd, shell=True)
 
-    debug("Execute on your terminal: export PATH=$PATH:$PWD/depot-tools")
+    debug("Execute on your terminal: export PATH=$PATH:$PWD/build/depot-tools")
 
 
 def run_task_build(targets, target_configurations):
@@ -348,7 +308,14 @@ def run_task_build(targets, target_configurations):
 
         # targets
         for target in targets:
+            if target["target_os"] == "macos":
+                pdfium_os = "mac"
+            else:
+                pdfium_os = target["target_os"]
+
             main_dir = os.path.join(
+                "build",
+                target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -357,7 +324,13 @@ def run_task_build(targets, target_configurations):
             remove_dir(main_dir)
             create_dir(main_dir)
 
-            os.chdir("pdfium")
+            os.chdir(
+                os.path.join(
+                    "build",
+                    target["target_os"],
+                    "pdfium",
+                )
+            )
 
             # generating files...
             debug(
@@ -370,16 +343,16 @@ def run_task_build(targets, target_configurations):
 
             # adding symbol_level=0 will squeeze the final result significantly, but it is needed for debug builds.
             args = []
-            args.append('target_os="{0}"'.format(target["target_os"]))
+            args.append('target_os="{0}"'.format(pdfium_os))
             args.append('target_cpu="{0}"'.format(target["target_cpu"]))
             args.append("use_goma=false")
             args.append("is_debug={0}".format(arg_is_debug))
             args.append("pdf_use_skia=false")
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
-            args.append("pdf_enable_v8=false")            
+            args.append("pdf_enable_v8=false")
             args.append("is_component_build=false")
-            args.append("clang_use_chrome_plugins=false")            
+            args.append("clang_use_chrome_plugins=false")
 
             if target["target_os"] == "ios":
                 args.append("pdf_is_standalone=false")
@@ -388,14 +361,12 @@ def run_task_build(targets, target_configurations):
                 args.append("use_xcode_clang=true")
 
                 if target["target_cpu"] == "x64":
-                    args.append("arm_use_neon=true")
+                    pass
                 elif target["target_cpu"] == "arm":
-                    args.append("arm_use_neon=false")
                     args.append("enable_ios_bitcode=true")
                 elif target["target_cpu"] == "arm64":
-                    args.append("arm_use_neon=true")
                     args.append("enable_ios_bitcode=true")
-            elif target["target_os"] == "mac":
+            elif target["target_os"] == "macos":
                 args.append("pdf_is_standalone=true")
                 args.append("use_xcode_clang=false")
 
@@ -743,8 +714,93 @@ def is_test_user():
     return user == "paulo"
 
 
+def file_has_content(file, content):
+    with open(file) as f:
+        if content in f.read():
+            return True
+
+    return False
+
+
+def get_file_content(file):
+    file = open(file, mode="r")
+    content = file.read()
+    file.close()
+    return content
+
+
+def prepend_to_file(file, content):
+    file_content = content + "\n" + get_file_content(file)
+    file_dest = open(file, "w")
+    file_dest.write(file_content)
+    file_dest.close()
+
+
+def append_to_file(file, content):
+    file_content = get_file_content(file) + "\n" + content
+    file_dest = open(file, "w")
+    file_dest.write(file_content)
+    file_dest.close()
+
+
+def replace_in_file(filename, old_string, new_string):
+    with open(filename) as f:
+        s = f.read()
+        if old_string not in s:
+            # print('"{old_string}" not found in {filename}.'.format(**locals()))
+            return
+
+    # Safely write the changed content, if found in the file
+    with open(filename, "w") as f:
+        # print('Changing "{old_string}" to "{new_string}" in {filename}'.format(**locals()))
+        s = s.replace(old_string, new_string)
+        f.write(s)
+        f.close()
+
+
+def replace_line_in_file(filename, line, content):
+    with open(filename) as f:
+        lines = f.readlines()
+        lines[line - 1] = content
+        f.close()
+
+        with open(filename, "w") as f:
+            f.writelines(lines)
+            f.close()
+
+
+def get_file_line_content(filename, line):
+    with open(filename) as f:
+        lines = f.readlines()
+        content = lines[line - 1]
+        f.close()
+
+        return content
+
+    return None
+
+
+def file_line_has_content(filename, line, content):
+    line_content = get_file_line_content(filename, line)
+    return line_content == content
+
+
+def file_line_comment(filename, line, comment="#"):
+    line_content = get_file_line_content(filename, line)
+
+    if not line_content.startswith(comment):
+        replace_line_in_file(filename, line, comment + line_content)
+
+
+def file_line_comment_range(filename, line_start, line_end, comment="#"):
+    for x in range(line_start, line_end + 1):
+        file_line_comment(filename, x, comment)
+
+
 def get_compiled_files(config, target):
     folder = os.path.join(
+        "build",
+        target["target_os"],
         "pdfium",
         "out",
         "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -757,6 +813,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -770,6 +828,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -783,6 +843,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -797,6 +859,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -811,6 +875,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -825,6 +891,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -839,6 +907,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -853,6 +923,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -867,6 +939,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -880,6 +954,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -893,6 +969,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -906,6 +984,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -919,6 +999,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -931,6 +1013,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -944,6 +1028,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -957,6 +1043,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -969,6 +1057,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -981,6 +1071,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -993,6 +1085,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -1005,6 +1099,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -1017,6 +1113,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -1029,6 +1127,8 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -1041,13 +1141,15 @@ def get_compiled_files(config, target):
 
     files.append(
         os.path.join(
+            "build",
+            target["target_os"],
             "pdfium",
             "out",
             "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
             "obj",
             "third_party",
             "zlib",
-            "zlib_x86_simd",
+            "zlib",
             "*.o",
         )
     )
@@ -1056,6 +1158,8 @@ def get_compiled_files(config, target):
         if target["target_cpu"] == "arm64":
             files.append(
                 os.path.join(
+                    "build",
+                    target["target_os"],
                     "pdfium",
                     "out",
                     "{0}-{1}-{2}".format(
@@ -1071,6 +1175,8 @@ def get_compiled_files(config, target):
 
             files.append(
                 os.path.join(
+                    "build",
+                    target["target_os"],
                     "pdfium",
                     "out",
                     "{0}-{1}-{2}".format(
@@ -1084,9 +1190,11 @@ def get_compiled_files(config, target):
                 )
             )
 
-    if target["target_os"] == "mac":
+    if target["target_os"] == "macos":
         files.append(
             os.path.join(
+                "build",
+                target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -1101,71 +1209,8 @@ def get_compiled_files(config, target):
 
         files.append(
             os.path.join(
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "yasm",
-                "yasm",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "yasm",
-                "genstring",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "yasm",
-                "genperf",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "yasm",
-                "re2c",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "yasm",
-                "genmacro",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
+                "build",
+                target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -1179,6 +1224,8 @@ def get_compiled_files(config, target):
 
         files.append(
             os.path.join(
+                "build",
+                target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
@@ -1192,6 +1239,23 @@ def get_compiled_files(config, target):
 
         files.append(
             os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "third_party",
+                "zlib",
+                "zlib_x86_simd",
+                "*.o",
+            )
+        )
+
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),

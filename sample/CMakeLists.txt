@@ -23,7 +23,10 @@ set_target_properties(sample PROPERTIES
 )
 
 target_link_libraries(sample ${LIBS})
+target_link_libraries(sample "-framework AppKit")
 target_link_libraries(sample "-framework CoreGraphics")
+target_link_libraries(sample "-framework CoreFoundation")
+target_link_libraries(sample "-framework CoreText")
 target_link_libraries(sample "-framework Foundation")
 
 target_include_directories(sample PRIVATE "include")
