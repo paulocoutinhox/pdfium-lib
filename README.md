@@ -1,4 +1,4 @@
-# Mobile PDFium
+# PDFium Library
 
 ![PDFium - iOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20iOS/badge.svg)
 ![PDFium - macOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20macOS/badge.svg)
