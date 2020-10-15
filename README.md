@@ -1,7 +1,7 @@
 # Mobile PDFium
 
-![PDFium - iOS](https://github.com/prsolucoes/mobile-pdfium/workflows/PDFium%20-%20iOS/badge.svg)
-![PDFium - macOS](https://github.com/prsolucoes/mobile-pdfium/workflows/PDFium%20-%20macOS/badge.svg)
+![PDFium - iOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20iOS/badge.svg)
+![PDFium - macOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20macOS/badge.svg)
 
 This project compile PDFium to all supported platforms. Current project compiles to:  
 
@@ -23,7 +23,8 @@ Obs: Only python version 3 is supported
 ## How to compile (general)
 
 1. Get the source:  
-```git clone https://github.com/prsolucoes/mobile-pdfium.git```  
+```git clone https://github.com/prsolucoes/pdfium-lib.git```  
+```cd pdfium-lib```  
 
 2. Install pip requirements:  
 ```pip3 install -r requirements.txt``` 
