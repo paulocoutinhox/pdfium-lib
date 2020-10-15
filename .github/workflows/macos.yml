@@ -83,10 +83,9 @@ jobs:
         run: python3 make.py run build-depot-tools
 
       - name: Environment
-        uses: allenevans/set-env@v1.1.1
-        with:
-          PATH: "$PATH:$PWD/build/depot-tools"
-          FORCE_MAC_SDK_MIN: "10.15"
+        run: |
+          echo "PATH=$PATH:$PWD/build/depot-tools" >> $GITHUB_ENV
+          echo "FORCE_MAC_SDK_MIN=10.15" >> $GITHUB_ENV
 
       - name: PDFium
         run: python3 make.py run build-pdfium
