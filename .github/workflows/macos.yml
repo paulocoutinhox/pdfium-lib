@@ -80,16 +80,19 @@ jobs:
         run: pip3 install -r requirements.txt --user
 
       - name: Depot tools
+        run: python3 make.py run build-depot-tools
+
+      - name: Environment
         run: |
-          python3 make.py run build-depot-tools
-          export PATH=$PATH:$PWD/build/depot-tools
+          echo "export PATH=$PATH:$PWD/build/depot-tools" > ~/.bashrc
+          echo "export FORCE_MAC_SDK_MIN=10.15" > ~/.bashrc
+          source ~/.bashrc
 
       - name: PDFium
         run: python3 make.py run build-pdfium
 
       - name: Build
         run: |
-          export FORCE_MAC_SDK_MIN=10.15
           python3 make.py run apply-patch-${{ matrix.config.target }}        
           python3 make.py run build-${{ matrix.config.target }}
           python3 make.py run install-${{ matrix.config.target }}

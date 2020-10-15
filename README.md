@@ -2,12 +2,15 @@
 
 [![Build Status](https://travis-ci.com/prsolucoes/mobile-pdfium.svg?branch=master)](https://travis-ci.com/prsolucoes/mobile-pdfium)
 
+![PDFium - iOS](https://github.com/prsolucoes/mobile-pdfium/workflows/PDFium%20-%20iOS/badge.svg)
+![PDFium - macOS](https://github.com/prsolucoes/mobile-pdfium/workflows/PDFium%20-%20macOS/badge.svg)
+
 This project compile PDFium to all supported platforms. Current project compiles to:  
 
-- [x] iOS device
-- [x] iOS simulator
+- [x] iOS device (arm64)
+- [x] iOS simulator (x86_64)
 - [ ] Android
-- [x] macOS
+- [x] macOS (x86_64)
 - [ ] Linux
 - [ ] Windows
 
