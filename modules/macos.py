@@ -35,13 +35,7 @@ def run_task_build():
             f.remove_dir(main_dir)
             f.create_dir(main_dir)
 
-            os.chdir(
-                os.path.join(
-                    "build",
-                    target["target_os"],
-                    "pdfium",
-                )
-            )
+            os.chdir(os.path.join("build", target["target_os"], "pdfium",))
 
             # generating files...
             f.debug(
@@ -65,7 +59,7 @@ def run_task_build():
             args.append("clang_use_chrome_plugins=false")
             args.append("pdf_is_standalone=true")
             args.append("use_xcode_clang=false")
-            
+
             if config == "release":
                 args.append("symbol_level=0")
 

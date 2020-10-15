@@ -5,7 +5,7 @@
 
 This project compile PDFium to all supported platforms. Current project compiles to:  
 
-- [x] iOS device (arm64)
+- [x] iOS device (armv7, arm64)
 - [x] iOS simulator (x86_64)
 - [ ] Android
 - [x] macOS (x86_64)
@@ -51,7 +51,7 @@ Check tutorial here: [Build for macOS](docs/BUILD_MACOS.md)
 
 ## Prebuilt binary
 
-For iOS (arm64 and x86_64):
+For iOS (armv7, arm64 and x86_64):
 
 https://www.dropbox.com/s/5zuddojoz7cqq80/libpdfium.a?dl=1
 
