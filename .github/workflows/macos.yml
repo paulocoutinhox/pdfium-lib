@@ -84,7 +84,7 @@ jobs:
 
       - name: Environment
         run: |
-          echo "PATH=$PATH:$PWD/build/depot-tools" >> $GITHUB_ENV
+          echo "$PWD/build/depot-tools" >> $GITHUB_PATH
           echo "FORCE_MAC_SDK_MIN=10.15" >> $GITHUB_ENV
 
       - name: PDFium
