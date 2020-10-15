@@ -90,11 +90,14 @@ jobs:
       - name: PDFium
         run: python3 make.py run build-pdfium
 
+      - name: Patch
+        run: python3 make.py run apply-patch-${{ matrix.config.target }}
+
       - name: Build
-        run: |
-          python3 make.py run apply-patch-${{ matrix.config.target }}        
-          python3 make.py run build-${{ matrix.config.target }}
-          python3 make.py run install-${{ matrix.config.target }}
+        run: python3 make.py run build-${{ matrix.config.target }}
+
+      - name: Install
+        run: python3 make.py run install-${{ matrix.config.target }}
 
       - name: Test
         run: python3 make.py run test-${{ matrix.config.target }}

@@ -1,7 +1,5 @@
 # Mobile PDFium
 
-[![Build Status](https://travis-ci.com/prsolucoes/mobile-pdfium.svg?branch=master)](https://travis-ci.com/prsolucoes/mobile-pdfium)
-
 ![PDFium - iOS](https://github.com/prsolucoes/mobile-pdfium/workflows/PDFium%20-%20iOS/badge.svg)
 ![PDFium - macOS](https://github.com/prsolucoes/mobile-pdfium/workflows/PDFium%20-%20macOS/badge.svg)
 

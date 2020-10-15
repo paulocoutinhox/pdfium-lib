@@ -21,9 +21,9 @@ def run_task_build():
     current_dir = os.getcwd()
 
     # configs
-    for config in c.configurations_ios:
+    for config in c.configurations_macos:
         # targets
-        for target in c.targets_ios:
+        for target in c.targets_macos:
             main_dir = os.path.join(
                 "build",
                 target["target_os"],
@@ -65,7 +65,7 @@ def run_task_build():
             args.append("clang_use_chrome_plugins=false")
             args.append("pdf_is_standalone=true")
             args.append("use_xcode_clang=false")
-
+            
             if config == "release":
                 args.append("symbol_level=0")
 

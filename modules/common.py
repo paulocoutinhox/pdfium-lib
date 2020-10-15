@@ -1,4 +1,5 @@
 import os
+import subprocess
 from subprocess import check_call
 
 import modules.config as c
@@ -59,6 +60,13 @@ def run_task_build_depot_tools():
 
 
 def run_task_format():
+    # check
+    try:
+        subprocess.check_output(["black", "--version"])
+    except OSError:
+        f.error("Black is not installed, check: https://github.com/psf/black")
+
+    # start
     f.debug("Formating...")
 
     # make.py
