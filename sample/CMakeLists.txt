@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.1)
 project(sample)
 
+#SET(CMAKE_C_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang)
+#SET(CMAKE_CXX_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang)
+
 file(GLOB S_FILES_PROJECT "src/*.cpp")
 file(GLOB H_FILES_PDFIUM "include/*.h")
 
@@ -23,10 +26,7 @@ set_target_properties(sample PROPERTIES
 )
 
 target_link_libraries(sample ${LIBS})
-target_link_libraries(sample "-framework AppKit")
 target_link_libraries(sample "-framework CoreGraphics")
-target_link_libraries(sample "-framework CoreFoundation")
-target_link_libraries(sample "-framework CoreText")
 target_link_libraries(sample "-framework Foundation")
 
 target_include_directories(sample PRIVATE "include")

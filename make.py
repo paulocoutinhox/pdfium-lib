@@ -253,26 +253,7 @@ def run_task_apply_patch_macos():
 
     source_dir = os.path.join("build", "macos", "pdfium")
 
-    # shared library
-    source_file = os.path.join(source_dir, "BUILD.gn")
-    if not file_has_content(source_file, 'shared_library("pdfium")'):
-        replace_in_file(source_file, 'component("pdfium")', 'shared_library("pdfium")')
-
-        debug("Applied: Shared Library")
-    else:
-        debug("Skipped: Shared Library")
-
     pass
-
-    # fpdfview
-    source_file = os.path.join(source_dir, "public", "fpdfview.h")
-    if not file_line_has_content(source_file, 179, "//#if defined(COMPONENT_BUILD)\n"):
-        file_line_comment(source_file, 179, "//")
-        file_line_comment_range(source_file, 195, 197, "//")
-
-        debug("Applied: FPDFView")
-    else:
-        debug("Skipped: FPDFView")
 
 
 def run_task_build_depot_tools():
@@ -1191,6 +1172,22 @@ def get_compiled_files(config, target):
             )
 
     if target["target_os"] == "macos":
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "buildtools",
+                "third_party",
+                "libc++",
+                "libc++",
+                "*.o",
+            )
+        )
+
         files.append(
             os.path.join(
                 "build",
