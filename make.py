@@ -25,13 +25,15 @@ Tasks:
 
   - apply-patch-ios
   - build-ios
-  - install-ios
+  - install-ios  
   - test-ios
+  - archive-ios
   
   - apply-patch-macos
   - build-macos
   - install-macos
   - test-macos
+  - archive-macos
 """
 
 from docopt import docopt
@@ -94,6 +96,10 @@ def main(options):
     elif make_task == "test-ios":
         ios.run_task_test()
 
+    # archive ios
+    elif make_task == "archive-ios":
+        ios.run_task_archive()
+
     # apply patch macos
     elif make_task == "apply-patch-macos":
         macos.run_task_apply_patch()
@@ -109,6 +115,10 @@ def main(options):
     # test macos
     elif make_task == "test-macos":
         macos.run_task_test()
+
+    # archive macos
+    elif make_task == "archive-macos":
+        macos.run_task_archive()
 
     f.message("")
     f.debug("FINISHED!")

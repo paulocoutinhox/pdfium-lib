@@ -70,11 +70,21 @@ def run_task_format():
     f.debug("Formating...")
 
     # make.py
-    command = " ".join(["black", "make.py",])
+    command = " ".join(
+        [
+            "black",
+            "make.py",
+        ]
+    )
     check_call(command, shell=True)
 
     # modules
-    command = " ".join(["black", "modules/",])
+    command = " ".join(
+        [
+            "black",
+            "modules/",
+        ]
+    )
     check_call(command, shell=True)
 
     f.debug("Finished")

@@ -12,7 +12,10 @@ def run_task_apply_patch():
     source_dir = os.path.join("build", "ios", "pdfium")
 
     # build gn
-    source_file = os.path.join(source_dir, "BUILD.gn",)
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
     if not f.file_line_has_content(source_file, 235, '#test("pdfium_unittests") {\n'):
         f.file_line_comment_range(source_file, 235, 282)
         f.file_line_comment_range(source_file, 375, 376)
@@ -22,7 +25,12 @@ def run_task_apply_patch():
         f.debug("Skipped: Build GN")
 
     # libjpeg
-    source_file = os.path.join(source_dir, "third_party", "libjpeg_turbo", "BUILD.gn",)
+    source_file = os.path.join(
+        source_dir,
+        "third_party",
+        "libjpeg_turbo",
+        "BUILD.gn",
+    )
     if not f.file_line_has_content(
         source_file,
         13,
@@ -36,7 +44,11 @@ def run_task_apply_patch():
 
     # ios automatically manage certs
     source_file = os.path.join(
-        source_dir, "build", "config", "ios", "ios_sdk_overrides.gni",
+        source_dir,
+        "build",
+        "config",
+        "ios",
+        "ios_sdk_overrides.gni",
     )
     if not f.file_has_content(source_file, "ios_automatically_manage_certs"):
         f.append_to_file(
@@ -48,7 +60,13 @@ def run_task_apply_patch():
         f.debug("Skipped: iOS Automatically Manage Certs")
 
     # compiler
-    source_file = os.path.join(source_dir, "build", "config", "compiler", "BUILD.gn",)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
     if not f.file_line_has_content(
         source_file, 1636, '#      "-Wimplicit-fallthrough",\n'
     ):
@@ -60,7 +78,11 @@ def run_task_apply_patch():
 
     # carbon
     source_file = os.path.join(
-        source_dir, "core", "fxge", "apple", "fx_quartz_device.h",
+        source_dir,
+        "core",
+        "fxge",
+        "apple",
+        "fx_quartz_device.h",
     )
     if not f.file_line_has_content(
         source_file, 10, "#include <CoreGraphics/CoreGraphics.h>\n"
@@ -76,7 +98,13 @@ def run_task_apply_patch():
         f.debug("Skipped: Carbon")
 
     # ios simulator
-    source_file = os.path.join(source_dir, "build", "config", "ios", "rules.gni",)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "ios",
+        "rules.gni",
+    )
     if not f.file_line_has_content(
         source_file, 910, '#          data_deps += [ "//testing/iossim" ]\n'
     ):
@@ -114,7 +142,11 @@ def run_task_apply_patch():
         f.debug("Skipped: 32bits constexpr")
 
     # ARM Neon
-    source_file = os.path.join(source_dir, "build_overrides", "build.gni",)
+    source_file = os.path.join(
+        source_dir,
+        "build_overrides",
+        "build.gni",
+    )
     if f.file_line_has_content(source_file, 18, 'if (current_cpu == "arm") {\n'):
         f.replace_line_in_file(source_file, 18, 'if (current_cpu == "arm64") {\n')
 
@@ -152,7 +184,13 @@ def run_task_build():
             f.remove_dir(main_dir)
             f.create_dir(main_dir)
 
-            os.chdir(os.path.join("build", target["target_os"], "pdfium",))
+            os.chdir(
+                os.path.join(
+                    "build",
+                    target["target_os"],
+                    "pdfium",
+                )
+            )
 
             # generating files...
             f.debug(
@@ -286,6 +324,16 @@ def run_task_test():
         check_call(command, shell=True)
 
     os.chdir(current_dir)
+
+
+def run_task_archive():
+    f.debug("Archiving...")
+
+    current_dir = os.getcwd()
+    lib_dir = os.path.join(current_dir, "build", "ios")
+    tar_file = os.path.join(current_dir, "ios.tgz")
+
+    f.make_tarfile(tar_file, lib_dir)
 
 
 def get_compiled_files(config, target):

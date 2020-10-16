@@ -35,7 +35,13 @@ def run_task_build():
             f.remove_dir(main_dir)
             f.create_dir(main_dir)
 
-            os.chdir(os.path.join("build", target["target_os"], "pdfium",))
+            os.chdir(
+                os.path.join(
+                    "build",
+                    target["target_os"],
+                    "pdfium",
+                )
+            )
 
             # generating files...
             f.debug(
@@ -181,6 +187,16 @@ def run_task_test():
 
     # finish
     os.chdir(current_dir)
+
+
+def run_task_archive():
+    f.debug("Archiving...")
+
+    current_dir = os.getcwd()
+    lib_dir = os.path.join(current_dir, "build", "macos")
+    tar_file = os.path.join(current_dir, "macos.tgz")
+
+    f.make_tarfile(tar_file, lib_dir)
 
 
 def get_compiled_files(config, target):

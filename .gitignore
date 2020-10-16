@@ -2,6 +2,7 @@
 /build
 /sample/build
 _bad_scm
+*.tgz
 
 # System
 .DS_Store
