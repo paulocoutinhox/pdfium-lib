@@ -137,6 +137,15 @@ def make_tarfile(output_filename, source_dir):
         tar.add(source_dir, arcname=os.path.basename(source_dir))
 
 
+def make_tarfile_from_list(output_filename, paths):
+    tar = tarfile.open(output_filename, "w:gz")
+
+    for item in paths:
+        tar.add(item)
+
+    tar.close()
+
+
 def write_to_file(dirname, filename, content):
     full_file_path = os.path.join(dirname, filename)
     remove_file(full_file_path)

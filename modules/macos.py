@@ -1,5 +1,6 @@
 import glob
 import os
+import tarfile
 from shutil import copyfile
 from subprocess import check_call
 
@@ -194,9 +195,18 @@ def run_task_archive():
 
     current_dir = os.getcwd()
     lib_dir = os.path.join(current_dir, "build", "macos")
-    tar_file = os.path.join(current_dir, "macos.tgz")
+    output_filename = os.path.join(current_dir, "macos.tgz")
 
-    f.make_tarfile(tar_file, lib_dir)
+    tar = tarfile.open(output_filename, "w:gz")
+
+    for configuration in c.configurations_macos:
+        tar.add(
+            name=os.path.join(lib_dir, configuration),
+            arcname=os.path.basename(os.path.join(lib_dir, configuration)),
+            filter=lambda x: (None if "_" in x.name else x),
+        )
+
+    tar.close()
 
 
 def get_compiled_files(config, target):

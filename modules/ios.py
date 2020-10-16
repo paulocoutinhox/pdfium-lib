@@ -1,5 +1,6 @@
 import glob
 import os
+import tarfile
 from subprocess import check_call
 
 import modules.config as c
@@ -331,9 +332,18 @@ def run_task_archive():
 
     current_dir = os.getcwd()
     lib_dir = os.path.join(current_dir, "build", "ios")
-    tar_file = os.path.join(current_dir, "ios.tgz")
+    output_filename = os.path.join(current_dir, "ios.tgz")
 
-    f.make_tarfile(tar_file, lib_dir)
+    tar = tarfile.open(output_filename, "w:gz")
+
+    for configuration in c.configurations_ios:
+        tar.add(
+            name=os.path.join(lib_dir, configuration),
+            arcname=os.path.basename(os.path.join(lib_dir, configuration)),
+            filter=lambda x: (None if "_" in x.name else x),
+        )
+
+    tar.close()
 
 
 def get_compiled_files(config, target):
