@@ -1,7 +1,6 @@
 import glob
 import os
 import tarfile
-from shutil import copyfile
 from subprocess import check_call
 
 import modules.config as c
@@ -11,7 +10,7 @@ import modules.functions as f
 def run_task_patch():
     f.debug("Patching...")
 
-    # source_dir = os.path.join("build", "macos", "pdfium")
+    # source_dir = os.path.join("build", "android", "pdfium")
 
     pass
 
@@ -22,9 +21,9 @@ def run_task_build():
     current_dir = os.getcwd()
 
     # configs
-    for config in c.configurations_macos:
+    for config in c.configurations_android:
         # targets
-        for target in c.targets_macos:
+        for target in c.targets_android:
             main_dir = os.path.join(
                 "build",
                 target["target_os"],
@@ -63,9 +62,8 @@ def run_task_build():
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
             args.append("is_component_build=false")
-            args.append("clang_use_chrome_plugins=false")
-            args.append("pdf_is_standalone=true")
-            args.append("use_xcode_clang=false")
+            args.append("pdf_is_standalone=false")
+            args.append("pdf_bundle_freetype=true")
 
             if config == "release":
                 args.append("symbol_level=0")
@@ -111,18 +109,21 @@ def run_task_install():
     f.debug("Installing libraries...")
 
     # configs
-    for config in c.configurations_macos:
-        f.remove_dir(os.path.join("build", "macos", config))
-        f.create_dir(os.path.join("build", "macos", config))
+    for config in c.configurations_android:
+        f.remove_dir(os.path.join("build", "android", config))
+        f.create_dir(os.path.join("build", "android", config))
 
         # targets
-        for target in c.targets_macos:
+        for target in c.targets_android:
             files = get_compiled_files(config, target)
 
             files_str = " ".join(files)
 
             lib_file_out = os.path.join(
-                "build", "macos", config, "libpdfium_{0}.a".format(target["target_cpu"])
+                "build",
+                "android",
+                config,
+                "libpdfium_{0}.a".format(target["target_cpu"]),
             )
 
             # we have removed symbols to squeeze final results. -no_warning_for_no_symbols will save us from useless warnings.
@@ -138,10 +139,10 @@ def run_task_install():
             check_call(command, shell=True)
 
         # universal
-        folder = os.path.join("build", "macos", config, "*.a")
+        folder = os.path.join("build", "android", config, "*.a")
         files = glob.glob(folder)
         files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "macos", config, "libpdfium.a")
+        lib_file_out = os.path.join("build", "android", config, "libpdfium.a")
 
         f.debug("Merging libraries (lipo)...")
         command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
@@ -160,33 +161,13 @@ def run_task_test():
     f.debug("Testing...")
 
     current_dir = os.getcwd()
-    sample_dir = os.path.join(current_dir, "sample")
-    build_dir = os.path.join(sample_dir, "build")
 
-    f.remove_dir(build_dir)
-    f.create_dir(build_dir)
+    for configuration in c.configurations_android:
+        lib_dir = os.path.join(current_dir, "build", "android", configuration)
 
-    os.chdir(build_dir)
+        command = " ".join(["file", os.path.join(lib_dir, "libpdfium.a")])
+        check_call(command, shell=True)
 
-    # generate project
-    command = " ".join(["cmake", "../"])
-
-    check_call(command, shell=True)
-
-    # build
-    command = " ".join(["cmake", "--build", "."])
-    check_call(command, shell=True)
-
-    # copy assets
-    copyfile(
-        os.path.join(sample_dir, "assets", "f1.pdf"), os.path.join(build_dir, "f1.pdf")
-    )
-
-    # run
-    command = " ".join(["./sample"])
-    check_call(command, shell=True)
-
-    # finish
     os.chdir(current_dir)
 
 
@@ -194,12 +175,12 @@ def run_task_archive():
     f.debug("Archiving...")
 
     current_dir = os.getcwd()
-    lib_dir = os.path.join(current_dir, "build", "macos")
-    output_filename = os.path.join(current_dir, "macos.tgz")
+    lib_dir = os.path.join(current_dir, "build", "android")
+    output_filename = os.path.join(current_dir, "android.tgz")
 
     tar = tarfile.open(output_filename, "w:gz")
 
-    for configuration in c.configurations_macos:
+    for configuration in c.configurations_android:
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
@@ -566,96 +547,35 @@ def get_compiled_files(config, target):
         )
     )
 
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "buildtools",
-            "third_party",
-            "libc++",
-            "libc++",
-            "*.o",
+    if target["target_cpu"] == "arm64":
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "third_party",
+                "zlib",
+                "zlib_adler32_simd",
+                "*.o",
+            )
         )
-    )
 
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "buildtools",
-            "third_party",
-            "libc++abi",
-            "libc++abi",
-            "*.o",
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "third_party",
+                "zlib",
+                "zlib_inflate_chunk_simd",
+                "*.o",
+            )
         )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_inflate_chunk_simd",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_crc32_simd",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_x86_simd",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_adler32_simd",
-            "*.o",
-        )
-    )
 
     return files

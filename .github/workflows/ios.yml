@@ -91,7 +91,7 @@ jobs:
         run: python3 make.py run build-pdfium
 
       - name: Patch
-        run: python3 make.py run apply-patch-${{ matrix.config.target }}
+        run: python3 make.py run patch-${{ matrix.config.target }}
 
       - name: Build
         run: python3 make.py run build-${{ matrix.config.target }}

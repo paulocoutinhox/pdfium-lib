@@ -7,8 +7,8 @@ import modules.config as c
 import modules.functions as f
 
 
-def run_task_apply_patch():
-    f.debug("Applying patchs...")
+def run_task_patch():
+    f.debug("Patching...")
 
     source_dir = os.path.join("build", "ios", "pdfium")
 

@@ -2,8 +2,8 @@
 
 1. Execute all **general** steps
 
-2. Apply patchs:  
-```python3 make.py run apply-patch-macos```  
+2. Patch:  
+```python3 make.py run patch-macos```  
 
 3. Compile:  
 ```python3 make.py run build-macos```  

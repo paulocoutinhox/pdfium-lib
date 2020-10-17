@@ -2,8 +2,8 @@
 
 1. Execute all **general** steps
 
-2. Apply patchs:  
-```python3 make.py run apply-patch-ios```  
+2. Patch:  
+```python3 make.py run patch-ios```  
 
 3. Compile:  
 ```python3 make.py run build-ios```  

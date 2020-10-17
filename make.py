@@ -23,17 +23,23 @@ Tasks:
   - build-depot-tools  
   - build-pdfium
 
-  - apply-patch-ios
+  - patch-ios
   - build-ios
   - install-ios  
   - test-ios
   - archive-ios
   
-  - apply-patch-macos
+  - patch-macos
   - build-macos
   - install-macos
   - test-macos
   - archive-macos
+
+  - patch-android
+  - build-android
+  - install-android
+  - test-android
+  - archive-android
 """
 
 from docopt import docopt
@@ -43,6 +49,7 @@ import modules.functions as f
 import modules.config as c
 import modules.ios as ios
 import modules.macos as macos
+import modules.android as android
 
 
 def main(options):
@@ -80,9 +87,9 @@ def main(options):
     elif make_task == "build-pdfium":
         common.run_task_build_pdfium()
 
-    # apply patch ios
-    elif make_task == "apply-patch-ios":
-        ios.run_task_apply_patch()
+    # patch ios
+    elif make_task == "patch-ios":
+        ios.run_task_patch()
 
     # build ios
     elif make_task == "build-ios":
@@ -100,9 +107,9 @@ def main(options):
     elif make_task == "archive-ios":
         ios.run_task_archive()
 
-    # apply patch macos
-    elif make_task == "apply-patch-macos":
-        macos.run_task_apply_patch()
+    # patch macos
+    elif make_task == "patch-macos":
+        macos.run_task_patch()
 
     # build macos
     elif make_task == "build-macos":
@@ -119,6 +126,26 @@ def main(options):
     # archive macos
     elif make_task == "archive-macos":
         macos.run_task_archive()
+
+    # patch android
+    elif make_task == "patch-android":
+        android.run_task_patch()
+
+    # build android
+    elif make_task == "build-android":
+        android.run_task_build()
+
+    # install android
+    elif make_task == "install-android":
+        android.run_task_install()
+
+    # test android
+    elif make_task == "test-android":
+        android.run_task_test()
+
+    # archive android
+    elif make_task == "archive-android":
+        android.run_task_archive()
 
     f.message("")
     f.debug("FINISHED!")
