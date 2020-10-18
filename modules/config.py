@@ -2,6 +2,7 @@
 make_debug = False
 make_task = ""
 targets = ["ios", "macos", "android"]
+targets = ["android"]
 
 # pdfium
 pdfium_git_commit = "e21911cc1c77d39dbc51001845bbfce2783e6514"

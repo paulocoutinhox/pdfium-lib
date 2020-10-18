@@ -21,20 +21,22 @@ Tasks:
   - format
 
   - build-depot-tools  
-  - build-pdfium
-
+  
+  - build-pdfium-ios
   - patch-ios
   - build-ios
   - install-ios  
   - test-ios
   - archive-ios
   
+  - build-pdfium-macos
   - patch-macos
   - build-macos
   - install-macos
   - test-macos
   - archive-macos
 
+  - build-pdfium-android
   - patch-android
   - build-android
   - install-android
@@ -83,69 +85,97 @@ def main(options):
     elif make_task == "build-depot-tools":
         common.run_task_build_depot_tools()
 
-    # build pdfium
-    elif make_task == "build-pdfium":
-        common.run_task_build_pdfium()
+    #######################
+    # iOS
+    #######################
 
-    # patch ios
+    # build pdfium - ios
+    elif make_task == "build-pdfium-ios":
+        ios.run_task_build_pdfium()
+
+    # patch - ios
     elif make_task == "patch-ios":
         ios.run_task_patch()
 
-    # build ios
+    # build - ios
     elif make_task == "build-ios":
         ios.run_task_build()
 
-    # install ios
+    # install - ios
     elif make_task == "install-ios":
         ios.run_task_install()
 
-    # test ios
+    # test - ios
     elif make_task == "test-ios":
         ios.run_task_test()
 
-    # archive ios
+    # archive - ios
     elif make_task == "archive-ios":
         ios.run_task_archive()
 
-    # patch macos
+    #######################
+    # macOS
+    #######################
+
+    # build pdfium - macos
+    elif make_task == "build-pdfium-macos":
+        macos.run_task_build_pdfium()
+
+    # patch - macos
     elif make_task == "patch-macos":
         macos.run_task_patch()
 
-    # build macos
+    # build - macos
     elif make_task == "build-macos":
         macos.run_task_build()
 
-    # install macos
+    # install - macos
     elif make_task == "install-macos":
         macos.run_task_install()
 
-    # test macos
+    # test - macos
     elif make_task == "test-macos":
         macos.run_task_test()
 
-    # archive macos
+    # archive - macos
     elif make_task == "archive-macos":
         macos.run_task_archive()
 
-    # patch android
+    #######################
+    # Android
+    #######################
+
+    # build pdfium - android
+    elif make_task == "build-pdfium-android":
+        android.run_task_build_pdfium()
+
+    # patch - android
     elif make_task == "patch-android":
         android.run_task_patch()
 
-    # build android
+    # build - android
     elif make_task == "build-android":
         android.run_task_build()
 
-    # install android
+    # install - android
     elif make_task == "install-android":
         android.run_task_install()
 
-    # test android
+    # test - android
     elif make_task == "test-android":
         android.run_task_test()
 
-    # archive android
+    # archive - android
     elif make_task == "archive-android":
         android.run_task_archive()
+
+    #######################
+    # Invalid
+    #######################
+
+    # invalid
+    else:
+        f.error("Task is invalid")
 
     f.message("")
     f.debug("FINISHED!")

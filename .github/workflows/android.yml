@@ -2,10 +2,6 @@ name: PDFium - Android
 
 on: [push]
 
-env:
-  CMAKE_VERSION: "3.16.2"
-  NINJA_VERSION: "1.9.0"
-
 jobs:
   build:
     name: ${{ matrix.config.name }}
@@ -14,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "Ubuntu Latest", os: "ubuntu-latest", target: "android" }
+          - { name: "Ubuntu Latest", os: "ubuntu-20.04", target: "android" }
         python-version: [3.7]
 
     steps:
@@ -34,82 +30,32 @@ jobs:
       - name: Display PIP version
         run: pip --version
 
-      - name: Install Ninja and CMake
-        id: cmake_and_ninja
-        shell: cmake -P {0}
-        run: |
-          set(cmake_version $ENV{CMAKE_VERSION})
-          set(ninja_version $ENV{NINJA_VERSION})
-
-          message(STATUS "Using host CMake version: ${CMAKE_VERSION}")
-
-          if ("${{ runner.os }}" STREQUAL "Windows")
-            set(ninja_suffix "win.zip")
-            set(cmake_suffix "win64-x64.zip")
-            set(cmake_dir "cmake-${cmake_version}-win64-x64/bin")
-          elseif ("${{ runner.os }}" STREQUAL "Linux")
-            set(ninja_suffix "linux.zip")
-            set(cmake_suffix "Linux-x86_64.tar.gz")
-            set(cmake_dir "cmake-${cmake_version}-Linux-x86_64/bin")
-          elseif ("${{ runner.os }}" STREQUAL "macOS")
-            set(ninja_suffix "mac.zip")
-            set(cmake_suffix "Darwin-x86_64.tar.gz")
-            set(cmake_dir "cmake-${cmake_version}-Darwin-x86_64/CMake.app/Contents/bin")
-          endif()
-
-          set(ninja_url "https://github.com/ninja-build/ninja/releases/download/v${ninja_version}/ninja-${ninja_suffix}")
-          file(DOWNLOAD "${ninja_url}" ./ninja.zip SHOW_PROGRESS)
-          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./ninja.zip)
-
-          set(cmake_url "https://github.com/Kitware/CMake/releases/download/v${cmake_version}/cmake-${cmake_version}-${cmake_suffix}")
-          file(DOWNLOAD "${cmake_url}" ./cmake.zip SHOW_PROGRESS)
-          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./cmake.zip)
-
-          # Save the path for other steps
-          file(TO_CMAKE_PATH "$ENV{GITHUB_WORKSPACE}/${cmake_dir}" cmake_dir)
-          message("::set-output name=cmake_dir::${cmake_dir}")
-
-          if (NOT "${{ runner.os }}" STREQUAL "Windows")
-            execute_process(
-              COMMAND chmod +x ninja
-              COMMAND chmod +x ${cmake_dir}/cmake
-            )
-          endif()
-
-      - name: Install NDK
-        run: echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT}
-
       - name: Python requirements
         run: pip3 install -r requirements.txt --user
 
-      - name: Depot tools
-        run: python3 make.py run build-depot-tools
+      - name: Docker build
+        run: docker build -t pdfium-android -f docker/android/Dockerfile docker/android
 
-      - name: Environment
-        run: |
-          echo "$PWD/build/depot-tools" >> $GITHUB_PATH
-          echo "FORCE_MAC_SDK_MIN=10.15" >> $GITHUB_ENV
+      - name: Docker test
+        run: docker run -v ${PWD}:/app -it pdfium-android echo "test"
 
       - name: PDFium
-        run: python3 make.py run build-pdfium
-
-      - name: PDFium android dependencies
-        run: ./build/android/pdfium/build/install-build-deps-android.sh
+        run: docker run -v ${PWD}:/app -it pdfium-android python3 make.py run build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: python3 make.py run patch-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -it pdfium-android python3 make.py run patch-${{ matrix.config.target }}
 
       - name: Build
-        run: python3 make.py run build-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -it pdfium-android python3 make.py run build-${{ matrix.config.target }}
 
       - name: Install
-        run: python3 make.py run install-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -it pdfium-android python3 make.py run install-${{ matrix.config.target }}
 
       - name: Test
-        run: python3 make.py run test-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -it pdfium-android python3 make.py run test-${{ matrix.config.target }}
 
       - name: Archive
-        run: python3 make.py run archive-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -it pdfium-android python3 make.py run archive-${{ matrix.config.target }}
         if: startsWith(github.ref, 'refs/tags/')
 
       - name: Save

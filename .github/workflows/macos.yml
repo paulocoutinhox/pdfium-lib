@@ -88,7 +88,7 @@ jobs:
           echo "FORCE_MAC_SDK_MIN=10.15" >> $GITHUB_ENV
 
       - name: PDFium
-        run: python3 make.py run build-pdfium
+        run: python3 make.py run build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
         run: python3 make.py run patch-${{ matrix.config.target }}
