@@ -179,7 +179,7 @@ def run_task_install():
                 config, target["target_os"], target["target_cpu"]
             )
             library_dir = os.path.join("build", "android", "pdfium", "out", out_dir)
-            target_dir = os.path.join("build", "android", config)
+            target_dir = os.path.join("build", "android", config, target["android_cpu"])
 
             f.remove_dir(target_dir)
             f.create_dir(target_dir)

@@ -40,3 +40,5 @@ Test with command:
 Now you can execute any command with pattern:
 
 ```docker run -v ${PWD}:/app -it pdfium-android [COMMAND]```
+
+Obs: This is the recommended way to build and is used on CD server.
