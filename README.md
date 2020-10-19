@@ -53,13 +53,9 @@ Check tutorial here: [Build for Android](docs/BUILD_ANDROID.md)
 
 ## Prebuilt binary
 
-For iOS (armv7, arm64 and x86_64):
+Access releases page to download prebuilt binaries:
 
-https://www.dropbox.com/s/5zuddojoz7cqq80/libpdfium.a?dl=1
-
-For macOS (x86_64):
-
-https://www.dropbox.com/s/lt2py3p6ru1ixte/libpdfium.a?dl=1
+https://github.com/prsolucoes/pdfium-lib/releases
 
 ## How to include files and extend pdfium
 
