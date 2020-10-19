@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 import tarfile
 from subprocess import check_call
 
@@ -342,6 +343,19 @@ def run_task_install():
         command = " ".join(["ls", "-lh ", lib_file_out])
         check_call(command, shell=True)
 
+        # include
+        include_dir = os.path.join("build", "macos", "pdfium", "public")
+        target_include_dir = os.path.join("build", "macos", config, "include")
+        f.remove_dir(target_include_dir)
+        f.create_dir(target_include_dir)
+
+        for basename in os.listdir(include_dir):
+            if basename.endswith(".h"):
+                pathname = os.path.join(include_dir, basename)
+
+                if os.path.isfile(pathname):
+                    shutil.copy2(pathname, target_include_dir)
+
 
 def run_task_test():
     f.debug("Testing...")
@@ -370,7 +384,9 @@ def run_task_archive():
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-            filter=lambda x: (None if "_" in x.name else x),
+            filter=lambda x: (
+                None if "_" in x.name and not x.name.endswith(".h") else x
+            ),
         )
 
     tar.close()

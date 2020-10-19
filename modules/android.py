@@ -1,5 +1,6 @@
 import glob
 import os
+import shutil
 import tarfile
 from subprocess import check_call
 
@@ -43,7 +44,33 @@ def run_task_build_pdfium():
 def run_task_patch():
     f.debug("Patching...")
 
-    # source_dir = os.path.join("build", "android", "pdfium")
+    source_dir = os.path.join("build", "android", "pdfium")
+
+    # build gn
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(source_file, 24, "  ]\n"):
+        f.replace_line_in_file(source_file, 24, '    "FPDFSDK_EXPORTS",\n  ]\n')
+
+        f.debug("Applied: Build GN")
+    else:
+        f.debug("Skipped: Build GN")
+
+    # build gn flags
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(source_file, 18, "  cflags = []\n"):
+        f.replace_line_in_file(
+            source_file, 18, '  cflags = [ "-fvisibility=default" ]\n'
+        )
+
+        f.debug("Applied: Build GN Flags")
+    else:
+        f.debug("Skipped: Build GN Flags")
 
     pass
 
@@ -94,8 +121,8 @@ def run_task_build():
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
-            args.append("is_component_build=false")
-            args.append("pdf_is_standalone=false")
+            args.append("is_component_build=true")
+            args.append("pdf_is_standalone=true")
             args.append("pdf_bundle_freetype=true")
 
             if config == "release":
@@ -148,46 +175,34 @@ def run_task_install():
 
         # targets
         for target in c.targets_android:
-            files = get_compiled_files(config, target)
-
-            files_str = " ".join(files)
-
-            lib_file_out = os.path.join(
-                "build",
-                "android",
-                config,
-                "libpdfium_{0}.a".format(target["target_cpu"]),
+            out_dir = "{0}-{1}-{2}".format(
+                config, target["target_os"], target["target_cpu"]
             )
+            library_dir = os.path.join("build", "android", "pdfium", "out", out_dir)
+            target_dir = os.path.join("build", "android", config)
 
-            # we have removed symbols to squeeze final results. -no_warning_for_no_symbols will save us from useless warnings.
-            command = " ".join(
-                [
-                    "libtool",
-                    "-static -no_warning_for_no_symbols",
-                    files_str,
-                    "-o",
-                    lib_file_out,
-                ]
-            )
-            check_call(command, shell=True)
+            f.remove_dir(target_dir)
+            f.create_dir(target_dir)
 
-        # universal
-        folder = os.path.join("build", "android", config, "*.a")
-        files = glob.glob(folder)
-        files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "android", config, "libpdfium.a")
+            for basename in os.listdir(library_dir):
+                if basename.endswith(".so"):
+                    pathname = os.path.join(library_dir, basename)
 
-        f.debug("Merging libraries (lipo)...")
-        command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
-        check_call(command, shell=True)
+                    if os.path.isfile(pathname):
+                        shutil.copy2(pathname, target_dir)
 
-        f.debug("File data...")
-        command = " ".join(["file", lib_file_out])
-        check_call(command, shell=True)
+        # include
+        include_dir = os.path.join("build", "android", "pdfium", "public")
+        target_include_dir = os.path.join("build", "android", config, "include")
+        f.remove_dir(target_include_dir)
+        f.create_dir(target_include_dir)
 
-        f.debug("File size...")
-        command = " ".join(["ls", "-lh ", lib_file_out])
-        check_call(command, shell=True)
+        for basename in os.listdir(include_dir):
+            if basename.endswith(".h"):
+                pathname = os.path.join(include_dir, basename)
+
+                if os.path.isfile(pathname):
+                    shutil.copy2(pathname, target_include_dir)
 
 
 def run_task_test():
@@ -217,7 +232,13 @@ def run_task_archive():
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-            filter=lambda x: (None if "_" in x.name else x),
+            filter=lambda x: (
+                None
+                if "_" in x.name
+                and not x.name.endswith(".h")
+                and not x.name.endswith(".so")
+                else x
+            ),
         )
 
     tar.close()
