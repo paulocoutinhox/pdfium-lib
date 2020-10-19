@@ -24,28 +24,28 @@ targets_ios = [
 # android
 configurations_android = ["release"]
 targets_android = [
-    # {
-    #     "target_os": "android",
-    #     "target_cpu": "arm",
-    #     "pdfium_os": "android",
-    #     "android_cpu": "armeabi-v7a",
-    # },
-    # {
-    #     "target_os": "android",
-    #     "target_cpu": "x86",
-    #     "pdfium_os": "android",
-    #     "android_cpu": "x86",
-    # },
+    {
+        "target_os": "android",
+        "target_cpu": "arm",
+        "pdfium_os": "android",
+        "android_cpu": "armeabi-v7a",
+    },
+    {
+        "target_os": "android",
+        "target_cpu": "x86",
+        "pdfium_os": "android",
+        "android_cpu": "x86",
+    },
     {
         "target_os": "android",
         "target_cpu": "arm64",
         "pdfium_os": "android",
         "android_cpu": "arm64-v8a",
     },
-    # {
-    #     "target_os": "android",
-    #     "target_cpu": "x64",
-    #     "pdfium_os": "android",
-    #     "android_cpu": "x86_64",
-    # },
+    {
+        "target_os": "android",
+        "target_cpu": "x64",
+        "pdfium_os": "android",
+        "android_cpu": "x86_64",
+    },
 ]
