@@ -344,8 +344,8 @@ def run_task_install():
         check_call(command, shell=True)
 
         # include
-        include_dir = os.path.join("build", "macos", "pdfium", "public")
-        target_include_dir = os.path.join("build", "macos", config, "include")
+        include_dir = os.path.join("build", "ios", "pdfium", "public")
+        target_include_dir = os.path.join("build", "ios", config, "include")
         f.remove_dir(target_include_dir)
         f.create_dir(target_include_dir)
 
