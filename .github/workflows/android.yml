@@ -1,0 +1,92 @@
+name: PDFium - Android
+
+on: [push]
+
+jobs:
+  build:
+    name: ${{ matrix.config.name }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { name: "Ubuntu Latest", os: "ubuntu-20.04", target: "android" }
+        python-version: [3.7]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade PIP
+        run: python -m pip install --upgrade pip setuptools wheel
+
+      - name: Display Python version
+        run: python --version
+
+      - name: Display PIP version
+        run: pip --version
+
+      - name: Python requirements
+        run: pip3 install -r requirements.txt --user
+
+      - name: Docker build
+        run: docker build -t pdfium-android -f docker/android/Dockerfile docker/android
+
+      - name: Docker test
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android echo "test"
+
+      - name: PDFium
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run build-pdfium-${{ matrix.config.target }}
+
+      - name: Patch
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run patch-${{ matrix.config.target }}
+
+      - name: Build
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run build-${{ matrix.config.target }}
+
+      - name: Install
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run install-${{ matrix.config.target }}
+
+      - name: Test
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run test-${{ matrix.config.target }}
+
+      - name: Archive
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run archive-${{ matrix.config.target }}
+        if: startsWith(github.ref, 'refs/tags/')
+
+      - name: Save
+        uses: actions/upload-artifact@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: artifact-${{ matrix.config.target }}
+          path: ${{ matrix.config.target }}.tgz
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Load
+        uses: actions/download-artifact@v2
+        with:
+          name: artifact-android
+      - name: Get release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.2
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - name: Upload release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: android.tgz
+          asset_name: android.tgz
+          asset_content_type: application/tar+gzip

@@ -6,36 +6,6 @@ import modules.config as c
 import modules.functions as f
 
 
-def run_task_build_pdfium():
-    f.debug("Building PDFium...")
-
-    for target in c.targets:
-        build_dir = os.path.join("build", target)
-        f.create_dir(build_dir)
-
-        target_dir = os.path.join(build_dir, "pdfium")
-        f.remove_dir(target_dir)
-
-        cwd = build_dir
-        command = " ".join(
-            [
-                "gclient",
-                "config",
-                "--unmanaged",
-                "https://pdfium.googlesource.com/pdfium.git",
-            ]
-        )
-        check_call(command, cwd=cwd, shell=True)
-
-        cwd = build_dir
-        command = " ".join(["gclient", "sync"])
-        check_call(command, cwd=cwd, shell=True)
-
-        cwd = target_dir
-        command = " ".join(["git", "checkout", c.pdfium_git_commit])
-        check_call(command, cwd=cwd, shell=True)
-
-
 def run_task_build_depot_tools():
     f.debug("Building depot tools...")
 

@@ -11,7 +11,7 @@ import modules.functions as f
 def run_task_build_pdfium():
     f.debug("Building PDFium...")
 
-    target = "ios"
+    target = "android"
     build_dir = os.path.join("build", target)
     f.create_dir(build_dir)
 
@@ -29,6 +29,9 @@ def run_task_build_pdfium():
     )
     check_call(command, cwd=cwd, shell=True)
 
+    gclient_file = os.path.join(build_dir, ".gclient")
+    f.append_to_file(gclient_file, "target_os = [ 'android' ]")
+
     cwd = build_dir
     command = " ".join(["gclient", "sync"])
     check_call(command, cwd=cwd, shell=True)
@@ -41,159 +44,35 @@ def run_task_build_pdfium():
 def run_task_patch():
     f.debug("Patching...")
 
-    source_dir = os.path.join("build", "ios", "pdfium")
+    source_dir = os.path.join("build", "android", "pdfium")
 
     # build gn
     source_file = os.path.join(
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 235, '#test("pdfium_unittests") {\n'):
-        f.file_line_comment_range(source_file, 235, 282)
-        f.file_line_comment_range(source_file, 375, 376)
+    if f.file_line_has_content(source_file, 24, "  ]\n"):
+        f.replace_line_in_file(source_file, 24, '    "FPDFSDK_EXPORTS",\n  ]\n')
 
         f.debug("Applied: Build GN")
     else:
         f.debug("Skipped: Build GN")
 
-    # libjpeg
+    # build gn flags
     source_file = os.path.join(
         source_dir,
-        "third_party",
-        "libjpeg_turbo",
         "BUILD.gn",
     )
-    if not f.file_line_has_content(
-        source_file,
-        13,
-        '#assert(!is_ios, "This is not used on iOS, don\'t drag it in unintentionally")\n',
-    ):
-        f.file_line_comment(source_file, 13)
-
-        f.debug("Applied: Lib JPEG")
-    else:
-        f.debug("Skipped: Lib JPEG")
-
-    # ios automatically manage certs
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "ios",
-        "ios_sdk_overrides.gni",
-    )
-    if not f.file_has_content(source_file, "ios_automatically_manage_certs"):
-        f.append_to_file(
-            source_file, "if (is_ios) { ios_automatically_manage_certs = true }"
-        )
-
-        f.debug("Applied: iOS Automatically Manage Certs")
-    else:
-        f.debug("Skipped: iOS Automatically Manage Certs")
-
-    # compiler
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-    if not f.file_line_has_content(
-        source_file, 1636, '#      "-Wimplicit-fallthrough",\n'
-    ):
-        f.file_line_comment(source_file, 1636)
-
-        f.debug("Applied: Compiler")
-    else:
-        f.debug("Skipped: Compiler")
-
-    # carbon
-    source_file = os.path.join(
-        source_dir,
-        "core",
-        "fxge",
-        "apple",
-        "fx_quartz_device.h",
-    )
-    if not f.file_line_has_content(
-        source_file, 10, "#include <CoreGraphics/CoreGraphics.h>\n"
-    ):
+    if f.file_line_has_content(source_file, 18, "  cflags = []\n"):
         f.replace_line_in_file(
-            source_file,
-            10,
-            "#include <CoreGraphics/CoreGraphics.h>\n#include <CoreFoundation/CFString.h>\n",
+            source_file, 18, '  cflags = [ "-fvisibility=default" ]\n'
         )
 
-        f.debug("Applied: Carbon")
+        f.debug("Applied: Build GN Flags")
     else:
-        f.debug("Skipped: Carbon")
+        f.debug("Skipped: Build GN Flags")
 
-    # ios simulator
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "ios",
-        "rules.gni",
-    )
-    if not f.file_line_has_content(
-        source_file, 910, '#          data_deps += [ "//testing/iossim" ]\n'
-    ):
-        f.file_line_comment(source_file, 910)
-
-        f.debug("Applied: iOS Simulator")
-    else:
-        f.debug("Skipped: iOS Simulator")
-
-    # 32bits constexpr
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "base",
-        "allocator",
-        "partition_allocator",
-        "address_space_randomization.h",
-    )
-    if f.file_line_has_content(
-        source_file, 248, "  constexpr ALWAYS_INLINE uintptr_t ASLRMask() {\n"
-    ):
-        f.replace_line_in_file(
-            source_file,
-            248,
-            "  PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLRMask() {\n",
-        )
-        f.replace_line_in_file(
-            source_file,
-            251,
-            "  PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLROffset() {\n",
-        )
-
-        f.debug("Applied: 32bits constexpr")
-    else:
-        f.debug("Skipped: 32bits constexpr")
-
-    # ARM Neon
-    source_file = os.path.join(
-        source_dir,
-        "build_overrides",
-        "build.gni",
-    )
-    if f.file_line_has_content(source_file, 18, 'if (current_cpu == "arm") {\n'):
-        f.replace_line_in_file(source_file, 18, 'if (current_cpu == "arm64") {\n')
-
-        f.debug("Applied: ARM Neon")
-    else:
-        f.debug("Skipped: ARM Neon")
-
-    # core fxge
-    source_file = os.path.join(source_dir, "core", "fxge", "BUILD.gn")
-    if f.file_line_has_content(source_file, 167, "  if (is_mac) {\n"):
-        f.replace_line_in_file(source_file, 167, "  if (is_mac || is_ios) {\n")
-
-        f.debug("Applied: Core FXGE")
-    else:
-        f.debug("Skipped: Core FXGE")
+    pass
 
 
 def run_task_build():
@@ -202,9 +81,9 @@ def run_task_build():
     current_dir = os.getcwd()
 
     # configs
-    for config in c.configurations_ios:
+    for config in c.configurations_android:
         # targets
-        for target in c.targets_ios:
+        for target in c.targets_android:
             main_dir = os.path.join(
                 "build",
                 target["target_os"],
@@ -242,18 +121,9 @@ def run_task_build():
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
-            args.append("is_component_build=false")
-            args.append("clang_use_chrome_plugins=false")
-            args.append("pdf_is_standalone=false")
-            args.append('ios_deployment_target="9.0"')
-            args.append("ios_enable_code_signing=false")
-            args.append("use_xcode_clang=true")
-
-            if target["target_cpu"] == "arm":
-                args.append("enable_ios_bitcode=true")
-                args.append("arm_use_neon=false")
-            elif target["target_cpu"] == "arm64":
-                args.append("enable_ios_bitcode=true")
+            args.append("is_component_build=true")
+            args.append("pdf_is_standalone=true")
+            args.append("pdf_bundle_freetype=true")
 
             if config == "release":
                 args.append("symbol_level=0")
@@ -299,53 +169,31 @@ def run_task_install():
     f.debug("Installing libraries...")
 
     # configs
-    for config in c.configurations_ios:
-        f.remove_dir(os.path.join("build", "ios", config))
-        f.create_dir(os.path.join("build", "ios", config))
+    for config in c.configurations_android:
+        f.remove_dir(os.path.join("build", "android", config))
+        f.create_dir(os.path.join("build", "android", config))
 
         # targets
-        for target in c.targets_ios:
-            files = get_compiled_files(config, target)
-
-            files_str = " ".join(files)
-
-            lib_file_out = os.path.join(
-                "build", "ios", config, "libpdfium_{0}.a".format(target["target_cpu"])
+        for target in c.targets_android:
+            out_dir = "{0}-{1}-{2}".format(
+                config, target["target_os"], target["target_cpu"]
             )
+            library_dir = os.path.join("build", "android", "pdfium", "out", out_dir)
+            target_dir = os.path.join("build", "android", config)
 
-            # we have removed symbols to squeeze final results. -no_warning_for_no_symbols will save us from useless warnings.
-            command = " ".join(
-                [
-                    "libtool",
-                    "-static -no_warning_for_no_symbols",
-                    files_str,
-                    "-o",
-                    lib_file_out,
-                ]
-            )
-            check_call(command, shell=True)
+            f.remove_dir(target_dir)
+            f.create_dir(target_dir)
 
-        # universal
-        folder = os.path.join("build", "ios", config, "*.a")
-        files = glob.glob(folder)
-        files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "ios", config, "libpdfium.a")
+            for basename in os.listdir(library_dir):
+                if basename.endswith(".so"):
+                    pathname = os.path.join(library_dir, basename)
 
-        f.debug("Merging libraries (lipo)...")
-        command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
-        check_call(command, shell=True)
-
-        f.debug("File data...")
-        command = " ".join(["file", lib_file_out])
-        check_call(command, shell=True)
-
-        f.debug("File size...")
-        command = " ".join(["ls", "-lh ", lib_file_out])
-        check_call(command, shell=True)
+                    if os.path.isfile(pathname):
+                        shutil.copy2(pathname, target_dir)
 
         # include
-        include_dir = os.path.join("build", "ios", "pdfium", "public")
-        target_include_dir = os.path.join("build", "ios", config, "include")
+        include_dir = os.path.join("build", "android", "pdfium", "public")
+        target_include_dir = os.path.join("build", "android", config, "include")
         f.remove_dir(target_include_dir)
         f.create_dir(target_include_dir)
 
@@ -362,8 +210,8 @@ def run_task_test():
 
     current_dir = os.getcwd()
 
-    for configuration in c.configurations_ios:
-        lib_dir = os.path.join(current_dir, "build", "ios", configuration)
+    for configuration in c.configurations_android:
+        lib_dir = os.path.join(current_dir, "build", "android", configuration)
 
         command = " ".join(["file", os.path.join(lib_dir, "libpdfium.a")])
         check_call(command, shell=True)
@@ -375,17 +223,21 @@ def run_task_archive():
     f.debug("Archiving...")
 
     current_dir = os.getcwd()
-    lib_dir = os.path.join(current_dir, "build", "ios")
-    output_filename = os.path.join(current_dir, "ios.tgz")
+    lib_dir = os.path.join(current_dir, "build", "android")
+    output_filename = os.path.join(current_dir, "android.tgz")
 
     tar = tarfile.open(output_filename, "w:gz")
 
-    for configuration in c.configurations_ios:
+    for configuration in c.configurations_android:
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
             filter=lambda x: (
-                None if "_" in x.name and not x.name.endswith(".h") else x
+                None
+                if "_" in x.name
+                and not x.name.endswith(".h")
+                and not x.name.endswith(".so")
+                else x
             ),
         )
 

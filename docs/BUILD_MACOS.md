@@ -2,16 +2,19 @@
 
 1. Execute all **general** steps
 
-2. Apply patchs:  
-```python3 make.py run apply-patch-macos```  
+2. Get PDFium:  
+```python3 make.py run build-pdfium-macos```  
 
-3. Compile:  
+3. Patch:  
+```python3 make.py run patch-macos```  
+
+4. Compile:  
 ```python3 make.py run build-macos```  
   
-4. Install libraries:  
+5. Install libraries:  
 ```python3 make.py run install-macos```  
 
-5. Test:  
+6. Test:  
 ```python3 make.py run test-macos```  
 
 Obs:

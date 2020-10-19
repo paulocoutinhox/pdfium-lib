@@ -33,9 +33,6 @@ Obs: Only python version 3 is supported
 ```python3 make.py run build-depot-tools```  
 ```export PATH=$PATH:$PWD/build/depot-tools```  
 
-4. Get PDFium:  
-```python3 make.py run build-pdfium```  
-
 Obs:
 - The file **make.py** need be executed with python version 3.  
 - These steps you only need make one time.  
@@ -48,6 +45,10 @@ Check tutorial here: [Build for iOS](docs/BUILD_IOS.md)
 ## How to compile for macOS
 
 Check tutorial here: [Build for macOS](docs/BUILD_MACOS.md)
+
+## How to compile for Android
+
+Check tutorial here: [Build for Android](docs/BUILD_ANDROID.md)
 
 ## Prebuilt binary
 
