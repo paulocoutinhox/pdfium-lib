@@ -237,6 +237,7 @@ def run_task_archive():
                 if "_" in x.name
                 and not x.name.endswith(".h")
                 and not x.name.endswith(".so")
+                and os.path.isfile(x.name)
                 else x
             ),
         )
