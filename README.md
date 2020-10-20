@@ -8,7 +8,7 @@ This project compile PDFium to all supported platforms. Current project compiles
 
 - [x] iOS device (armv7, arm64)
 - [x] iOS simulator (x86_64)
-- [X] Android
+- [X] Android (armv7, armv8, x86, x86_64)
 - [x] macOS (x86_64)
 - [ ] Linux
 - [ ] Windows
