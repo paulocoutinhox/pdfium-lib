@@ -1,16 +1,19 @@
 # general
 make_debug = False
 make_task = ""
+
 targets = ["ios", "macos", "android"]
 targets = ["android"]
 
 # pdfium
-pdfium_git_commit = "e21911cc1c77d39dbc51001845bbfce2783e6514"
+pdfium_git_commit = "d3664703dfa9dc530246de50a16b8e8523b676d6"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4389
 
 # macos
 configurations_macos = ["release"]
 targets_macos = [
     {"target_os": "macos", "target_cpu": "x64", "pdfium_os": "mac"},
+    {"target_os": "macos", "target_cpu": "arm64", "pdfium_os": "mac"},
 ]
 
 # ios

@@ -607,39 +607,7 @@ def get_compiled_files(config, target):
             "obj",
             "third_party",
             "zlib",
-            "zlib",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "buildtools",
-            "third_party",
-            "libc++",
-            "libc++",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "buildtools",
-            "third_party",
-            "libc++abi",
-            "libc++abi",
+            "zlib_adler32_simd",
             "*.o",
         )
     )
@@ -659,49 +627,82 @@ def get_compiled_files(config, target):
         )
     )
 
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_crc32_simd",
-            "*.o",
+    if target["target_cpu"] != "arm64":        
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "third_party",
+                "zlib",
+                "zlib",
+                "*.o",
+            )
         )
-    )
 
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_x86_simd",
-            "*.o",
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "buildtools",
+                "third_party",
+                "libc++",
+                "libc++",
+                "*.o",
+            )
         )
-    )
 
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_adler32_simd",
-            "*.o",
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "buildtools",
+                "third_party",
+                "libc++abi",
+                "libc++abi",
+                "*.o",
+            )
         )
-    )
+
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "third_party",
+                "zlib",
+                "zlib_crc32_simd",
+                "*.o",
+            )
+        )
+
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "third_party",
+                "zlib",
+                "zlib_x86_simd",
+                "*.o",
+            )
+        )
 
     return files

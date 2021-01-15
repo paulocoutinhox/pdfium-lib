@@ -183,5 +183,5 @@ def main(options):
 
 if __name__ == "__main__":
     # main CLI entrypoint
-    args = docopt(__doc__, version="1.0.0")
+    args = docopt(__doc__, version="1.1.0")
     main(args)

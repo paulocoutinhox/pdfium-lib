@@ -100,9 +100,9 @@ def run_task_patch():
         "BUILD.gn",
     )
     if not f.file_line_has_content(
-        source_file, 1636, '#      "-Wimplicit-fallthrough",\n'
+        source_file, 1623, '#      "-Wimplicit-fallthrough",\n'
     ):
-        f.file_line_comment(source_file, 1636)
+        f.file_line_comment(source_file, 1623)
 
         f.debug("Applied: Compiler")
     else:
@@ -138,9 +138,9 @@ def run_task_patch():
         "rules.gni",
     )
     if not f.file_line_has_content(
-        source_file, 910, '#          data_deps += [ "//testing/iossim" ]\n'
+        source_file, 930, '#          data_deps += [ "//testing/iossim" ]\n'
     ):
-        f.file_line_comment(source_file, 910)
+        f.file_line_comment(source_file, 930)
 
         f.debug("Applied: iOS Simulator")
     else:
