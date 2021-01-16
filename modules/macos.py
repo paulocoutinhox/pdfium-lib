@@ -42,7 +42,53 @@ def run_task_build_pdfium():
 def run_task_patch():
     f.debug("Patching...")
 
-    # source_dir = os.path.join("build", "macos", "pdfium")
+    source_dir = os.path.join("build", "macos", "pdfium")
+
+    # zlib
+    source_file = os.path.join(
+        source_dir,
+        "third_party",
+        "zlib",
+        "BUILD.gn",
+    )
+    if not f.file_line_has_content(
+        source_file,
+        56,
+        'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            55,
+            '\nuse_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n\n',
+        )
+
+        f.debug("Applied: zlib")
+    else:
+        f.debug("Skipped: zlib")
+
+    # zlib - skia
+    source_file = os.path.join(
+        source_dir,
+        "third_party",
+        "skia",
+        "third_party",
+        "zlib",
+        "BUILD.gn",
+    )
+    if not f.file_line_has_content(
+        source_file,
+        23,
+        '  use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            22,
+            '\n  use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n\n',
+        )
+
+        f.debug("Applied: zlib - skia")
+    else:
+        f.debug("Skipped: zlib - skia")
 
     pass
 
@@ -627,7 +673,22 @@ def get_compiled_files(config, target):
         )
     )
 
-    if target["target_cpu"] != "arm64":        
+    files.append(
+        os.path.join(
+            "build",
+            target["target_os"],
+            "pdfium",
+            "out",
+            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+            "obj",
+            "third_party",
+            "zlib",
+            "zlib",
+            "*.o",
+        )
+    )
+
+    if target["target_cpu"] == "arm64":
         files.append(
             os.path.join(
                 "build",
@@ -638,43 +699,12 @@ def get_compiled_files(config, target):
                 "obj",
                 "third_party",
                 "zlib",
-                "zlib",
+                "zlib_arm_crc32",
                 "*.o",
             )
         )
 
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "buildtools",
-                "third_party",
-                "libc++",
-                "libc++",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "buildtools",
-                "third_party",
-                "libc++abi",
-                "libc++abi",
-                "*.o",
-            )
-        )
-
+    else:
         files.append(
             os.path.join(
                 "build",
@@ -686,6 +716,38 @@ def get_compiled_files(config, target):
                 "third_party",
                 "zlib",
                 "zlib_crc32_simd",
+                "*.o",
+            )
+        )
+
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "buildtools",
+                "third_party",
+                "libc++",
+                "libc++",
+                "*.o",
+            )
+        )
+
+        files.append(
+            os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "buildtools",
+                "third_party",
+                "libc++abi",
+                "libc++abi",
                 "*.o",
             )
         )
