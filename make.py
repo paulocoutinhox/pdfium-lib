@@ -21,6 +21,7 @@ Tasks:
   - format
 
   - build-depot-tools  
+  - build-emsdk  
   
   - build-pdfium-ios
   - patch-ios
@@ -42,6 +43,13 @@ Tasks:
   - install-android
   - test-android
   - archive-android
+
+  - build-pdfium-wasm
+  - patch-wasm
+  - build-wasm
+  - install-wasm
+  - test-wasm
+  - archive-wasm
 """
 
 from docopt import docopt
@@ -52,6 +60,7 @@ import modules.config as c
 import modules.ios as ios
 import modules.macos as macos
 import modules.android as android
+import modules.wasm as wasm
 
 
 def main(options):
@@ -84,6 +93,10 @@ def main(options):
     # build depot tools
     elif make_task == "build-depot-tools":
         common.run_task_build_depot_tools()
+
+    # build depot tools
+    elif make_task == "build-emsdk":
+        common.run_task_build_emsdk()
 
     #######################
     # iOS
@@ -168,6 +181,34 @@ def main(options):
     # archive - android
     elif make_task == "archive-android":
         android.run_task_archive()
+
+    #######################
+    # WASM
+    #######################
+
+    # build pdfium - wasm
+    elif make_task == "build-pdfium-wasm":
+        wasm.run_task_build_pdfium()
+
+    # patch - wasm
+    elif make_task == "patch-wasm":
+        wasm.run_task_patch()
+
+    # build - wasm
+    elif make_task == "build-wasm":
+        wasm.run_task_build()
+
+    # install - wasm
+    elif make_task == "install-wasm":
+        wasm.run_task_install()
+
+    # test - wasm
+    elif make_task == "test-wasm":
+        wasm.run_task_test()
+
+    # archive - wasm
+    elif make_task == "archive-wasm":
+        wasm.run_task_archive()
 
     #######################
     # Invalid

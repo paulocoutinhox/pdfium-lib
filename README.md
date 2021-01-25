@@ -51,6 +51,10 @@ Check tutorial here: [Build for macOS](docs/BUILD_MACOS.md)
 
 Check tutorial here: [Build for Android](docs/BUILD_ANDROID.md)
 
+## How to compile for WASM
+
+Check tutorial here: [Build for WASM](docs/BUILD_WASM.md)
+
 ## Prebuilt binary
 
 Access releases page to download prebuilt binaries:

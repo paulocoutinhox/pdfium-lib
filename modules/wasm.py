@@ -12,7 +12,7 @@ import modules.functions as f
 def run_task_build_pdfium():
     f.debug("Building PDFium...")
 
-    target = "macos"
+    target = "linux"
     build_dir = os.path.join("build", target)
     f.create_dir(build_dir)
 
@@ -42,53 +42,198 @@ def run_task_build_pdfium():
 def run_task_patch():
     f.debug("Patching...")
 
-    source_dir = os.path.join("build", "macos", "pdfium")
+    source_dir = os.path.join("build", "linux", "pdfium")
 
-    # zlib
+    # build config
     source_file = os.path.join(
         source_dir,
-        "third_party",
-        "zlib",
-        "BUILD.gn",
+        "build",
+        "build_config.h",
     )
-    if not f.file_line_has_content(
+    if f.file_line_has_content(
         source_file,
-        56,
-        'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
+        201,
+        "#error Please add support for your architecture in build/build_config.h\n",
     ):
         f.replace_line_in_file(
             source_file,
-            55,
-            '\nuse_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n\n',
+            201,
+            "#define ARCH_CPU_X86_FAMILY 1\n#define ARCH_CPU_32_BITS 1\n#define ARCH_CPU_LITTLE_ENDIAN 1\n",
         )
 
-        f.debug("Applied: zlib")
+        f.debug("Applied: build config")
     else:
-        f.debug("Skipped: zlib")
+        f.debug("Skipped: build config")
 
-    # zlib - skia
+    # thin archive
     source_file = os.path.join(
         source_dir,
-        "third_party",
-        "skia",
-        "third_party",
-        "zlib",
-        "BUILD.gn",
+        "build",
+        "config",
+        "BUILDCONFIG.gn",
     )
-    if not f.file_line_has_content(
+    if f.file_line_has_content(
         source_file,
-        23,
-        '  use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
+        342,
+        '  "//build/config/compiler:thin_archive",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            22,
-            '\n  use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n\n',
+            342,
+            '  #"//build/config/compiler:thin_archive",\n',
         )
 
-        f.debug("Applied: zlib - skia")
+        f.debug("Applied: thin archive")
     else:
-        f.debug("Skipped: zlib - skia")
+        f.debug("Skipped: thin archive")
+
+    # compiler
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        768,
+        '        "-m64",\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            768,
+            '        #"-m64",\n',
+        )
+        f.replace_line_in_file(
+            source_file,
+            769,
+            '        #"-march=$x64_arch",\n',
+        )
+        f.replace_line_in_file(
+            source_file,
+            770,
+            '        #"-msse3",\n',
+        )
+
+        f.debug("Applied: compiler")
+    else:
+        f.debug("Skipped: compiler")
+
+    # pragma optimize
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        1541,
+        '          "-Wno-ignored-pragma-optimize",\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1541,
+            '          "-Wno-deprecated-register",\n',
+        )
+
+        f.debug("Applied: pragma optimize")
+    else:
+        f.debug("Skipped: pragma optimize")
+
+    # pubnames
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        2358,
+        '        cflags += [ "-ggnu-pubnames" ]\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            2358,
+            '        #cflags += [ "-ggnu-pubnames" ]\n',
+        )
+
+        f.debug("Applied: pubnames")
+    else:
+        f.debug("Skipped: pubnames")
+
+    # gcc toolchain
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "toolchain",
+        "gcc_toolchain.gni",
+    )
+    if f.file_line_has_content(
+        source_file,
+        643,
+        '    cc = "$prefix/clang"\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            643,
+            '    cc = "emcc"\n',
+        )
+        f.replace_line_in_file(
+            source_file,
+            644,
+            '    cxx = "em++"\n',
+        )
+
+        f.debug("Applied: gcc toolchain")
+    else:
+        f.debug("Skipped: gcc toolchain")
+
+    # partition allocator
+    source_file = os.path.join(
+        source_dir,
+        "third_party",
+        "base",
+        "allocator",
+        "partition_allocator",
+        "spin_lock.cc",
+    )
+    if f.file_line_has_content(
+        source_file,
+        54,
+        '#warning "Processor yield not supported on this architecture."\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            54,
+            '//#warning "Processor yield not supported on this architecture."\n',
+        )
+
+        f.debug("Applied: partition allocator")
+    else:
+        f.debug("Skipped: partition allocator")
+
+    # copy files required
+    f.debug("Copying required files...")
+
+    linux_dir = os.path.join(source_dir, "linux")
+    f.create_dir(linux_dir)
+
+    f.copyfile("/usr/include/jpeglib.h", os.path.join(source_dir, "jpeglib.h"))
+    f.copyfile("/usr/include/jmorecfg.h", os.path.join(source_dir, "jmorecfg.h"))
+    f.copyfile("/usr/include/zlib.h", os.path.join(source_dir, "zlib.h"))
+    f.copyfile("/usr/include/zconf.h", os.path.join(source_dir, "zconf.h"))
+    f.copyfile("/usr/include/jerror.h", os.path.join(source_dir, "jerror.h"))
+    f.copyfile(
+        "/usr/include/x86_64-linux-gnu/jconfig.h", os.path.join(source_dir, "jconfig.h")
+    )
+    f.copyfile("/usr/include/linux/limits.h", os.path.join(linux_dir, "limits.h"))
+
+    f.debug("Copied!")
 
 
 def run_task_build():
@@ -97,9 +242,9 @@ def run_task_build():
     current_dir = os.getcwd()
 
     # configs
-    for config in c.configurations_macos:
+    for config in c.configurations_wasm:
         # targets
-        for target in c.targets_macos:
+        for target in c.targets_wasm:
             main_dir = os.path.join(
                 "build",
                 target["target_os"],
@@ -141,6 +286,11 @@ def run_task_build():
             args.append("clang_use_chrome_plugins=false")
             args.append("pdf_is_standalone=true")
             args.append("use_xcode_clang=false")
+            args.append("use_debug_fission=false")
+            args.append("use_custom_libcxx=false")
+            args.append("use_sysroot=false")
+            args.append("use_system_libjpeg=true")
+            args.append("use_system_zlib=true")
 
             if config == "release":
                 args.append("symbol_level=0")
@@ -186,25 +336,23 @@ def run_task_install():
     f.debug("Installing libraries...")
 
     # configs
-    for config in c.configurations_macos:
-        f.remove_dir(os.path.join("build", "macos", config))
-        f.create_dir(os.path.join("build", "macos", config))
+    for config in c.configurations_wasm:
+        f.remove_dir(os.path.join("build", "linux", config))
+        f.create_dir(os.path.join("build", "linux", config))
 
         # targets
-        for target in c.targets_macos:
+        for target in c.targets_wasm:
             files = get_compiled_files(config, target)
 
             files_str = " ".join(files)
 
-            lib_file_out = os.path.join(
-                "build", "macos", config, "libpdfium_{0}.a".format(target["target_cpu"])
-            )
+            lib_file_out = os.path.join("build", "linux", config, "libpdfium.a")
 
-            # we have removed symbols to squeeze final results. -no_warning_for_no_symbols will save us from useless warnings.
             command = " ".join(
                 [
-                    "libtool",
-                    "-static -no_warning_for_no_symbols",
+                    "emcc",
+                    "-Wall",
+                    "-Os",
                     files_str,
                     "-o",
                     lib_file_out,
@@ -212,15 +360,8 @@ def run_task_install():
             )
             check_call(command, shell=True)
 
-        # universal
-        folder = os.path.join("build", "macos", config, "*.a")
-        files = glob.glob(folder)
-        files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "macos", config, "libpdfium.a")
-
-        f.debug("Merging libraries (lipo)...")
-        command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
-        check_call(command, shell=True)
+        # check file
+        lib_file_out = os.path.join("build", "linux", config, "libpdfium.a")
 
         f.debug("File data...")
         command = " ".join(["file", lib_file_out])
@@ -231,8 +372,8 @@ def run_task_install():
         check_call(command, shell=True)
 
         # include
-        include_dir = os.path.join("build", "macos", "pdfium", "public")
-        target_include_dir = os.path.join("build", "macos", config, "include")
+        include_dir = os.path.join("build", "linux", "pdfium", "public")
+        target_include_dir = os.path.join("build", "linux", config, "include")
         f.remove_dir(target_include_dir)
         f.create_dir(target_include_dir)
 
@@ -248,46 +389,43 @@ def run_task_test():
     f.debug("Testing...")
 
     current_dir = os.getcwd()
-    sample_dir = os.path.join(current_dir, "sample")
+    sample_dir = os.path.join(current_dir, "sample-wasm")
     build_dir = os.path.join(sample_dir, "build")
+
+    lib_file_out = os.path.join(current_dir, "build", "linux", "release", "libpdfium.a")
+    include_dir = os.path.join(current_dir, "build", "linux", "release", "include")
 
     f.remove_dir(build_dir)
     f.create_dir(build_dir)
 
-    os.chdir(build_dir)
-
-    # generate project
-    command = " ".join(["cmake", "../"])
-
-    check_call(command, shell=True)
-
     # build
-    command = " ".join(["cmake", "--build", "."])
-    check_call(command, shell=True)
-
-    # copy assets
-    copyfile(
-        os.path.join(sample_dir, "assets", "f1.pdf"), os.path.join(build_dir, "f1.pdf")
+    command = " ".join(
+        [
+            "em++",
+            "-o",
+            "build/index.html",
+            "src/main.cpp",
+            lib_file_out,
+            "-I{0}".format(include_dir),
+            "-s",
+            "DEMANGLE_SUPPORT=1",
+            "--embed-file",
+            "files/web-assembly.pdf",
+        ]
     )
-
-    # run
-    command = " ".join(["./sample"])
-    check_call(command, shell=True)
-
-    # finish
-    os.chdir(current_dir)
+    check_call(command, cwd=sample_dir, shell=True)
 
 
 def run_task_archive():
     f.debug("Archiving...")
 
     current_dir = os.getcwd()
-    lib_dir = os.path.join(current_dir, "build", "macos")
-    output_filename = os.path.join(current_dir, "macos.tgz")
+    lib_dir = os.path.join(current_dir, "build", "linux")
+    output_filename = os.path.join(current_dir, "wasm.tgz")
 
     tar = tarfile.open(output_filename, "w:gz")
 
-    for configuration in c.configurations_macos:
+    for configuration in c.configurations_wasm:
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
@@ -640,129 +778,5 @@ def get_compiled_files(config, target):
             "*.o",
         )
     )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_adler32_simd",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib_inflate_chunk_simd",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib",
-            "*.o",
-        )
-    )
-
-    if target["target_cpu"] == "arm64":
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "zlib",
-                "zlib_arm_crc32",
-                "*.o",
-            )
-        )
-
-    else:
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "zlib",
-                "zlib_crc32_simd",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "buildtools",
-                "third_party",
-                "libc++",
-                "libc++",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "buildtools",
-                "third_party",
-                "libc++abi",
-                "libc++abi",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "zlib",
-                "zlib_x86_simd",
-                "*.o",
-            )
-        )
 
     return files
