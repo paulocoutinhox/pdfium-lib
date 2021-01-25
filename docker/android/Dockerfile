@@ -23,9 +23,14 @@ ENV PATH ${PATH}:${ANDROID_HOME}/platform-tools/:${ANDROID_NDK_HOME}:${ANDROID_H
 
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release tzdata --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
+
+# define timezone
+RUN echo "America/Sao_Paulo" > /etc/timezone
+RUN dpkg-reconfigure -f noninteractive tzdata
+RUN /bin/echo -e "LANG=\"en_US.UTF-8\"" > /etc/default/local
 
 # java
 ENV PATH=${PATH}:${JAVA_HOME}/bin

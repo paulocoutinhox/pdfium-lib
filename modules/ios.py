@@ -100,9 +100,9 @@ def run_task_patch():
         "BUILD.gn",
     )
     if not f.file_line_has_content(
-        source_file, 1623, '#      "-Wimplicit-fallthrough",\n'
+        source_file, 1630, '#      "-Wimplicit-fallthrough",\n'
     ):
-        f.file_line_comment(source_file, 1623)
+        f.file_line_comment(source_file, 1630)
 
         f.debug("Applied: Compiler")
     else:
