@@ -448,7 +448,7 @@ def run_task_test():
     current_dir = os.getcwd()
     sample_dir = os.path.join(current_dir, "sample-wasm")
     build_dir = os.path.join(sample_dir, "build")
-    final_dir = os.path.join("sample-wasm", "build")
+    http_dir = os.path.join("sample-wasm", "build")
 
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
@@ -486,11 +486,13 @@ def run_task_test():
                     "-s",
                     "DEMANGLE_SUPPORT=1",
                     "-s",
-                    "USE_PTHREADS",
+                    "USE_PTHREADS=1",
                     "-s",
                     "USE_ZLIB=1",
                     "-s",
                     "USE_LIBJPEG=1",
+                    "-s",
+                    "WASM=1",
                     "--embed-file",
                     "assets/web-assembly.pdf",
                 ]
@@ -499,7 +501,7 @@ def run_task_test():
 
             f.debug(
                 "Test on browser with: python -m http.server --directory {0}".format(
-                    final_dir
+                    http_dir
                 )
             )
 
@@ -514,39 +516,18 @@ def run_task_generate():
             # paths
             utils_dir = os.path.join(current_dir, "extras", "wasm", "utils")
 
-            lib_dir = os.path.join(
-                current_dir,
+            relative_dir = os.path.join(
                 "build",
                 target["target_os"],
                 target["target_cpu"],
-                config,
-                "lib",
             )
 
-            include_dir = os.path.join(
-                current_dir,
-                "build",
-                target["target_os"],
-                target["target_cpu"],
-                config,
-                "include",
-            )
-
-            gen_dir = os.path.join(
-                current_dir,
-                "build",
-                target["target_os"],
-                target["target_cpu"],
-                "gen",
-            )
-
-            final_dir = os.path.join(
-                "build",
-                target["target_os"],
-                target["target_cpu"],
-                "gen",
-                "out",
-            )
+            root_dir = os.path.join(current_dir, relative_dir)
+            main_dir = os.path.join(root_dir, config)
+            lib_dir = os.path.join(main_dir, "lib")
+            include_dir = os.path.join(main_dir, "include")
+            gen_dir = os.path.join(root_dir, "gen")
+            http_dir = os.path.join(relative_dir, config, "node")
 
             f.remove_dir(gen_dir)
             f.create_dir(gen_dir)
@@ -566,9 +547,13 @@ def run_task_generate():
                     doxygen_file,
                 ]
             )
-            check_call(command, cwd=gen_dir, shell=True)
+            check_call(command, cwd=include_dir, shell=True)
 
             # copy files
+            xml_dir = os.path.join(include_dir, "xml")
+            f.copytree(xml_dir, os.path.join(gen_dir, "xml"))
+            f.remove_dir(xml_dir)
+
             f.copytree(utils_dir, os.path.join(gen_dir, "utils"))
 
             # prepare files
@@ -622,16 +607,14 @@ def run_task_generate():
             check_call(command, cwd=gen_utils_dir, shell=True)
 
             # copy files
-            node_dir = os.path.join(lib_dir, "node")
-
+            node_dir = os.path.join(main_dir, "node")
             f.remove_dir(node_dir)
-
             f.copytree(gen_out_dir, node_dir)
 
             # test
             f.debug(
                 "Test on browser with: python -m http.server --directory {0}".format(
-                    final_dir
+                    http_dir
                 )
             )
 
