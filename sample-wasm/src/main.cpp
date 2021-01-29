@@ -16,7 +16,7 @@ int main(int argc, char **argv)
 
     std::cout << "Loading PDF..." << std::endl;
 
-    FPDF_STRING testDoc = "files/web-assembly.pdf";
+    FPDF_STRING testDoc = "assets/web-assembly.pdf";
     FPDF_DOCUMENT doc = FPDF_LoadDocument(testDoc, nullptr);
 
     std::cout << "Checking PDF..." << std::endl;

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.1)
 project(sample)
 
 #SET(CMAKE_C_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang)
-#SET(CMAKE_CXX_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang)
+#SET(CMAKE_CXX_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang++)
 
 file(GLOB S_FILES_PROJECT "src/*.cpp")
 file(GLOB H_FILES_PDFIUM "include/*.h")

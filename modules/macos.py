@@ -142,6 +142,8 @@ def run_task_build():
             args.append("pdf_is_standalone=true")
             args.append("use_xcode_clang=false")
             args.append("pdf_is_complete_lib=true")
+            args.append("use_custom_libcxx=false")
+            args.append("use_sysroot=false")
 
             if config == "release":
                 args.append("symbol_level=0")
