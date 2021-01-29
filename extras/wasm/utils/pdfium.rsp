@@ -1,3 +1,3 @@
 {LIB_DIR}/libpdfium.a
--I{LIB_DIR}/include/
+-I{INCLUDE_DIR}
 -s DEMANGLE_SUPPORT=1

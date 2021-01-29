@@ -303,6 +303,7 @@ def run_task_install():
     for config in c.configurations_ios:
         f.remove_dir(os.path.join("build", "ios", config))
         f.create_dir(os.path.join("build", "ios", config))
+        f.create_dir(os.path.join("build", "ios", config, "lib"))
 
         # targets
         for target in c.targets_ios:
@@ -320,16 +321,17 @@ def run_task_install():
                 "build",
                 target["target_os"],
                 config,
+                "lib",
                 "libpdfium_{0}.a".format(target["target_cpu"]),
             )
 
             f.copyfile(source_lib_path, target_lib_path)
 
         # universal
-        folder = os.path.join("build", "ios", config, "*.a")
+        folder = os.path.join("build", "ios", config, "lib", "*.a")
         files = glob.glob(folder)
         files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "ios", config, "libpdfium.a")
+        lib_file_out = os.path.join("build", "ios", config, "lib", "libpdfium.a")
 
         f.debug("Merging libraries (lipo)...")
         command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
@@ -360,15 +362,11 @@ def run_task_install():
 def run_task_test():
     f.debug("Testing...")
 
-    current_dir = os.getcwd()
-
-    for configuration in c.configurations_ios:
-        lib_dir = os.path.join(current_dir, "build", "ios", configuration)
+    for config in c.configurations_ios:
+        lib_dir = os.path.join("build", "ios", config, "lib")
 
         command = " ".join(["file", os.path.join(lib_dir, "libpdfium.a")])
         check_call(command, shell=True)
-
-    os.chdir(current_dir)
 
 
 def run_task_archive():

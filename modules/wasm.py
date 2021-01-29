@@ -389,6 +389,12 @@ def run_task_install():
                 os.path.join("build", target["target_os"], target["target_cpu"], config)
             )
 
+            f.create_dir(
+                os.path.join(
+                    "build", target["target_os"], target["target_cpu"], config, "lib"
+                )
+            )
+
             source_lib_path = os.path.join(
                 "build",
                 target["target_os"],
@@ -404,6 +410,7 @@ def run_task_install():
                 target["target_os"],
                 target["target_cpu"],
                 config,
+                "lib",
                 "libpdfium.a",
             )
 
@@ -451,6 +458,7 @@ def run_task_test():
                 target["target_os"],
                 target["target_cpu"],
                 config,
+                "lib",
                 "libpdfium.a",
             )
 
@@ -512,6 +520,16 @@ def run_task_generate():
                 target["target_os"],
                 target["target_cpu"],
                 config,
+                "lib",
+            )
+
+            include_dir = os.path.join(
+                current_dir,
+                "build",
+                target["target_os"],
+                target["target_cpu"],
+                config,
+                "include",
             )
 
             gen_dir = os.path.join(
@@ -556,6 +574,7 @@ def run_task_generate():
             # prepare files
             rsp_file = os.path.join(gen_dir, "utils", "pdfium.rsp")
             f.replace_in_file(rsp_file, "{LIB_DIR}", lib_dir)
+            f.replace_in_file(rsp_file, "{INCLUDE_DIR}", include_dir)
 
             # node modules
             gen_utils_dir = os.path.join(

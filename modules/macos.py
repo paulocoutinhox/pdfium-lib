@@ -192,6 +192,7 @@ def run_task_install():
     for config in c.configurations_macos:
         f.remove_dir(os.path.join("build", "macos", config))
         f.create_dir(os.path.join("build", "macos", config))
+        f.create_dir(os.path.join("build", "macos", config, "lib"))
 
         # targets
         for target in c.targets_macos:
@@ -209,16 +210,17 @@ def run_task_install():
                 "build",
                 target["target_os"],
                 config,
+                "lib",
                 "libpdfium_{0}.a".format(target["target_cpu"]),
             )
 
             f.copyfile(source_lib_path, target_lib_path)
 
         # universal
-        folder = os.path.join("build", "macos", config, "*.a")
+        folder = os.path.join("build", "macos", config, "lib", "*.a")
         files = glob.glob(folder)
         files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "macos", config, "libpdfium.a")
+        lib_file_out = os.path.join("build", "macos", config, "lib", "libpdfium.a")
 
         f.debug("Merging libraries (lipo)...")
         command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])

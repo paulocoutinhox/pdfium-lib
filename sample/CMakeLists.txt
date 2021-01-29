@@ -17,7 +17,7 @@ find_library(CORE_GRAPHICS_FWK CoreGraphics)
 get_filename_component(FRAMEWORK_DIR ${CORE_GRAPHICS_FWK} PATH)
 
 set(LIBS pdfium)
-link_directories("../build/macos/release/")
+link_directories("../build/macos/release/lib")
 
 add_executable(sample ${PROJ_FILES})
 

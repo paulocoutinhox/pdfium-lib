@@ -208,15 +208,12 @@ def run_task_install():
 def run_task_test():
     f.debug("Testing...")
 
-    current_dir = os.getcwd()
+    for config in c.configurations_android:
+        for target in c.targets_android:
+            lib_dir = os.path.join("build", "android", config, target["android_cpu"])
 
-    for configuration in c.configurations_android:
-        lib_dir = os.path.join(current_dir, "build", "android", configuration)
-
-        command = " ".join(["file", os.path.join(lib_dir, "libpdfium.a")])
-        check_call(command, shell=True)
-
-    os.chdir(current_dir)
+            command = " ".join(["file", os.path.join(lib_dir, "libpdfium.so")])
+            check_call(command, shell=True)
 
 
 def run_task_archive():
