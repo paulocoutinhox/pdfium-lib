@@ -49,7 +49,8 @@ Tasks:
   - build-wasm
   - install-wasm
   - test-wasm
-  - archive-wasm
+  - generate-wasm
+  - archive-wasm  
 """
 
 from docopt import docopt
@@ -205,6 +206,10 @@ def main(options):
     # test - wasm
     elif make_task == "test-wasm":
         wasm.run_task_test()
+
+    # generate - wasm
+    elif make_task == "generate-wasm":
+        wasm.run_task_generate()
 
     # archive - wasm
     elif make_task == "archive-wasm":

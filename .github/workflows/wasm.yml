@@ -51,6 +51,9 @@ jobs:
       - name: Test
         run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py run test-${{ matrix.config.target }}
 
+      - name: Generate
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py run generate-${{ matrix.config.target }}
+
       - name: Archive
         run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py run archive-${{ matrix.config.target }}
         if: startsWith(github.ref, 'refs/tags/')

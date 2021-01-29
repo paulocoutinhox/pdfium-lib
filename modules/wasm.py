@@ -65,7 +65,7 @@ def run_task_patch():
     else:
         f.debug("Skipped: build config")
 
-    # thin archive
+    # compiler thin archive
     source_file = os.path.join(
         source_dir,
         "build",
@@ -83,9 +83,29 @@ def run_task_patch():
             '  #"//build/config/compiler:thin_archive",\n',
         )
 
-        f.debug("Applied: thin archive")
+        f.debug("Applied: compiler thin archive")
     else:
-        f.debug("Skipped: thin archive")
+        f.debug("Skipped: compiler thin archive")
+
+    # build thin archive
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        203,
+        '    configs -= [ "//build/config/compiler:thin_archive" ]\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            203,
+            '    #configs -= [ "//build/config/compiler:thin_archive" ]\n',
+        )
+
+        f.debug("Applied: build thin archive")
+    else:
+        f.debug("Skipped: build thin archive")
 
     # compiler
     source_file = os.path.join(
@@ -217,6 +237,29 @@ def run_task_patch():
     else:
         f.debug("Skipped: partition allocator")
 
+    # compiler stack protector
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        306,
+        '        cflags += [ "-fstack-protector" ]\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            306,
+            '        cflags += [ "-fno-stack-protector" ]\n',
+        )
+
+        f.debug("Applied: compiler stack protector")
+    else:
+        f.debug("Skipped: compiler stack protector")
+
     # copy files required
     f.debug("Copying required files...")
 
@@ -250,7 +293,7 @@ def run_task_build():
                 target["target_os"],
                 "pdfium",
                 "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
             )
 
             f.remove_dir(main_dir)
@@ -285,12 +328,12 @@ def run_task_build():
             args.append("is_component_build=false")
             args.append("clang_use_chrome_plugins=false")
             args.append("pdf_is_standalone=true")
-            args.append("use_xcode_clang=false")
             args.append("use_debug_fission=false")
             args.append("use_custom_libcxx=false")
             args.append("use_sysroot=false")
             args.append("use_system_libjpeg=true")
             args.append("use_system_zlib=true")
+            args.append("pdf_is_complete_lib=true")
 
             if config == "release":
                 args.append("symbol_level=0")
@@ -302,7 +345,7 @@ def run_task_build():
                     "gn",
                     "gen",
                     "out/{0}-{1}-{2}".format(
-                        config, target["target_os"], target["target_cpu"]
+                        target["target_os"], target["target_cpu"], config
                     ),
                     "--args='{0}'".format(args_str),
                 ]
@@ -321,7 +364,7 @@ def run_task_build():
                     "ninja",
                     "-C",
                     "out/{0}-{1}-{2}".format(
-                        config, target["target_os"], target["target_cpu"]
+                        target["target_os"], target["target_cpu"], config
                     ),
                     "pdfium",
                     "-v",
@@ -337,52 +380,59 @@ def run_task_install():
 
     # configs
     for config in c.configurations_wasm:
-        f.remove_dir(os.path.join("build", "linux", config))
-        f.create_dir(os.path.join("build", "linux", config))
-
-        # targets
         for target in c.targets_wasm:
-            files = get_compiled_files(config, target)
-
-            files_str = " ".join(files)
-
-            lib_file_out = os.path.join("build", "linux", config, "libpdfium.a")
-
-            command = " ".join(
-                [
-                    "emcc",
-                    "-Wall",
-                    "-Os",
-                    files_str,
-                    "-o",
-                    lib_file_out,
-                ]
+            f.remove_dir(
+                os.path.join("build", target["target_os"], target["target_cpu"], config)
             )
+
+            f.create_dir(
+                os.path.join("build", target["target_os"], target["target_cpu"], config)
+            )
+
+            source_lib_path = os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "obj",
+                "libpdfium.a",
+            )
+
+            target_lib_path = os.path.join(
+                "build",
+                target["target_os"],
+                target["target_cpu"],
+                config,
+                "libpdfium.a",
+            )
+
+            f.copyfile(source_lib_path, target_lib_path)
+
+            # check file
+            f.debug("File data...")
+            command = " ".join(["file", target_lib_path])
             check_call(command, shell=True)
 
-        # check file
-        lib_file_out = os.path.join("build", "linux", config, "libpdfium.a")
+            f.debug("File size...")
+            command = " ".join(["ls", "-lh ", target_lib_path])
+            check_call(command, shell=True)
 
-        f.debug("File data...")
-        command = " ".join(["file", lib_file_out])
-        check_call(command, shell=True)
+            # include
+            include_dir = os.path.join("build", "linux", "pdfium", "public")
+            target_include_dir = os.path.join(
+                "build", target["target_os"], target["target_cpu"], config, "include"
+            )
 
-        f.debug("File size...")
-        command = " ".join(["ls", "-lh ", lib_file_out])
-        check_call(command, shell=True)
+            f.remove_dir(target_include_dir)
+            f.create_dir(target_include_dir)
 
-        # include
-        include_dir = os.path.join("build", "linux", "pdfium", "public")
-        target_include_dir = os.path.join("build", "linux", config, "include")
-        f.remove_dir(target_include_dir)
-        f.create_dir(target_include_dir)
+            for basename in os.listdir(include_dir):
+                if basename.endswith(".h"):
+                    pathname = os.path.join(include_dir, basename)
 
-        for basename in os.listdir(include_dir):
-            if basename.endswith(".h"):
-                pathname = os.path.join(include_dir, basename)
-
-                if os.path.isfile(pathname):
-                    shutil.copy2(pathname, target_include_dir)
+                    if os.path.isfile(pathname):
+                        shutil.copy2(pathname, target_include_dir)
 
 
 def run_task_test():
@@ -391,392 +441,204 @@ def run_task_test():
     current_dir = os.getcwd()
     sample_dir = os.path.join(current_dir, "sample-wasm")
     build_dir = os.path.join(sample_dir, "build")
+    final_dir = os.path.join("sample-wasm", "build")
 
-    lib_file_out = os.path.join(current_dir, "build", "linux", "release", "libpdfium.a")
-    include_dir = os.path.join(current_dir, "build", "linux", "release", "include")
+    for config in c.configurations_wasm:
+        for target in c.targets_wasm:
+            lib_file_out = os.path.join(
+                current_dir,
+                "build",
+                target["target_os"],
+                target["target_cpu"],
+                config,
+                "libpdfium.a",
+            )
 
-    f.remove_dir(build_dir)
-    f.create_dir(build_dir)
+            include_dir = os.path.join(
+                current_dir,
+                "build",
+                target["target_os"],
+                target["target_cpu"],
+                config,
+                "include",
+            )
 
-    # build
-    command = " ".join(
-        [
-            "em++",
-            "-o",
-            "build/index.html",
-            "src/main.cpp",
-            lib_file_out,
-            "-I{0}".format(include_dir),
-            "-s",
-            "DEMANGLE_SUPPORT=1",
-            "--embed-file",
-            "files/web-assembly.pdf",
-        ]
-    )
-    check_call(command, cwd=sample_dir, shell=True)
+            f.remove_dir(build_dir)
+            f.create_dir(build_dir)
+
+            # build
+            command = " ".join(
+                [
+                    "em++",
+                    "-o",
+                    "build/index.html",
+                    "src/main.cpp",
+                    lib_file_out,
+                    "-I{0}".format(include_dir),
+                    "-s",
+                    "DEMANGLE_SUPPORT=1",
+                    "-s",
+                    "USE_PTHREADS",
+                    "-s",
+                    "USE_ZLIB=1",
+                    "-s",
+                    "USE_LIBJPEG=1",
+                    "--embed-file",
+                    "files/web-assembly.pdf",
+                ]
+            )
+            check_call(command, cwd=sample_dir, shell=True)
+
+            f.debug(
+                "Test on browser with: python -m http.server --directory {0}".format(
+                    final_dir
+                )
+            )
+
+
+def run_task_generate():
+    f.debug("Generating...")
+
+    current_dir = os.getcwd()
+
+    for config in c.configurations_wasm:
+        for target in c.targets_wasm:
+            # paths
+            utils_dir = os.path.join(current_dir, "extras", "wasm", "utils")
+
+            lib_dir = os.path.join(
+                current_dir,
+                "build",
+                target["target_os"],
+                target["target_cpu"],
+                config,
+            )
+
+            gen_dir = os.path.join(
+                current_dir,
+                "build",
+                target["target_os"],
+                target["target_cpu"],
+                "gen",
+            )
+
+            final_dir = os.path.join(
+                "build",
+                target["target_os"],
+                target["target_cpu"],
+                "gen",
+                "out",
+            )
+
+            f.remove_dir(gen_dir)
+            f.create_dir(gen_dir)
+
+            # doxygen
+            doxygen_file = os.path.join(
+                current_dir,
+                "extras",
+                "wasm",
+                "config",
+                "Doxyfile",
+            )
+
+            command = " ".join(
+                [
+                    "doxygen",
+                    doxygen_file,
+                ]
+            )
+            check_call(command, cwd=gen_dir, shell=True)
+
+            # copy files
+            f.copytree(utils_dir, os.path.join(gen_dir, "utils"))
+
+            # prepare files
+            rsp_file = os.path.join(gen_dir, "utils", "pdfium.rsp")
+            f.replace_in_file(rsp_file, "{LIB_DIR}", lib_dir)
+
+            # node modules
+            gen_utils_dir = os.path.join(
+                gen_dir,
+                "utils",
+            )
+
+            command = " ".join(
+                [
+                    "npm",
+                    "install",
+                ]
+            )
+            check_call(command, cwd=gen_utils_dir, shell=True)
+
+            # generate
+            gen_out_dir = os.path.join(
+                gen_dir,
+                "out",
+            )
+
+            f.remove_dir(gen_out_dir)
+            f.create_dir(gen_out_dir)
+
+            html_file = os.path.join(
+                gen_out_dir,
+                "pdfium.html",
+            )
+
+            command = " ".join(
+                [
+                    "emcc",
+                    "-o",
+                    html_file,
+                    "-s",
+                    'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml createDocFromBuffer)"',
+                    "-s",
+                    'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
+                    "--pre-js pre-js.js",
+                    "avail.c",
+                    "@pdfium.rsp",
+                    "-Os",
+                ]
+            )
+            check_call(command, cwd=gen_utils_dir, shell=True)
+
+            # copy files
+            node_dir = os.path.join(lib_dir, "node")
+
+            f.remove_dir(node_dir)
+
+            f.copytree(gen_out_dir, node_dir)
+
+            # test
+            f.debug(
+                "Test on browser with: python -m http.server --directory {0}".format(
+                    final_dir
+                )
+            )
+
+    f.debug("Generated")
 
 
 def run_task_archive():
     f.debug("Archiving...")
 
     current_dir = os.getcwd()
-    lib_dir = os.path.join(current_dir, "build", "linux")
     output_filename = os.path.join(current_dir, "wasm.tgz")
 
     tar = tarfile.open(output_filename, "w:gz")
 
-    for configuration in c.configurations_wasm:
-        tar.add(
-            name=os.path.join(lib_dir, configuration),
-            arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-            filter=lambda x: (
-                None if "_" in x.name and not x.name.endswith(".h") else x
-            ),
-        )
+    for config in c.configurations_wasm:
+        for target in c.targets_wasm:
+            lib_dir = os.path.join(
+                current_dir, "build", target["target_os"], target["target_cpu"], config
+            )
+
+            tar.add(
+                name=lib_dir,
+                arcname=os.path.basename(lib_dir),
+                filter=lambda x: (
+                    None if "_" in x.name and not x.name.endswith(".h") else x
+                ),
+            )
 
     tar.close()
-
-
-def get_compiled_files(config, target):
-    folder = os.path.join(
-        "build",
-        target["target_os"],
-        "pdfium",
-        "out",
-        "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-        "obj",
-        "**",
-        "*.a",
-    )
-
-    files = glob.glob(folder, recursive=True)
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdftext",
-            "fpdftext",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fxcrt",
-            "fxcrt",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "page",
-            "page",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "render",
-            "render",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "parser",
-            "parser",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "edit",
-            "edit",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "cmaps",
-            "cmaps",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "font",
-            "font",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfdoc",
-            "fpdfdoc",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fxcodec",
-            "fxcodec",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fxge",
-            "fxge",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fdrm",
-            "fdrm",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fxjs",
-            "fxjs",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fpdfsdk",
-            "pwl",
-            "pwl",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fpdfsdk",
-            "formfiller",
-            "formfiller",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fpdfsdk",
-            "fpdfsdk",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_freetype",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_agg",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "skia_shared",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "pdfium_base",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_lcms2",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_libopenjpeg",
-            "*.o",
-        )
-    )
-
-    return files

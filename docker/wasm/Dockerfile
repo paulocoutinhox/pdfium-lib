@@ -11,7 +11,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
