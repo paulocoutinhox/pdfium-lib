@@ -394,7 +394,7 @@ def run_task_install():
                 target["target_os"],
                 "pdfium",
                 "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
                 "obj",
                 "libpdfium.a",
             )

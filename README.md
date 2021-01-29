@@ -3,6 +3,7 @@
 ![PDFium - iOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20iOS/badge.svg)
 ![PDFium - macOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20macOS/badge.svg)
 ![PDFium - Android](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20Android/badge.svg)
+![PDFium - WASM](https://github.com/paulo-coutinho/pdfium-lib/workflows/PDFium%20-%20WASM/badge.svg)
 
 This project compile PDFium to all supported platforms. Current project compiles to:  
 
@@ -12,6 +13,7 @@ This project compile PDFium to all supported platforms. Current project compiles
 - [x] macOS (x86_64, arm64)
 - [ ] Linux
 - [ ] Windows
+- [x] WASM (x86_64)
 
 ## Requirements
 
