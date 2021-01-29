@@ -50,6 +50,7 @@ Tasks:
   - install-wasm
   - test-wasm
   - generate-wasm
+  - publish-wasm
   - archive-wasm  
 """
 
@@ -210,6 +211,10 @@ def main(options):
     # generate - wasm
     elif make_task == "generate-wasm":
         wasm.run_task_generate()
+
+    # publish - wasm
+    elif make_task == "publish-wasm":
+        wasm.run_task_publish()
 
     # archive - wasm
     elif make_task == "archive-wasm":

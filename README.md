@@ -13,7 +13,7 @@ This project compile PDFium to all supported platforms. Current project compiles
 - [x] macOS (x86_64, arm64)
 - [ ] Linux
 - [ ] Windows
-- [x] WASM (x86_64)
+- [x] WASM (web assembly)
 
 ## Requirements
 

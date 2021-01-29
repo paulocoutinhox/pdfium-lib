@@ -515,6 +515,7 @@ def run_task_generate():
         for target in c.targets_wasm:
             # paths
             utils_dir = os.path.join(current_dir, "extras", "wasm", "utils")
+            template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
             relative_dir = os.path.join(
                 "build",
@@ -527,6 +528,7 @@ def run_task_generate():
             lib_dir = os.path.join(main_dir, "lib")
             include_dir = os.path.join(main_dir, "include")
             gen_dir = os.path.join(root_dir, "gen")
+            node_dir = os.path.join(main_dir, "node")
             http_dir = os.path.join(relative_dir, config, "node")
 
             f.remove_dir(gen_dir)
@@ -549,11 +551,12 @@ def run_task_generate():
             )
             check_call(command, cwd=include_dir, shell=True)
 
-            # copy files
+            # copy xml files
             xml_dir = os.path.join(include_dir, "xml")
             f.copytree(xml_dir, os.path.join(gen_dir, "xml"))
             f.remove_dir(xml_dir)
 
+            # copy utils files
             f.copytree(utils_dir, os.path.join(gen_dir, "utils"))
 
             # prepare files
@@ -607,9 +610,14 @@ def run_task_generate():
             check_call(command, cwd=gen_utils_dir, shell=True)
 
             # copy files
-            node_dir = os.path.join(main_dir, "node")
             f.remove_dir(node_dir)
             f.copytree(gen_out_dir, node_dir)
+
+            # copy template files
+            f.copyfile(
+                os.path.join(template_dir, "index.html"),
+                os.path.join(node_dir, "index.html"),
+            )
 
             # test
             f.debug(
@@ -619,6 +627,43 @@ def run_task_generate():
             )
 
     f.debug("Generated")
+
+
+def run_task_publish():
+    f.debug("Publishing...")
+
+    current_dir = os.getcwd()
+    publish_dir = os.path.join(current_dir, "build", "linux", "publish")
+    node_dir = os.path.join(current_dir, "build", "linux", "x64", "release", "node")
+    template_dir = os.path.join(current_dir, "extras", "wasm", "template")
+
+    # copy generated files
+    f.remove_dir(publish_dir)
+    f.copytree(node_dir, publish_dir)
+
+    # copy template files
+    f.copyfile(
+        os.path.join(template_dir, "README.md"),
+        os.path.join(publish_dir, "README.md"),
+    )
+
+    # clone gh-pages branch
+    command = "git init ."
+    check_call(command, cwd=publish_dir, shell=True)
+
+    command = "git add ."
+    check_call(command, cwd=publish_dir, shell=True)
+
+    command = 'git commit -m "published new version"'
+    check_call(command, cwd=publish_dir, shell=True)
+
+    command = 'git push "git@github.com:paulo-coutinho/pdfium-lib.git" master:gh-pages --force'
+    check_call(command, cwd=publish_dir, shell=True)
+
+    # finish
+    f.debug("Test on browser with: https://paulo-coutinho.github.io/pdfium-lib/")
+
+    f.debug("Published")
 
 
 def run_task_archive():

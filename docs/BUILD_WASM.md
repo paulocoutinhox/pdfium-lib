@@ -81,3 +81,9 @@ or with docker you can use:
 docker run -v ${PWD}:/app -it pdfium-wasm python3 make.py run test-wasm
 docker run -v ${PWD}:/app -it pdfium-wasm node --experimental-wasm-threads --experimental-wasm-bulk-memory sample-wasm/build/index.js
 ```
+
+## Web demo
+
+You can test pdfium on web browser here:
+
+https://paulo-coutinho.github.io/pdfium-lib/

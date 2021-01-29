@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PDFium - WebAssembly Test</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+</head>
+
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">
+                PDFium - Test
+            </h1>
+            <br>
+            <button class="button is-success" id="btRun">Test function</button>
+            <br>
+            <br>
+            <br>
+            <small>Obs: Check your console and check the result and messages</small>
+        </div>
+    </section>
+
+    <script>
+        // check for wasm support
+        if (!('WebAssembly' in window)) {
+            alert('You need a browser with wasm support enabled :(');
+        }
+
+        // imports
+        var imports = imports || {};
+        imports.module = imports.module || {};
+        imports.env = imports.env || {};
+        imports.env.memoryBase = imports.env.memoryBase || 0;
+        imports.env.tableBase = imports.env.tableBase || 0;
+
+        if (!imports.env.memory) {
+            imports.env.memory = new WebAssembly.Memory({
+                initial: 256
+            });
+        }
+
+        if (!imports.env.table) {
+            imports.env.table = new WebAssembly.Table({
+                initial: 0,
+                element: 'anyfunc'
+            });
+        }
+
+        // load library
+        const btRun = document.getElementById('btRun');
+        btRun.firstChild.data = 'Loading WASM...';
+        btRun.className = 'button is-warning';
+
+        (async() => {
+            const response = await fetch('pdfium.wasm');
+
+            // buffer
+            const buffer = await response.arrayBuffer();
+            console.log("BUFFER:");
+            console.log(buffer);
+
+            // module
+            const module = await WebAssembly.compile(buffer);
+            console.log("MODULE:");
+            console.log(module);
+
+            try {
+                // instante
+                const instance = await WebAssembly.instantiate(module, imports);
+                console.log("INSTANCE:");
+                console.log(instance);
+
+                // result
+                const result = instance.exports.createDocFromBuffer(0, 0);
+                console.log("RESULT:");
+                console.log(result);
+            } catch (error) {
+                // error state
+                btRun.firstChild.data = 'Error while load WASM';
+                btRun.className = 'button is-danger';
+
+                // throw error to browser
+                throw error;
+            }
+
+            // button event
+            document.getElementById('btRun').onclick = function() {
+                const result = instance.exports.createDocFromBuffer(0, 0);
+                console.log(result);
+            }
+
+            // success state
+            btRun.firstChild.data = 'Test function';
+            btRun.className = 'button is-success';
+        })();
+    </script>
+</body>
+
+</html>
