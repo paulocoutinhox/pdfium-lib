@@ -15,6 +15,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - uses: fregante/setup-git-user@v1
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
@@ -69,7 +70,6 @@ jobs:
           path: ${{ matrix.config.target }}.tgz
 
       - name: Publish to web
-        uses: fregante/setup-git-user@v1
         run: |
           sudo chmod -R 777 build/linux
           python3 make.py run publish-${{ matrix.config.target }}
