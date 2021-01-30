@@ -69,7 +69,9 @@ jobs:
           path: ${{ matrix.config.target }}.tgz
 
       - name: Publish to web
-        run: python3 make.py run publish-${{ matrix.config.target }}
+        run: |
+          sudo chmod -R 777 build/linux
+          python3 make.py run publish-${{ matrix.config.target }}
         if: startsWith(github.ref, 'refs/tags/')
 
   deploy:
