@@ -22,13 +22,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Upgrade PIP
-        run: python -m pip install --upgrade pip setuptools wheel
+        run: python3 -m pip install --upgrade pip setuptools wheel
 
       - name: Display Python version
-        run: python --version
+        run: python3 --version
 
       - name: Display PIP version
-        run: pip --version
+        run: pip3 --version
 
       - name: Python requirements
         run: pip3 install -r requirements.txt --user

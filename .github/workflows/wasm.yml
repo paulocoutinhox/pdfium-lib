@@ -22,13 +22,16 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Upgrade PIP
-        run: python -m pip install --upgrade pip setuptools wheel
+        run: python3 -m pip install --upgrade pip setuptools wheel
 
       - name: Display Python version
-        run: python --version
+        run: python3 --version
 
       - name: Display PIP version
-        run: pip --version
+        run: pip3 --version
+
+      - name: Python requirements
+        run: pip3 install -r requirements.txt --user
 
       - name: Docker build
         run: docker build -t pdfium-wasm -f docker/wasm/Dockerfile docker/wasm
@@ -66,7 +69,7 @@ jobs:
           path: ${{ matrix.config.target }}.tgz
 
       - name: Publish to web
-        run: python make.py run publish-${{ matrix.config.target }}
+        run: python3 make.py run publish-${{ matrix.config.target }}
         if: startsWith(github.ref, 'refs/tags/')
 
   deploy:
