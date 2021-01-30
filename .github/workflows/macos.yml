@@ -19,7 +19,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: fregante/setup-git-user@v1
+        run: |
+          git config --global user.name "Paulo Coutinho"
+          git config --global user.email "paulo@prsolucoes.com"
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
