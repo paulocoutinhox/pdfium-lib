@@ -15,6 +15,13 @@ This project compile PDFium to all supported platforms. Current project compiles
 - [ ] Windows
 - [x] WASM (web assembly)
 
+## Web demo
+
+You can test pdfium on web browser here:
+
+https://paulo-coutinho.github.io/pdfium-lib/
+
+
 ## Requirements
 
 1. ninja (brew install ninja)  

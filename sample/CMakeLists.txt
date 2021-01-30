@@ -5,7 +5,7 @@ project(sample)
 #SET(CMAKE_CXX_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang++)
 
 file(GLOB S_FILES_PROJECT "src/*.cpp")
-file(GLOB H_FILES_PDFIUM "include/*.h")
+file(GLOB H_FILES_PDFIUM "../build/macos/release/include/*.h")
 
 set(
     PROJ_FILES
@@ -29,4 +29,4 @@ target_link_libraries(sample ${LIBS})
 target_link_libraries(sample "-framework CoreGraphics")
 target_link_libraries(sample "-framework Foundation")
 
-target_include_directories(sample PRIVATE "include")
+target_include_directories(sample PRIVATE "../build/macos/release/include")
