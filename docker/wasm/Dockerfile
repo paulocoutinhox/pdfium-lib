@@ -3,27 +3,15 @@ FROM ubuntu:18.04
 # general
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV PROJ_TARGET="android"
+ENV PROJ_TARGET="wasm"
 
-ENV ANDROID_NDK_VERSION="r21d"
-ENV ANDROID_COMPILE_SDK="30"
-ENV ANDROID_BUILD_TOOLS="30.0.2"
-ENV ANDROID_SDK_TOOLS_REV="4333796"
-ENV ANDROID_CMAKE_REV="3.6.4111459"
-ENV ANDROID_CMAKE_REV_3_10="3.10.2.4988404"
-ENV GRADLE_VERSION="6.1.1"
 ENV JAVA_VERSION="8"
 
 ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
-ENV GRADLE_HOME="/opt/gradle-6.1.1"
-ENV ANDROID_HOME="/opt/android-sdk-linux"
-ENV ANDROID_NDK_HOME="/opt/android-ndk-linux"
-
-ENV PATH ${PATH}:${ANDROID_HOME}/platform-tools/:${ANDROID_NDK_HOME}:${ANDROID_HOME}/ndk-bundle:${ANDROID_HOME}/tools/bin/
 
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release tzdata --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -36,13 +24,6 @@ RUN /bin/echo -e "LANG=\"en_US.UTF-8\"" > /etc/default/local
 ENV PATH=${PATH}:${JAVA_HOME}/bin
 RUN echo ${JAVA_HOME}
 RUN java -version
-
-# gradle
-ENV PATH=${PATH}:${GRADLE_HOME}/bin
-RUN wget -q https://services.gradle.org/distributions/gradle-${GRADLE_VERSION}-bin.zip \
-    && unzip gradle-${GRADLE_VERSION}-bin.zip -d /opt \
-    && rm gradle-${GRADLE_VERSION}-bin.zip
-RUN gradle --version
 
 # google depot tools
 RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot-tools
@@ -63,7 +44,7 @@ RUN apt-get install -o APT::Immediate-Configure=false -f apt
 RUN apt-get -f install
 RUN dpkg --configure -a
 RUN apt-get -y dist-upgrade
-RUN echo n | ./build/install-build-deps-android.sh
+RUN echo n | ./build/install-build-deps.sh
 RUN rm -rf /build
 
 # ninja
@@ -72,6 +53,23 @@ RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
 # dependencies
 RUN pip3 install --upgrade pip
 RUN pip3 install docopt python-slugify tqdm
+
+# emsdk
+RUN mkdir /emsdk
+WORKDIR /emsdk
+RUN git clone https://github.com/emscripten-core/emsdk.git .
+RUN ./emsdk install 2.0.13
+RUN ./emsdk activate 2.0.13
+ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
+
+# cache system libraries
+RUN bash -c 'echo "int main() { return 0; }" > /tmp/main.cc'
+RUN bash -c 'source /emsdk/emsdk_env.sh && em++ -s USE_ZLIB=1 -s USE_LIBJPEG=1 -s USE_PTHREADS=1 -s ASSERTIONS=1 -o /tmp/main.html /tmp/main.cc'
+
+# nodejs and npm
+RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN apt-get install -y nodejs
+RUN npm install -g npm@latest
 
 # working dir
 WORKDIR /app

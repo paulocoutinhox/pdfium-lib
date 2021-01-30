@@ -100,9 +100,9 @@ def run_task_patch():
         "BUILD.gn",
     )
     if not f.file_line_has_content(
-        source_file, 1623, '#      "-Wimplicit-fallthrough",\n'
+        source_file, 1630, '#      "-Wimplicit-fallthrough",\n'
     ):
-        f.file_line_comment(source_file, 1623)
+        f.file_line_comment(source_file, 1630)
 
         f.debug("Applied: Compiler")
     else:
@@ -210,7 +210,7 @@ def run_task_build():
                 target["target_os"],
                 "pdfium",
                 "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
+                "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
             )
 
             f.remove_dir(main_dir)
@@ -248,6 +248,7 @@ def run_task_build():
             args.append('ios_deployment_target="9.0"')
             args.append("ios_enable_code_signing=false")
             args.append("use_xcode_clang=true")
+            args.append("pdf_is_complete_lib=true")
 
             if target["target_cpu"] == "arm":
                 args.append("enable_ios_bitcode=true")
@@ -265,7 +266,7 @@ def run_task_build():
                     "gn",
                     "gen",
                     "out/{0}-{1}-{2}".format(
-                        config, target["target_os"], target["target_cpu"]
+                        target["target_os"], target["target_cpu"], config
                     ),
                     "--args='{0}'".format(args_str),
                 ]
@@ -284,7 +285,7 @@ def run_task_build():
                     "ninja",
                     "-C",
                     "out/{0}-{1}-{2}".format(
-                        config, target["target_os"], target["target_cpu"]
+                        target["target_os"], target["target_cpu"], config
                     ),
                     "pdfium",
                     "-v",
@@ -302,34 +303,35 @@ def run_task_install():
     for config in c.configurations_ios:
         f.remove_dir(os.path.join("build", "ios", config))
         f.create_dir(os.path.join("build", "ios", config))
+        f.create_dir(os.path.join("build", "ios", config, "lib"))
 
         # targets
         for target in c.targets_ios:
-            files = get_compiled_files(config, target)
-
-            files_str = " ".join(files)
-
-            lib_file_out = os.path.join(
-                "build", "ios", config, "libpdfium_{0}.a".format(target["target_cpu"])
+            source_lib_path = os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "out",
+                "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
+                "obj",
+                "libpdfium.a",
             )
 
-            # we have removed symbols to squeeze final results. -no_warning_for_no_symbols will save us from useless warnings.
-            command = " ".join(
-                [
-                    "libtool",
-                    "-static -no_warning_for_no_symbols",
-                    files_str,
-                    "-o",
-                    lib_file_out,
-                ]
+            target_lib_path = os.path.join(
+                "build",
+                target["target_os"],
+                config,
+                "lib",
+                "libpdfium_{0}.a".format(target["target_cpu"]),
             )
-            check_call(command, shell=True)
+
+            f.copyfile(source_lib_path, target_lib_path)
 
         # universal
-        folder = os.path.join("build", "ios", config, "*.a")
+        folder = os.path.join("build", "ios", config, "lib", "*.a")
         files = glob.glob(folder)
         files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "ios", config, "libpdfium.a")
+        lib_file_out = os.path.join("build", "ios", config, "lib", "libpdfium.a")
 
         f.debug("Merging libraries (lipo)...")
         command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
@@ -360,15 +362,11 @@ def run_task_install():
 def run_task_test():
     f.debug("Testing...")
 
-    current_dir = os.getcwd()
-
-    for configuration in c.configurations_ios:
-        lib_dir = os.path.join(current_dir, "build", "ios", configuration)
+    for config in c.configurations_ios:
+        lib_dir = os.path.join("build", "ios", config, "lib")
 
         command = " ".join(["file", os.path.join(lib_dir, "libpdfium.a")])
         check_call(command, shell=True)
-
-    os.chdir(current_dir)
 
 
 def run_task_archive():
@@ -390,394 +388,3 @@ def run_task_archive():
         )
 
     tar.close()
-
-
-def get_compiled_files(config, target):
-    folder = os.path.join(
-        "build",
-        target["target_os"],
-        "pdfium",
-        "out",
-        "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-        "obj",
-        "**",
-        "*.a",
-    )
-
-    files = glob.glob(folder, recursive=True)
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdftext",
-            "fpdftext",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fxcrt",
-            "fxcrt",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "page",
-            "page",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "render",
-            "render",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "parser",
-            "parser",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "edit",
-            "edit",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "cmaps",
-            "cmaps",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfapi",
-            "font",
-            "font",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fpdfdoc",
-            "fpdfdoc",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fxcodec",
-            "fxcodec",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fxge",
-            "fxge",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "core",
-            "fdrm",
-            "fdrm",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fxjs",
-            "fxjs",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fpdfsdk",
-            "pwl",
-            "pwl",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fpdfsdk",
-            "formfiller",
-            "formfiller",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "fpdfsdk",
-            "fpdfsdk",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_freetype",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_agg",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "skia_shared",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "pdfium_base",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_lcms2",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "fx_libopenjpeg",
-            "*.o",
-        )
-    )
-
-    files.append(
-        os.path.join(
-            "build",
-            target["target_os"],
-            "pdfium",
-            "out",
-            "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-            "obj",
-            "third_party",
-            "zlib",
-            "zlib",
-            "*.o",
-        )
-    )
-
-    if target["target_cpu"] == "arm64":
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "zlib",
-                "zlib_adler32_simd",
-                "*.o",
-            )
-        )
-
-        files.append(
-            os.path.join(
-                "build",
-                target["target_os"],
-                "pdfium",
-                "out",
-                "{0}-{1}-{2}".format(config, target["target_os"], target["target_cpu"]),
-                "obj",
-                "third_party",
-                "zlib",
-                "zlib_inflate_chunk_simd",
-                "*.o",
-            )
-        )
-
-    return files

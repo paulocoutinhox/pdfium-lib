@@ -52,3 +52,9 @@ targets_android = [
         "android_cpu": "x86_64",
     },
 ]
+
+# wasm
+configurations_wasm = ["release"]
+targets_wasm = [
+    {"target_os": "linux", "target_cpu": "x64", "pdfium_os": "linux"},
+]

@@ -1,6 +1,7 @@
 # Build
 /build
 /sample/build
+/sample-wasm/build
 _bad_scm
 *.tgz
 

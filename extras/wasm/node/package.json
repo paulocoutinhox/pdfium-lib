@@ -1,0 +1,16 @@
+{
+    "name": "pdfium",
+    "scripts": {
+        "build": "webpack",
+        "serve": "http-server dist/",
+        "start": "npm run build && npm run serve"
+    },
+    "devDependencies": {
+        "exports-loader": "0.7.0",
+        "file-loader": "1.1.11",
+        "http-server": "0.12.3",
+        "webpack": "4.43.0",
+        "webpack-cli": "4.4.0",
+        "html-webpack-plugin": "4.5.1"
+    }
+}

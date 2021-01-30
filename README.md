@@ -3,6 +3,7 @@
 ![PDFium - iOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20iOS/badge.svg)
 ![PDFium - macOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20macOS/badge.svg)
 ![PDFium - Android](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20Android/badge.svg)
+![PDFium - WASM](https://github.com/paulo-coutinho/pdfium-lib/workflows/PDFium%20-%20WASM/badge.svg)
 
 This project compile PDFium to all supported platforms. Current project compiles to:  
 
@@ -12,6 +13,7 @@ This project compile PDFium to all supported platforms. Current project compiles
 - [x] macOS (x86_64, arm64)
 - [ ] Linux
 - [ ] Windows
+- [x] WASM (web assembly)
 
 ## Requirements
 
@@ -51,11 +53,15 @@ Check tutorial here: [Build for macOS](docs/BUILD_MACOS.md)
 
 Check tutorial here: [Build for Android](docs/BUILD_ANDROID.md)
 
+## How to compile for WASM
+
+Check tutorial here: [Build for WASM](docs/BUILD_WASM.md)
+
 ## Prebuilt binary
 
 Access releases page to download prebuilt binaries:
 
-https://github.com/prsolucoes/pdfium-lib/releases
+https://github.com/paulo-coutinho/pdfium-lib/releases
 
 ## How to include files and extend pdfium
 

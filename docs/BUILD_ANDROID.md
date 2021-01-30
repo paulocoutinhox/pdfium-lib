@@ -2,14 +2,14 @@
 
 1. Execute all **general** steps
 
-2. Get PDFium:  
+2. PDFium android dependencies
+```./build/android/pdfium/build/install-build-deps-android.sh```
+
+3. Get PDFium:  
 ```python3 make.py run build-pdfium-android```  
 
-3. Patch:  
+4. Patch:  
 ```python3 make.py run patch-android```  
-
-4. PDFium android dependencies
-```./build/android/pdfium/build/install-build-deps-android.sh```
 
 5. Compile:  
 ```python3 make.py run build-android```  
@@ -23,6 +23,7 @@
 Obs:
 - The file **make.py** need be executed with python version 3.  
 - You need run all steps in a Linux machine (real, vm or docker) to it works.
+- With docker you can skip step 2.
 
 
 ## Docker
