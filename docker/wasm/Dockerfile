@@ -58,9 +58,18 @@ RUN pip3 install docopt python-slugify tqdm
 RUN mkdir /emsdk
 WORKDIR /emsdk
 RUN git clone https://github.com/emscripten-core/emsdk.git .
-RUN ./emsdk install 2.0.12
-RUN ./emsdk activate 2.0.12
-ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten:/emsdk/node/12.18.1_64bit/bin"
+RUN ./emsdk install 2.0.13
+RUN ./emsdk activate 2.0.13
+ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
+
+# cache system libraries
+RUN bash -c 'echo "int main() { return 0; }" > /tmp/main.cc'
+RUN bash -c 'source /emsdk/emsdk_env.sh && em++ -s USE_ZLIB=1 -s USE_LIBJPEG=1 -s USE_PTHREADS=1 -s ASSERTIONS=1 -o /tmp/main.html /tmp/main.cc'
+
+# nodejs and npm
+RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN apt-get install -y nodejs
+RUN npm install -g npm@latest
 
 # working dir
 WORKDIR /app

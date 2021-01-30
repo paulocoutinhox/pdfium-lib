@@ -5,7 +5,215 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PDFium - WebAssembly Test</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+
+    <script src="pdfium.js"></script>
+
+    <script>
+        async function loadFile() {
+            try {
+                changeButton('Loading file...', 'warning');
+
+                let files = fileInput.files;
+
+                if (files.length <= 0) {
+                    throw { message: "Select a PDF file first" };
+                }
+
+                let file = files[0];
+
+                let fileByteArray = await fileToByteArray(file);
+
+                if (fileByteArray.length <= 0) {
+                    throw { message: "The PDF file is invalid" };
+                }
+
+                pdfCountPages(fileByteArray);
+            } catch (error) {
+                changeButton('Error while load file', 'danger');
+                console.log('Error while load file: ' + error.message);
+            }
+        }
+
+        function pdfCountPages(fileByteArray) {
+            try {
+                changeButton('Loading...', 'warning');
+
+                // map functions
+                console.log('Mapping functions...');
+
+                FPDF_InitLibrary = Module.cwrap('FPDF_InitLibrary');
+                FPDF_LoadMemDocument = Module.cwrap('FPDF_LoadMemDocument', 'number', ['number', 'number', 'string']);
+                FPDF_GetLastError = Module.cwrap('FPDF_GetLastError', 'number');
+                FPDF_GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
+                FPDF_CloseDocument = Module.cwrap('FPDF_CloseDocument', '', ['number']);
+                FPDF_DestroyLibrary = Module.cwrap('FPDF_DestroyLibrary');
+
+                // check file size
+                console.log('Getting file size...');
+
+                let fileSize = fileByteArray.length;
+                console.log("File size: " + fileSize);
+
+                // init library
+                console.log('Initializing library...');
+
+                FPDF_InitLibrary();
+
+                // load document to memory
+                console.log('Loading data to buffer...');
+
+                let wasmBuffer = Module._malloc(fileSize);
+                Module.HEAPU8.set(fileByteArray, wasmBuffer);
+
+                // create document
+                console.log('Loading document...');
+
+                let doc = FPDF_LoadMemDocument(wasmBuffer, fileSize, "");
+
+                // check last error
+                let lastError = FPDF_GetLastError();
+                let loadPDFState = "";
+
+                switch (lastError) {
+                    case 0:
+                        loadPDFState = "Success";
+                        break;
+                    case FPDF_ERR_UNKNOWN:
+                        loadPDFState = "Unknown error";
+                        break;
+                    case FPDF_ERR_FILE:
+                        loadPDFState = "File not found or could not be opened";
+                        break;
+                    case FPDF_ERR_FORMAT:
+                        loadPDFState = "File not in PDF format or corrupted";
+                        break;
+                    case FPDF_ERR_PASSWORD:
+                        loadPDFState = "Password required or incorrect password";
+                        break;
+                    case FPDF_ERR_SECURITY:
+                        loadPDFState = "Unsupported security scheme";
+                        break;
+                    case FPDF_ERR_PAGE:
+                        loadPDFState = "Page not found or content error";
+                        break;
+                    default:
+                        loadPDFState = "Unknown error (" + lastError + ")";
+                }
+
+                console.log("Load document state: " + loadPDFState);
+
+                // count page
+                console.log('Couting pages...');
+
+                let pages = FPDF_GetPageCount(doc);
+                console.log('Pages: ' + pages);
+
+                // clean memory
+                console.log('Cleaning objects...');
+
+                FPDF_CloseDocument(doc);
+                FPDF_DestroyLibrary();
+
+                // initial state
+                buttonToInitialState();
+
+                console.log('Finished');
+            } catch (error) {
+                changeButton('Error while count pages', 'danger');
+                console.log('Error while count pages: ' + error.message);
+            }
+        }
+
+        function fileToByteArray(file) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let reader = new FileReader();
+                    let fileByteArray = [];
+
+                    reader.readAsArrayBuffer(file);
+                    reader.onloadend = (evt) => {
+                        if (evt.target.readyState == FileReader.DONE) {
+                            let arrayBuffer = evt.target.result,
+                                array = new Uint8Array(arrayBuffer);
+                            for (byte of array) {
+                                fileByteArray.push(byte);
+                            }
+                        }
+                        resolve(fileByteArray);
+                    }
+                }
+                catch (e) {
+                    reject(e);
+                }
+            })
+        }
+
+        function changeButton(text, className) {
+            btRun.firstChild.data = text;
+            btRun.className = 'button is-' + className;
+        }
+
+        function buttonToInitialState() {
+            changeButton('Process file', 'success');
+        }
+
+        function load() {
+            // change console methods
+            if (typeof console != "undefined") {
+                if (typeof console.log != 'undefined') {
+                    console.olog = console.log;
+                } else {
+                    console.olog = function () { };
+                }
+            }
+
+            console.log = function (message) {
+                // we will disable it for now
+                // console.olog(message);
+
+                var currentDate = new Date().toLocaleTimeString();
+
+                var e = document.createElement('p');
+                e.innerHTML = "➔ [" + currentDate + "] " + message;
+
+                document.getElementById('debugDiv').prepend(e);
+            };
+
+            console.error = console.debug = console.info = console.log;
+
+            // button
+            let btRun = document.getElementById('btRun');
+
+            // check for wasm support
+            if (!('WebAssembly' in window)) {
+                console.log('You need a browser with Web Assembly support enabled :(');
+                changeButton('Web Assembly not supported', 'danger');
+                return;
+            }
+
+            // file input
+            var fileInput = document.querySelector('#file-container input[type=file]');
+            fileInput.onchange = () => {
+                if (fileInput.files.length > 0) {
+                    var fileName = document.querySelector('#file-container .file-name');
+                    fileName.textContent = fileInput.files[0].name;
+                }
+            }
+
+            // initial state
+            buttonToInitialState();
+
+            btRun.onclick = function () {
+                loadFile();
+            }
+        }
+
+        window.onload = function (e) {
+            load();
+        }
+    </script>
 </head>
 
 <body>
@@ -15,88 +223,47 @@
                 PDFium - Test
             </h1>
             <br>
-            <button class="button is-success" id="btRun">Test function</button>
+            <p>1 - Select your PDF file:</p>
+            <br>
+            <div class="file is-info has-name">
+                <div id="file-container" class="file has-name">
+                    <label class="file-label">
+                        <input class="file-input" id="fileInput" type="file" accept="application/pdf">
+                        <span class="file-cta">
+                            <span class="file-label">
+                                Choose a file…
+                            </span>
+                        </span>
+                        <span class="file-name">
+                            No file uploaded
+                        </span>
+                    </label>
+                </div>
+            </div>
+            <br>
+            <br>
+            <p>2 - Press button to count pages:</p>
+            <br>
+            <button class="button is-warning" id="btRun">Loading...</button>
             <br>
             <br>
             <br>
-            <small>Obs: Check your console and check the result and messages</small>
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        Debug console
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                        <div id="debugDiv">
+                            <p>➔ Debug messages will be showed here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
-
-    <script>
-        // check for wasm support
-        if (!('WebAssembly' in window)) {
-            alert('You need a browser with wasm support enabled :(');
-        }
-
-        // imports
-        var imports = imports || {};
-        imports.module = imports.module || {};
-        imports.env = imports.env || {};
-        imports.env.memoryBase = imports.env.memoryBase || 0;
-        imports.env.tableBase = imports.env.tableBase || 0;
-
-        if (!imports.env.memory) {
-            imports.env.memory = new WebAssembly.Memory({
-                initial: 256
-            });
-        }
-
-        if (!imports.env.table) {
-            imports.env.table = new WebAssembly.Table({
-                initial: 0,
-                element: 'anyfunc'
-            });
-        }
-
-        // load library
-        const btRun = document.getElementById('btRun');
-        btRun.firstChild.data = 'Loading WASM...';
-        btRun.className = 'button is-warning';
-
-        (async() => {
-            const response = await fetch('pdfium.wasm');
-
-            // buffer
-            const buffer = await response.arrayBuffer();
-            console.log("BUFFER:");
-            console.log(buffer);
-
-            // module
-            const module = await WebAssembly.compile(buffer);
-            console.log("MODULE:");
-            console.log(module);
-
-            try {
-                // instante
-                const instance = await WebAssembly.instantiate(module, imports);
-                console.log("INSTANCE:");
-                console.log(instance);
-
-                // result
-                const result = instance.exports.createDocFromBuffer(0, 0);
-                console.log("RESULT:");
-                console.log(result);
-            } catch (error) {
-                // error state
-                btRun.firstChild.data = 'Error while load WASM';
-                btRun.className = 'button is-danger';
-
-                // throw error to browser
-                throw error;
-            }
-
-            // button event
-            document.getElementById('btRun').onclick = function() {
-                const result = instance.exports.createDocFromBuffer(0, 0);
-                console.log(result);
-            }
-
-            // success state
-            btRun.firstChild.data = 'Test function';
-            btRun.className = 'button is-success';
-        })();
-    </script>
 </body>
 
 </html>

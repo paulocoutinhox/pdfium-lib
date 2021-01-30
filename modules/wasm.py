@@ -260,6 +260,74 @@ def run_task_patch():
     else:
         f.debug("Skipped: compiler stack protector")
 
+    # build pthread
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        236,
+        '      "pthread",\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            236,
+            '      #"pthread",\n',
+        )
+
+        f.debug("Applied: build pthread")
+    else:
+        f.debug("Skipped: build pthread")
+
+    # compiler pthread
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        465,
+        '    cflags += [ "-pthread" ]\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            465,
+            '    #cflags += [ "-pthread" ]\n',
+        )
+
+        f.debug("Applied: compiler pthread")
+    else:
+        f.debug("Skipped: compiler pthread")
+
+    # skia pthread
+    source_file = os.path.join(
+        source_dir,
+        "third_party",
+        "skia",
+        "gn",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        231,
+        '    libs += [ "pthread" ]\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            231,
+            '    #libs += [ "pthread" ]\n',
+        )
+
+        f.debug("Applied: skia pthread")
+    else:
+        f.debug("Skipped: skia pthread")
+
     # copy files required
     f.debug("Copying required files...")
 
@@ -486,13 +554,13 @@ def run_task_test():
                     "-s",
                     "DEMANGLE_SUPPORT=1",
                     "-s",
-                    "USE_PTHREADS=1",
-                    "-s",
                     "USE_ZLIB=1",
                     "-s",
                     "USE_LIBJPEG=1",
                     "-s",
                     "WASM=1",
+                    "-s",
+                    "ASSERTIONS=1",
                     "--embed-file",
                     "assets/web-assembly.pdf",
                 ]
@@ -535,11 +603,13 @@ def run_task_generate():
             f.create_dir(gen_dir)
 
             # doxygen
+            f.debug("Doxygen...")
+
             doxygen_file = os.path.join(
                 current_dir,
                 "extras",
                 "wasm",
-                "config",
+                "doxygen",
                 "Doxyfile",
             )
 
@@ -552,19 +622,27 @@ def run_task_generate():
             check_call(command, cwd=include_dir, shell=True)
 
             # copy xml files
+            f.debug("Copying xml files...")
+
             xml_dir = os.path.join(include_dir, "xml")
             f.copytree(xml_dir, os.path.join(gen_dir, "xml"))
             f.remove_dir(xml_dir)
 
             # copy utils files
+            f.debug("Copying utils files...")
+
             f.copytree(utils_dir, os.path.join(gen_dir, "utils"))
 
             # prepare files
+            f.debug("Preparing files...")
+
             rsp_file = os.path.join(gen_dir, "utils", "pdfium.rsp")
             f.replace_in_file(rsp_file, "{LIB_DIR}", lib_dir)
             f.replace_in_file(rsp_file, "{INCLUDE_DIR}", include_dir)
 
             # node modules
+            f.debug("Installing node modules...")
+
             gen_utils_dir = os.path.join(
                 gen_dir,
                 "utils",
@@ -579,6 +657,8 @@ def run_task_generate():
             check_call(command, cwd=gen_utils_dir, shell=True)
 
             # generate
+            f.debug("Compiling with emscripten...")
+
             gen_out_dir = os.path.join(
                 gen_dir,
                 "out",
@@ -598,22 +678,25 @@ def run_task_generate():
                     "-o",
                     html_file,
                     "-s",
-                    'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml createDocFromBuffer)"',
+                    'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
                     "-s",
                     'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
-                    "--pre-js pre-js.js",
-                    "avail.c",
                     "@pdfium.rsp",
                     "-Os",
+                    "--no-entry",
                 ]
             )
             check_call(command, cwd=gen_utils_dir, shell=True)
 
             # copy files
+            f.debug("Copying compiled files...")
+
             f.remove_dir(node_dir)
             f.copytree(gen_out_dir, node_dir)
 
             # copy template files
+            f.debug("Copying template files...")
+
             f.copyfile(
                 os.path.join(template_dir, "index.html"),
                 os.path.join(node_dir, "index.html"),

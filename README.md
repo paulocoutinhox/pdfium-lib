@@ -61,7 +61,7 @@ Check tutorial here: [Build for WASM](docs/BUILD_WASM.md)
 
 Access releases page to download prebuilt binaries:
 
-https://github.com/prsolucoes/pdfium-lib/releases
+https://github.com/paulo-coutinho/pdfium-lib/releases
 
 ## How to include files and extend pdfium
 
