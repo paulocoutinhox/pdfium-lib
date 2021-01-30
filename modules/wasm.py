@@ -730,6 +730,30 @@ def run_task_publish():
         os.path.join(publish_dir, "README.md"),
     )
 
+    # finish
+    f.debug("Test on browser with: https://paulo-coutinho.github.io/pdfium-lib/")
+
+    f.debug("Published")
+
+
+def run_task_publish_to_web():
+    f.debug("Publishing...")
+
+    current_dir = os.getcwd()
+    publish_dir = os.path.join(current_dir, "build", "linux", "publish")
+    node_dir = os.path.join(current_dir, "build", "linux", "x64", "release", "node")
+    template_dir = os.path.join(current_dir, "extras", "wasm", "template")
+
+    # copy generated files
+    f.remove_dir(publish_dir)
+    f.copytree(node_dir, publish_dir)
+
+    # copy template files
+    f.copyfile(
+        os.path.join(template_dir, "README.md"),
+        os.path.join(publish_dir, "README.md"),
+    )
+
     # clone gh-pages branch
     command = "git init ."
     check_call(command, cwd=publish_dir, shell=True)

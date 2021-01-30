@@ -51,6 +51,7 @@ Tasks:
   - test-wasm
   - generate-wasm
   - publish-wasm
+  - publish-to-web-wasm
   - archive-wasm  
 """
 
@@ -215,6 +216,10 @@ def main(options):
     # publish - wasm
     elif make_task == "publish-wasm":
         wasm.run_task_publish()
+
+    # publish to web - wasm
+    elif make_task == "publish-to-web-wasm":
+        wasm.run_task_publish_to_web()
 
     # archive - wasm
     elif make_task == "archive-wasm":
