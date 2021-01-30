@@ -561,6 +561,8 @@ def run_task_test():
                     "WASM=1",
                     "-s",
                     "ASSERTIONS=1",
+                    "-s",
+                    "ALLOW_MEMORY_GROWTH=1",
                     "--embed-file",
                     "assets/web-assembly.pdf",
                 ]
