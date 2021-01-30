@@ -69,6 +69,7 @@ jobs:
           path: ${{ matrix.config.target }}.tgz
 
       - name: Publish to web
+        uses: fregante/setup-git-user@v1
         run: |
           sudo chmod -R 777 build/linux
           python3 make.py run publish-${{ matrix.config.target }}
