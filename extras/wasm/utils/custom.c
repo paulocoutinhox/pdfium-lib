@@ -63,6 +63,17 @@ EMSCRIPTEN_KEEPALIVE char *PDFium_GetRenderPageBitmap(FPDF_DOCUMENT doc, int pag
     return result;
 }
 
+EMSCRIPTEN_KEEPALIVE int PDFium_GetRenderPageDataSize(FPDF_DOCUMENT doc, int pageIndex)
+{
+    // page size
+    double pageWidth;
+    double pageHeight;
+
+    FPDF_GetPageSizeByIndex(doc, pageIndex, &pageWidth, &pageHeight);
+
+    return (int)((int)pageWidth * (int)pageHeight * 4);
+}
+
 EMSCRIPTEN_KEEPALIVE char *PDFium_GetLastError()
 {
     char *result = "";

@@ -5,7 +5,7 @@
     <meta charset="utf-8">
 
     <meta name="viewport"
-        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
+        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 
     <title>PDFium - WebAssembly Test</title>
 
@@ -68,6 +68,7 @@
                 PDFium_GetLastError = Module.cwrap('PDFium_GetLastError', 'string');
                 PDFium_GetPageSizeByIndex = Module.cwrap('PDFium_GetPageSizeByIndex', 'number', ['number', 'number']);
                 PDFium_GetRenderPageBitmap = Module.cwrap('PDFium_GetRenderPageBitmap', 'number', ['number', 'number']);
+                PDFium_GetRenderPageDataSize = Module.cwrap('PDFium_GetRenderPageDataSize', 'number', ['number', 'number']);
 
                 FPDF_GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
                 FPDF_CloseDocument = Module.cwrap('FPDF_CloseDocument', '', ['number']);
@@ -123,15 +124,17 @@
 
                         Module._free(pageSizePtr);
 
-                        let pageWidth = pageSize[0];
-                        let pageHeight = pageSize[1];
+                        let pageWidth = parseInt(pageSize[0]);
+                        let pageHeight = parseInt(pageSize[1]);
 
                         console.log("Page " + (x + 1) + " has size: " + pageWidth + "pt X " + pageHeight + "pt");
 
                         // get page render bytes
+                        let pageRenderDataSize = PDFium_GetRenderPageDataSize(doc, x);
+
                         let pageRenderPtr = PDFium_GetRenderPageBitmap(doc, x);
                         let pageRenderData = [];
-                        let pageRenderSize = (pageWidth * pageHeight * 4);
+                        let pageRenderSize = pageRenderDataSize;
 
                         for (let v = 0; v < pageRenderSize; v++) {
                             pageRenderData.push(Module.HEAPU8[pageRenderPtr / Uint8Array.BYTES_PER_ELEMENT + v])
@@ -215,8 +218,8 @@
 
                 console.log('Finished');
             } catch (error) {
-                changeButton('Error while count pages', 'danger');
-                console.log('Error while count pages: ' + error.message);
+                changeButton('Error while process PDF', 'danger');
+                console.log('Error while process PDF: ' + error.message);
             }
         }
 
@@ -369,7 +372,7 @@
         }
 
         .item-slide img {
-            max-width: 1200px;
+            max-width: 100%;
         }
 
         /* modal (background) */
@@ -493,27 +496,13 @@
 
                         <div class="modal" id="galleryModal">
                             <div class="modal-content is-vcentered" id="modalImageList">
-                                <div class="item-slide">
-                                    <img src="https://source.unsplash.com/800x1000/?nature,water">
-                                </div>
-                                <div class="item-slide">
-                                    <img src="https://source.unsplash.com/800x600/?nature,water">
-                                </div>
-                                <div class="item-slide">
-                                    <img src="https://source.unsplash.com/800x900/?nature,water">
-                                </div>
-                                <div class="item-slide">
-                                    <img src="https://source.unsplash.com/800x550/?nature,water">
-                                </div>
-                                <div class="item-slide">
-                                    <img src="https://source.unsplash.com/800x650/?nature,water">
-                                </div>
-                                <div class="item-slide">
-                                    <img src="https://source.unsplash.com/800x700/?nature,water">
-                                </div>
+
                             </div>
+
                             <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
+
                             <a class="next" onclick="plusSlides(1)">&#10095;</a>
+
                             <button onclick="closeModal()" class="modal-close is-large" aria-label="close"></button>
                         </div>
                     </div>
