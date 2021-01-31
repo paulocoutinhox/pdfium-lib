@@ -683,6 +683,7 @@ def run_task_generate():
                     'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
                     "-s",
                     'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
+                    "custom.c",
                     "@pdfium.rsp",
                     "-Os",
                     "--no-entry",
