@@ -8,6 +8,24 @@
 
 #include <emscripten.h>
 
+void convertFromBGRAandRGBA(char *input, int width, int height, char *output)
+{
+    int offset = 0;
+
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            output[offset] = input[offset + 2];
+            output[offset + 1] = input[offset + 1];
+            output[offset + 2] = input[offset];
+            output[offset + 3] = input[offset + 3];
+
+            offset += 4;
+        }
+    }
+}
+
 EMSCRIPTEN_KEEPALIVE void PDFium_Init()
 {
     FPDF_LIBRARY_CONFIG config;
@@ -33,6 +51,9 @@ EMSCRIPTEN_KEEPALIVE double *PDFium_GetPageSizeByIndex(FPDF_DOCUMENT doc, int pa
 
     FPDF_GetPageSizeByIndex(doc, pageIndex, &pageWidth, &pageHeight);
 
+    pageWidth = pageWidth * 1.333333;
+    pageHeight = pageHeight * 1.333333;
+
     result[0] = pageWidth;
     result[1] = pageHeight;
 
@@ -47,12 +68,15 @@ EMSCRIPTEN_KEEPALIVE char *PDFium_GetRenderPageBitmap(FPDF_DOCUMENT doc, int pag
 
     FPDF_GetPageSizeByIndex(doc, pageIndex, &pageWidth, &pageHeight);
 
+    pageWidth = pageWidth * 1.333333;
+    pageHeight = pageHeight * 1.333333;
+
     // render page
     FPDF_PAGE page = FPDF_LoadPage(doc, pageIndex);
 
-    char *result = malloc((int)pageWidth * (int)pageHeight * 4);
+    char *input = malloc((int)pageWidth * (int)pageHeight * 4);
 
-    FPDF_BITMAP pageBitmap = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, FPDFBitmap_BGRA, result, (int)pageWidth * 4);
+    FPDF_BITMAP pageBitmap = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, FPDFBitmap_BGRA, input, (int)pageWidth * 4);
     int background = 0xFFFFFFFF;
 
     FPDFBitmap_FillRect(pageBitmap, 0, 0, (int)pageWidth, (int)pageHeight, background);
@@ -60,7 +84,11 @@ EMSCRIPTEN_KEEPALIVE char *PDFium_GetRenderPageBitmap(FPDF_DOCUMENT doc, int pag
     FPDFBitmap_Destroy(pageBitmap);
     FPDF_ClosePage(page);
 
-    return result;
+    char *output = malloc((int)pageWidth * (int)pageHeight * 4);
+    convertFromBGRAandRGBA(input, (int)pageWidth, (int)pageHeight, output);
+    free(input);
+
+    return output;
 }
 
 EMSCRIPTEN_KEEPALIVE int PDFium_GetRenderPageDataSize(FPDF_DOCUMENT doc, int pageIndex)
@@ -70,6 +98,9 @@ EMSCRIPTEN_KEEPALIVE int PDFium_GetRenderPageDataSize(FPDF_DOCUMENT doc, int pag
     double pageHeight;
 
     FPDF_GetPageSizeByIndex(doc, pageIndex, &pageWidth, &pageHeight);
+
+    pageWidth = pageWidth * 1.333333;
+    pageHeight = pageHeight * 1.333333;
 
     return (int)((int)pageWidth * (int)pageHeight * 4);
 }

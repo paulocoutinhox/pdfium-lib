@@ -137,7 +137,7 @@
                         let pageRenderSize = pageRenderDataSize;
 
                         for (let v = 0; v < pageRenderSize; v++) {
-                            pageRenderData.push(Module.HEAPU8[pageRenderPtr / Uint8Array.BYTES_PER_ELEMENT + v])
+                            pageRenderData.push(Module.HEAPU8[pageRenderPtr / Uint8Array.BYTES_PER_ELEMENT + v]);
                         }
 
                         console.log("Page render data size: " + pageRenderData.length);
