@@ -68,22 +68,6 @@ jobs:
           name: artifact-${{ matrix.config.target }}
           path: ${{ matrix.config.target }}.tgz
 
-      - name: Publish
-        run: |
-          docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py run publish-${{ matrix.config.target }}
-          sudo chmod -R 777 build/linux/publish
-        if: startsWith(github.ref, 'refs/tags/')
-
-      - name: Publish to web
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: build/linux/publish
-          publish_branch: gh-pages
-          keep_files: false
-          force_orphan: true
-          full_commit_message: ${{ github.event.head_commit.message }}
-
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
