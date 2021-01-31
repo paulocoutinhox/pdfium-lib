@@ -178,15 +178,18 @@ def run_task_install():
             out_dir = "{0}-{1}-{2}".format(
                 target["target_os"], target["target_cpu"], config
             )
-            library_dir = os.path.join("build", "android", "pdfium", "out", out_dir)
-            target_dir = os.path.join("build", "android", config, target["android_cpu"])
+
+            source_lib_dir = os.path.join("build", "android", "pdfium", "out", out_dir)
+
+            lib_dir = os.path.join("build", "android", config, "lib")
+            target_dir = os.path.join(lib_dir, target["android_cpu"])
 
             f.remove_dir(target_dir)
             f.create_dir(target_dir)
 
-            for basename in os.listdir(library_dir):
+            for basename in os.listdir(source_lib_dir):
                 if basename.endswith(".so"):
-                    pathname = os.path.join(library_dir, basename)
+                    pathname = os.path.join(source_lib_dir, basename)
 
                     if os.path.isfile(pathname):
                         shutil.copy2(pathname, target_dir)
@@ -210,7 +213,9 @@ def run_task_test():
 
     for config in c.configurations_android:
         for target in c.targets_android:
-            lib_dir = os.path.join("build", "android", config, target["android_cpu"])
+            lib_dir = os.path.join(
+                "build", "android", config, "lib", target["android_cpu"]
+            )
 
             command = " ".join(["file", os.path.join(lib_dir, "libpdfium.so")])
             check_call(command, shell=True)
