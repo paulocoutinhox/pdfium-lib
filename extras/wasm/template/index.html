@@ -21,7 +21,7 @@
         let currentPageIndex = 1;
         let pageLoaded = false;
         let moduleLoaded = false;
-        let debugMode = true;
+        let debugMode = false;
         let autoOpenMode = true;
 
         // runtime initialized
@@ -586,10 +586,10 @@
             let urlParamDebug = getUrlParam("debug");
             let urlParamOpen = getUrlParam("open");
 
-            if (urlParamDebug && urlParamDebug === "0") {
-                debugMode = false;
-            } else {
+            if (urlParamDebug && urlParamDebug === "1") {
                 debugMode = true;
+            } else {
+                debugMode = false;
             }
 
             if (urlParamOpen && urlParamOpen === "0") {

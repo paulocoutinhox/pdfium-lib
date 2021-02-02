@@ -11,7 +11,7 @@ You can use some URL parameters to automatically open your PDF file and/or chang
 1. **title** = Any text that you want as title on page
 2. **url** = Your PDF public URL to be downloaded by the viewer
 3. **open** = Auto open after load (0 = disabled, 1 = enabled, default = 1)
-4. **debug** = Debug console (0 = disabled, 1 = enabled, default = 1)
+4. **debug** = Debug console (0 = disabled, 1 = enabled, default = 0)
 
 Example:
 
