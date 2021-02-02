@@ -385,6 +385,10 @@
             fileTitle.innerHTML = decodeURI(title);
         }
 
+        function changePageTitle(title) {
+            document.title = decodeURI(title) + " - PDF Viewer";
+        }
+
         function showDebugConsole(show) {
             let debugConsole = document.getElementById('debugConsole');
 
@@ -577,6 +581,7 @@
 
             if (urlParamTitle) {
                 changeFileTitle(urlParamTitle);
+                changePageTitle(urlParamTitle);
             }
 
             if (urlParamUrl) {
