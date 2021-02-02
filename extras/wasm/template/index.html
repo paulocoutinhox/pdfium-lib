@@ -22,6 +22,7 @@
         let pageLoaded = false;
         let moduleLoaded = false;
         let debugMode = true;
+        let autoOpenMode = true;
 
         // runtime initialized
         Module.onRuntimeInitialized = async _ => {
@@ -38,6 +39,8 @@
         async function loadFile() {
             try {
                 changeButton('Loading file from input...', 'warning');
+
+                resetOnLoad();
 
                 let files = fileInput.files;
 
@@ -67,6 +70,8 @@
         async function loadFileFromURL(url) {
             try {
                 changeButton('Loading file from URL...', 'warning');
+
+                resetOnLoad();
 
                 let response = await fetch(url);
                 let data = await response.blob();
@@ -243,7 +248,10 @@
                     pageListTitle.innerHTML = "Number of pages: " + pages;
 
                     pageListContainer.style.display = "block";
-                    showPageItem(currentPageIndex);
+
+                    if (autoOpenMode) {
+                        showPageItem(currentPageIndex);
+                    }
 
                     showFileForm(false);
 
@@ -468,6 +476,10 @@
             openModal();
         }
 
+        function resetOnLoad() {
+            currentPageIndex = 1;
+        }
+
         function bindKeys() {
             document.onkeydown = function (e) {
                 switch (e.which) {
@@ -572,11 +584,18 @@
             let urlParamTitle = getUrlParam("title");
             let urlParamUrl = getUrlParam("url");
             let urlParamDebug = getUrlParam("debug");
+            let urlParamOpen = getUrlParam("open");
 
             if (urlParamDebug && urlParamDebug === "0") {
                 debugMode = false;
             } else {
                 debugMode = true;
+            }
+
+            if (urlParamOpen && urlParamOpen === "0") {
+                autoOpenMode = false;
+            } else {
+                autoOpenMode = true;
             }
 
             if (urlParamTitle) {
@@ -758,7 +777,7 @@
                 <!-- page as a column -->
                 <div class="columns is-multiline is-mobile" id="pageList"></div>
 
-                <div class="modal is-active" id="pageModal">
+                <div class="modal" id="pageModal">
                     <div class="modal-background" onclick="closeModal()"></div>
                     <div class="modal-content">
                         <img id="pageModalImage" src="">
