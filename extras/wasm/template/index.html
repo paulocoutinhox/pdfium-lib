@@ -37,7 +37,7 @@
         // functions
         async function loadFile() {
             try {
-                changeButton('Loading file...', 'warning');
+                changeButton('Loading file from input...', 'warning');
 
                 let files = fileInput.files;
 
@@ -53,7 +53,7 @@
                     throw { message: "The PDF file is invalid" };
                 }
 
-                changeButton('Loading...', 'warning');
+                changeButton('Processing file...', 'warning');
 
                 setTimeout(function () {
                     processPDF(fileByteArray);
@@ -82,7 +82,7 @@
                     throw { message: "The PDF file is invalid" };
                 }
 
-                changeButton('Loading...', 'warning');
+                changeButton('Processing file...', 'warning');
 
                 setTimeout(function () {
                     processPDF(fileByteArray);
@@ -96,7 +96,7 @@
         async function processPDF(fileByteArray) {
             try {
                 // html general
-                changeButton('Loading...', 'warning');
+                changeButton('Processing file...', 'warning');
 
                 let pageListContainer = document.getElementById('pageListContainer');
                 let pageList = document.getElementById('pageList');
@@ -240,10 +240,17 @@
                         console.log('Page ' + (x + 1) + ' rendered');
                     }
 
-                    pageListTitle.innerHTML = "Page list showing " + pages + " pages:";
+                    pageListTitle.innerHTML = "Number of pages: " + pages;
 
                     pageListContainer.style.display = "block";
                     showPageItem(currentPageIndex);
+
+                    showFileForm(false);
+
+                    setTimeout(function () {
+                        console.log('Scrolling to top...');
+                        scrollToTop();
+                    }, 100);
                 } else {
                     console.log('Cannot render PDF pages: PDF is empty');
                 }
@@ -396,6 +403,10 @@
             } else {
                 fileForm.style.display = "none";
             }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0 })
         }
 
         function openModal() {
@@ -596,6 +607,11 @@
             touch-action: pan-x pan-y;
         }
 
+        .footer {
+            padding-bottom: 1.5rem;
+            padding-top: 1.5rem;
+        }
+
         /* page list item */
         .page-list-item {
             box-sizing: border-box;
@@ -732,7 +748,7 @@
 
             <!-- page list container -->
             <div id="pageListContainer">
-                <p style="font-weight: bold;" id="pageListTitle">Page list title</p>
+                <p style="font-weight: bold;" id="pageListTitle">Number of pages: 0</p>
 
                 <!-- page as a column -->
                 <div class="columns is-multiline is-mobile" id="pageList"></div>
@@ -770,6 +786,17 @@
         </div>
 
     </section>
+
+    <!-- footer -->
+    <footer class="footer">
+        <div class="content has-text-centered">
+            <p>
+                This application is powered by an open source project called PDF Viewer and can be found <a
+                    target="_blank" href="https://github.com/paulo-coutinho/pdfium-lib">here</a>. No data is stored and
+                it run only client side.
+            </p>
+        </div>
+    </footer>
 
     <!-- google analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-J2FWK7KZMQ"></script>
