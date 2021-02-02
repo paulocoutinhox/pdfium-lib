@@ -1,8 +1,6 @@
 import glob
 import os
-import shutil
 import tarfile
-from shutil import copyfile
 from subprocess import check_call
 
 import modules.config as c
@@ -334,15 +332,15 @@ def run_task_patch():
     linux_dir = os.path.join(source_dir, "linux")
     f.create_dir(linux_dir)
 
-    f.copyfile("/usr/include/jpeglib.h", os.path.join(source_dir, "jpeglib.h"))
-    f.copyfile("/usr/include/jmorecfg.h", os.path.join(source_dir, "jmorecfg.h"))
-    f.copyfile("/usr/include/zlib.h", os.path.join(source_dir, "zlib.h"))
-    f.copyfile("/usr/include/zconf.h", os.path.join(source_dir, "zconf.h"))
-    f.copyfile("/usr/include/jerror.h", os.path.join(source_dir, "jerror.h"))
-    f.copyfile(
+    f.copy_file("/usr/include/jpeglib.h", os.path.join(source_dir, "jpeglib.h"))
+    f.copy_file("/usr/include/jmorecfg.h", os.path.join(source_dir, "jmorecfg.h"))
+    f.copy_file("/usr/include/zlib.h", os.path.join(source_dir, "zlib.h"))
+    f.copy_file("/usr/include/zconf.h", os.path.join(source_dir, "zconf.h"))
+    f.copy_file("/usr/include/jerror.h", os.path.join(source_dir, "jerror.h"))
+    f.copy_file(
         "/usr/include/x86_64-linux-gnu/jconfig.h", os.path.join(source_dir, "jconfig.h")
     )
-    f.copyfile("/usr/include/linux/limits.h", os.path.join(linux_dir, "limits.h"))
+    f.copy_file("/usr/include/linux/limits.h", os.path.join(linux_dir, "limits.h"))
 
     f.debug("Copied!")
 
@@ -482,7 +480,7 @@ def run_task_install():
                 "libpdfium.a",
             )
 
-            f.copyfile(source_lib_path, target_lib_path)
+            f.copy_file(source_lib_path, target_lib_path)
 
             # check file
             f.debug("File data...")
@@ -507,7 +505,7 @@ def run_task_install():
                     pathname = os.path.join(include_dir, basename)
 
                     if os.path.isfile(pathname):
-                        shutil.copy2(pathname, target_include_dir)
+                        f.copy_file2(pathname, target_include_dir)
 
 
 def run_task_test():
@@ -627,13 +625,13 @@ def run_task_generate():
             f.debug("Copying xml files...")
 
             xml_dir = os.path.join(include_dir, "xml")
-            f.copytree(xml_dir, os.path.join(gen_dir, "xml"))
+            f.copy_dir(xml_dir, os.path.join(gen_dir, "xml"))
             f.remove_dir(xml_dir)
 
             # copy utils files
             f.debug("Copying utils files...")
 
-            f.copytree(utils_dir, os.path.join(gen_dir, "utils"))
+            f.copy_dir(utils_dir, os.path.join(gen_dir, "utils"))
 
             # prepare files
             f.debug("Preparing files...")
@@ -695,12 +693,12 @@ def run_task_generate():
             f.debug("Copying compiled files...")
 
             f.remove_dir(node_dir)
-            f.copytree(gen_out_dir, node_dir)
+            f.copy_dir(gen_out_dir, node_dir)
 
             # copy template files
             f.debug("Copying template files...")
 
-            f.copyfile(
+            f.copy_file(
                 os.path.join(template_dir, "index.html"),
                 os.path.join(node_dir, "index.html"),
             )
@@ -725,10 +723,10 @@ def run_task_publish():
 
     # copy generated files
     f.remove_dir(publish_dir)
-    f.copytree(node_dir, publish_dir)
+    f.copy_dir(node_dir, publish_dir)
 
     # copy template files
-    f.copyfile(
+    f.copy_file(
         os.path.join(template_dir, "README.md"),
         os.path.join(publish_dir, "README.md"),
     )
@@ -749,10 +747,10 @@ def run_task_publish_to_web():
 
     # copy generated files
     f.remove_dir(publish_dir)
-    f.copytree(node_dir, publish_dir)
+    f.copy_dir(node_dir, publish_dir)
 
     # copy template files
-    f.copyfile(
+    f.copy_file(
         os.path.join(template_dir, "README.md"),
         os.path.join(publish_dir, "README.md"),
     )
@@ -764,14 +762,14 @@ def run_task_publish_to_web():
     command = "git add ."
     check_call(command, cwd=publish_dir, shell=True)
 
-    command = 'git commit -m "published new version"'
+    command = 'git commit -m "new version published"'
     check_call(command, cwd=publish_dir, shell=True)
 
-    command = 'git push "git@github.com:paulo-coutinho/pdfium-lib.git" master:gh-pages --force'
+    command = 'git push "git@github.com:pdfviewer/pdfviewer.github.io.git" master:master --force'
     check_call(command, cwd=publish_dir, shell=True)
 
     # finish
-    f.debug("Test on browser with: https://paulo-coutinho.github.io/pdfium-lib/")
+    f.debug("Test on browser with: https://pdfviewer.github.io/")
 
     f.debug("Published")
 

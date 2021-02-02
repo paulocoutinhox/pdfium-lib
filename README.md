@@ -19,8 +19,7 @@ This project compile PDFium to all supported platforms. Current project compiles
 
 You can test pdfium on web browser here:
 
-https://paulo-coutinho.github.io/pdfium-lib/
-
+https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf
 
 ## Requirements
 

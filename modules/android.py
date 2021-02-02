@@ -1,6 +1,5 @@
 import glob
 import os
-import shutil
 import tarfile
 from subprocess import check_call
 
@@ -192,7 +191,7 @@ def run_task_install():
                     pathname = os.path.join(source_lib_dir, basename)
 
                     if os.path.isfile(pathname):
-                        shutil.copy2(pathname, target_dir)
+                        f.copy_file2(pathname, target_dir)
 
         # include
         include_dir = os.path.join("build", "android", "pdfium", "public")
@@ -205,7 +204,7 @@ def run_task_install():
                 pathname = os.path.join(include_dir, basename)
 
                 if os.path.isfile(pathname):
-                    shutil.copy2(pathname, target_include_dir)
+                    f.copy_file2(pathname, target_include_dir)
 
 
 def run_task_test():

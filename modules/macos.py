@@ -1,8 +1,6 @@
 import glob
 import os
-import shutil
 import tarfile
-from shutil import copyfile
 from subprocess import check_call
 
 import modules.config as c
@@ -214,7 +212,7 @@ def run_task_install():
                 "libpdfium_{0}.a".format(target["target_cpu"]),
             )
 
-            f.copyfile(source_lib_path, target_lib_path)
+            f.copy_file(source_lib_path, target_lib_path)
 
         # universal
         folder = os.path.join("build", "macos", config, "lib", "*.a")
@@ -245,7 +243,7 @@ def run_task_install():
                 pathname = os.path.join(include_dir, basename)
 
                 if os.path.isfile(pathname):
-                    shutil.copy2(pathname, target_include_dir)
+                    f.copy_file2(pathname, target_include_dir)
 
 
 def run_task_test():
@@ -270,7 +268,7 @@ def run_task_test():
     check_call(command, shell=True)
 
     # copy assets
-    copyfile(
+    f.copy_file(
         os.path.join(sample_dir, "assets", "f1.pdf"), os.path.join(build_dir, "f1.pdf")
     )
 

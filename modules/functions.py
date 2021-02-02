@@ -7,8 +7,8 @@ import sys
 import tarfile
 import urllib.parse as urlparse
 import urllib.request as urllib2
-from shutil import copyfile, copytree
 from subprocess import check_call
+from distutils.dir_util import copy_tree
 
 from slugify import slugify
 from tqdm import tqdm
@@ -253,3 +253,54 @@ def file_line_comment(filename, line, comment="#"):
 def file_line_comment_range(filename, line_start, line_end, comment="#"):
     for x in range(line_start, line_end + 1):
         file_line_comment(filename, x, comment)
+
+
+def copy_all_inside(root_path, dst):
+    create_dir(dst)
+    copy_tree(root_path, dst, update=1)
+
+
+def copy_dir(src, dst, symlinks=False, ignore=None, ignore_file=None):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+        shutil.copystat(src, dst)
+
+    lst = os.listdir(src)
+
+    if ignore:
+        excl = ignore(src, lst)
+        lst = [x for x in lst if x not in excl]
+
+    for item in lst:
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if symlinks and os.path.islink(s):
+            if os.path.lexists(d):
+                os.remove(d)
+            os.symlink(os.readlink(s), d)
+            try:
+                st = os.lstat(s)
+                mode = stat.S_IMODE(st.st_mode)
+                os.lchmod(d, mode)
+            except:
+                pass  # lchmod not available
+        elif os.path.isdir(s):
+            copy_dir(s, d, symlinks, ignore, ignore_file)
+        else:
+            if ignore_file is not None:
+                ignored_file = ignore_file(s)
+            else:
+                ignored_file = False
+
+            if not ignored_file:
+                shutil.copy2(s, d)
+
+
+def copy_file(from_path, to_path):
+    create_dir(os.path.dirname(to_path))
+    shutil.copyfile(from_path, to_path)
+
+
+def copy_file2(from_path, to_path):
+    create_dir(os.path.dirname(to_path))
+    shutil.copy2(from_path, to_path)
