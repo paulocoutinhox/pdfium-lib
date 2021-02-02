@@ -11,11 +11,14 @@
 
 EMSCRIPTEN_KEEPALIVE void PDFium_Init()
 {
+    // https://source.chromium.org/chromium/chromium/src/+/master:third_party/pdfium/samples/pdfium_test.cc;l=1172
+
     FPDF_LIBRARY_CONFIG config;
-    config.version = 2;
+    config.version = 3;
     config.m_pUserFontPaths = NULL;
     config.m_pIsolate = NULL;
     config.m_v8EmbedderSlot = 0;
+    config.m_pPlatform = NULL;
 
     FPDF_InitLibraryWithConfig(&config);
 }

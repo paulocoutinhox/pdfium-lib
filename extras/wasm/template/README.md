@@ -10,10 +10,11 @@ You can use some URL parameters to automatically open your PDF file and/or chang
 
 1. **title** = Any text that you want as title on page
 2. **url** = Your PDF public URL to be downloaded by the viewer
+3. **debug** = Debug console (0 = disabled, 1 = enabled, default = 1)
 
 Example:
 
-[https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf](https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf)
+[https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf&debug=1](https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf&debug=1)
 
 ### Project
 

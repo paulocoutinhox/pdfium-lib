@@ -17,8 +17,24 @@
     <script src="pdfium.js"></script>
 
     <script>
+        // variables
         let currentPageIndex = 1;
+        let pageLoaded = false;
+        let moduleLoaded = false;
+        let debugMode = true;
 
+        // runtime initialized
+        Module.onRuntimeInitialized = async _ => {
+            moduleLoaded = true;
+
+            if (pageLoaded) {
+                console.log('The module was loaded!');
+            }
+
+            checkIfEverythingWasLoaded();
+        };
+
+        // functions
         async function loadFile() {
             try {
                 changeButton('Loading file...', 'warning');
@@ -26,7 +42,7 @@
                 let files = fileInput.files;
 
                 if (files.length <= 0) {
-                    throw { message: "Select a PDF file first" };
+                    throw { message: "Select a PDF file or type a public PDF url" };
                 }
 
                 let file = files[0];
@@ -49,25 +65,32 @@
         }
 
         async function loadFileFromURL(url) {
-            let response = await fetch(url);
-            let data = await response.blob();
-            let metadata = {
-                type: 'application/pdf'
-            };
+            try {
+                changeButton('Loading file from URL...', 'warning');
 
-            let file = new File([data], "file.pdf", metadata);
+                let response = await fetch(url);
+                let data = await response.blob();
+                let metadata = {
+                    type: 'application/pdf'
+                };
 
-            let fileByteArray = await fileToByteArray(file);
+                let file = new File([data], "file.pdf", metadata);
 
-            if (fileByteArray.length <= 0) {
-                throw { message: "The PDF file is invalid" };
+                let fileByteArray = await fileToByteArray(file);
+
+                if (fileByteArray.length <= 0) {
+                    throw { message: "The PDF file is invalid" };
+                }
+
+                changeButton('Loading...', 'warning');
+
+                setTimeout(function () {
+                    processPDF(fileByteArray);
+                }, 300);
+            } catch (error) {
+                changeButton('Error while load file from URL', 'danger');
+                console.log('Error while load file from URL: ' + error.message);
             }
-
-            changeButton('Loading...', 'warning');
-
-            setTimeout(function () {
-                processPDF(fileByteArray);
-            }, 300);
         }
 
         async function processPDF(fileByteArray) {
@@ -268,6 +291,7 @@
         }
 
         function changeButton(text, className) {
+            let btRun = document.getElementById('btRun');
             btRun.firstChild.data = text;
             btRun.className = 'button is-' + className;
         }
@@ -352,6 +376,26 @@
         function changeFileTitle(title) {
             let fileTitle = document.getElementById('fileTitle');
             fileTitle.innerHTML = decodeURI(title);
+        }
+
+        function showDebugConsole(show) {
+            let debugConsole = document.getElementById('debugConsole');
+
+            if (show) {
+                debugConsole.style.display = "block";
+            } else {
+                debugConsole.style.display = "none";
+            }
+        }
+
+        function showFileForm(show) {
+            let fileForm = document.getElementById('fileForm');
+
+            if (show) {
+                fileForm.style.display = "block";
+            } else {
+                fileForm.style.display = "none";
+            }
         }
 
         function openModal() {
@@ -444,7 +488,13 @@
             };
         }
 
-        function load() {
+        function checkIfEverythingWasLoaded() {
+            if (pageLoaded && moduleLoaded) {
+                startApp();
+            }
+        }
+
+        function startUI() {
             // change console methods
             if (typeof console != "undefined") {
                 if (typeof console.log != 'undefined') {
@@ -463,13 +513,10 @@
                 var e = document.createElement('p');
                 e.innerHTML = "➔ [" + currentDate + "] " + message;
 
-                document.getElementById('debugDiv').prepend(e);
+                document.getElementById('debugConsoleContent').prepend(e);
             };
 
             console.error = console.debug = console.info = console.log;
-
-            // button
-            let btRun = document.getElementById('btRun');
 
             // check for wasm support
             if (!('WebAssembly' in window)) {
@@ -488,8 +535,13 @@
             }
 
             // initial state
+            bindKeys();
             buttonToInitialState();
+        }
 
+        function startApp() {
+            // let button start load files
+            let btRun = document.getElementById('btRun');
             btRun.onclick = function () {
                 let urlInput = document.getElementById('urlInput');
                 let url = urlInput.value;
@@ -501,23 +553,40 @@
                 }
             }
 
-            bindKeys();
-
             // load data from url
             let urlParamTitle = getUrlParam("title");
             let urlParamUrl = getUrlParam("url");
+            let urlParamDebug = getUrlParam("debug");
+
+            if (urlParamDebug && urlParamDebug === "0") {
+                debugMode = false;
+            } else {
+                debugMode = true;
+            }
 
             if (urlParamTitle) {
                 changeFileTitle(urlParamTitle);
             }
 
             if (urlParamUrl) {
+                let urlInput = document.getElementById('urlInput');
+                urlParamUrl.value = urlParamUrl;
+
                 loadFileFromURL(decodeURI(urlParamUrl));
             }
+
+            // debug console
+            showDebugConsole(debugMode);
         }
 
         window.onload = function (e) {
-            load();
+            pageLoaded = true;
+
+            startUI();
+
+            console.log('The page was loaded!');
+
+            checkIfEverythingWasLoaded();
         }
     </script>
 
@@ -616,41 +685,56 @@
 </head>
 
 <body>
-    <section class="section">
-        <div class="container is-fluid">
+    <!-- content -->
+    <section class="section is-centered">
+        <div class="container">
+
+            <!-- title -->
             <h1 id="fileTitle" class="title">PDF Viewer</h1>
-            <br>
-            <p>1 - Select your PDF file:</p>
-            <br>
-            <div id="file-container" class="file is-info has-name is-boxed">
-                <label class="file-label">
-                    <input class="file-input" id="fileInput" type="file" accept="application/pdf">
-                    <span class="file-cta">
-                        <span class="file-label">
-                            Choose a file…
+
+            <div id="fileForm">
+                <br>
+                <p>1 - Select your PDF file:</p>
+                <br>
+
+                <!-- file input -->
+                <div id="file-container" class="file is-info has-name is-boxed">
+                    <label class="file-label">
+                        <input class="file-input" id="fileInput" type="file" accept="application/pdf">
+                        <span class="file-cta">
+                            <span class="file-label">
+                                Choose a file…
+                            </span>
                         </span>
-                    </span>
-                    <span class="file-name">
-                        No file uploaded
-                    </span>
-                </label>
+                        <span class="file-name">
+                            No file uploaded
+                        </span>
+                    </label>
+                </div>
+                <br>
+                <br>
+
+                <!-- url input -->
+                <p>Or type any PDF public url:</p>
+                <br>
+                <input class="input" type="text" placeholder="" id="urlInput">
+                <br>
+                <br>
+
+                <!-- process button -->
+                <p>2 - Press button to process:</p>
+                <br>
+                <button class="button is-warning" id="btRun">Loading...</button>
+                <br>
+                <br>
+                <br>
             </div>
-            <br>
-            <br>
-            <p>Or type any PDF public url:</p>
-            <br>
-            <input class="input" type="text" placeholder="" id="urlInput">
-            <br>
-            <br>
-            <p>2 - Press button to process:</p>
-            <br>
-            <button class="button is-warning" id="btRun">Loading...</button>
-            <br>
-            <br>
-            <br>
+
+            <!-- page list container -->
             <div id="pageListContainer">
                 <p style="font-weight: bold;" id="pageListTitle">Page list title</p>
 
+                <!-- page as a column -->
                 <div class="columns is-multiline is-mobile" id="pageList"></div>
 
                 <div class="modal is-active" id="pageModal">
@@ -659,6 +743,7 @@
                         <img id="pageModalImage" src="">
                     </div>
 
+                    <!-- modal buttons -->
                     <a class="page-prev" onclick="changeCurrentPageItemPlus(-1)">&#10094;</a>
 
                     <a class="page-next" onclick="changeCurrentPageItemPlus(1)">&#10095;</a>
@@ -666,7 +751,9 @@
                     <button onclick="closeModal()" class="modal-close is-large" aria-label="close"></button>
                 </div>
             </div>
-            <div class="card">
+
+            <!-- debug console -->
+            <div class="card" id="debugConsole">
                 <header class="card-header">
                     <p class="card-header-title">
                         Debug console
@@ -674,14 +761,25 @@
                 </header>
                 <div class="card-content">
                     <div class="content">
-                        <div id="debugDiv">
+                        <div id="debugConsoleContent">
                             <p>➔ Debug messages will be showed here</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     </section>
+
+    <!-- google analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J2FWK7KZMQ"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-J2FWK7KZMQ');
+    </script>
 </body>
 
 </html>
