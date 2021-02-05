@@ -174,7 +174,7 @@ def run_task_build():
                     "out/{0}-{1}-{2}".format(
                         target["target_os"], target["target_cpu"], config
                     ),
-                    "pdfium_all",
+                    "pdfium",
                     "-v",
                 ]
             )
