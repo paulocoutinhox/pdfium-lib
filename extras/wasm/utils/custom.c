@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 
 #include "fpdfview.h"
 #include "fpdf_dataavail.h"
@@ -21,6 +22,21 @@ EMSCRIPTEN_KEEPALIVE void PDFium_Init()
     config.m_pPlatform = NULL;
 
     FPDF_InitLibraryWithConfig(&config);
+}
+
+EMSCRIPTEN_KEEPALIVE bool PDFium_CheckDimensions(int stride, int width, int height)
+{
+    if (stride < 0 || width < 0 || height < 0)
+    {
+        return false;
+    }
+
+    if (height > 0 && stride > INT_MAX / height)
+    {
+        return false;
+    }
+
+    return true;
 }
 
 EMSCRIPTEN_KEEPALIVE FPDF_DOCUMENT PDFium_CreateDocFromBuffer(void *buffer, int length)
@@ -60,12 +76,15 @@ EMSCRIPTEN_KEEPALIVE char *PDFium_GetRenderPageBitmap(FPDF_DOCUMENT doc, int pag
     // render page
     FPDF_PAGE page = FPDF_LoadPage(doc, pageIndex);
 
-    char *result = malloc((int)pageWidth * (int)pageHeight * 4);
+    // get alpha
+    //int alpha = FPDFPage_HasTransparency(page) ? 1 : 0;   // C++ only
+    int alpha = 1;
 
-    FPDF_BITMAP pageBitmap = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, FPDFBitmap_BGRA, result, (int)pageWidth * 4);
-    int background = 0xFFFFFFFF;
+    // create bitmap
+    FPDF_BITMAP pageBitmap = FPDFBitmap_Create((int)pageWidth, (int)pageHeight, alpha);
+    FPDF_DWORD fillColor = alpha ? 0x00000000 : 0xFFFFFFFF;
 
-    FPDFBitmap_FillRect(pageBitmap, 0, 0, (int)pageWidth, (int)pageHeight, background);
+    FPDFBitmap_FillRect(pageBitmap, 0, 0, (int)pageWidth, (int)pageHeight, fillColor);
 
     int flags = 0;
 
@@ -79,10 +98,14 @@ EMSCRIPTEN_KEEPALIVE char *PDFium_GetRenderPageBitmap(FPDF_DOCUMENT doc, int pag
     }
 
     FPDF_RenderPageBitmap(pageBitmap, page, 0, 0, (int)pageWidth, (int)pageHeight, 0, flags);
+
+    int stride = FPDFBitmap_GetStride(pageBitmap);
+    char *buffer = FPDFBitmap_GetBuffer(pageBitmap);
+
     FPDFBitmap_Destroy(pageBitmap);
     FPDF_ClosePage(page);
 
-    return result;
+    return buffer;
 }
 
 EMSCRIPTEN_KEEPALIVE int PDFium_GetRenderPageDataSize(FPDF_DOCUMENT doc, int pageIndex)
