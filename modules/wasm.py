@@ -683,7 +683,7 @@ def run_task_generate():
                     'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
                     "custom.c",
                     "@pdfium.rsp",
-                    "-Os",
+                    "-O3",
                     "--no-entry",
                 ]
             )
