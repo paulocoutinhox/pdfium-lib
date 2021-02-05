@@ -6,8 +6,8 @@ targets = ["ios", "macos", "android"]
 targets = ["android"]
 
 # pdfium
-pdfium_git_commit = "d3664703dfa9dc530246de50a16b8e8523b676d6"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4389
+pdfium_git_commit = "46ff50212421a1959bc4adbe476ffeac2c6aa593"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4408
 
 # macos
 configurations_macos = ["release"]
