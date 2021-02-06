@@ -674,16 +674,18 @@ def run_task_generate():
 
             command = " ".join(
                 [
-                    "emcc",
+                    "em++",
                     "-o",
                     html_file,
                     "-s",
                     'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
                     "-s",
                     'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
-                    "custom.c",
+                    "custom.cpp",
                     "@pdfium.rsp",
                     "-O3",
+                    "-std=c++11",
+                    "-Wall",
                     "--no-entry",
                 ]
             )
