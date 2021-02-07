@@ -23,6 +23,8 @@ extern "C"
 }
 #endif
 
+const double PDF_SCALE = 2.0;
+
 void PDFium_Init()
 {
     // https://source.chromium.org/chromium/chromium/src/+/master:third_party/pdfium/samples/pdfium_test.cc;l=1172
@@ -66,8 +68,8 @@ double *PDFium_GetPageSizeByIndex(FPDF_DOCUMENT doc, int pageIndex)
 
     FPDF_GetPageSizeByIndex(doc, pageIndex, &pageWidth, &pageHeight);
 
-    pageWidth = pageWidth * 1.333333;
-    pageHeight = pageHeight * 1.333333;
+    pageWidth = pageWidth * PDF_SCALE;
+    pageHeight = pageHeight * PDF_SCALE;
 
     result[0] = pageWidth;
     result[1] = pageHeight;
@@ -83,8 +85,8 @@ unsigned char *PDFium_GetRenderPageBitmap(FPDF_DOCUMENT doc, int pageIndex, bool
 
     FPDF_GetPageSizeByIndex(doc, pageIndex, &pageWidth, &pageHeight);
 
-    pageWidth = pageWidth * 1.333333;
-    pageHeight = pageHeight * 1.333333;
+    pageWidth = pageWidth * PDF_SCALE;
+    pageHeight = pageHeight * PDF_SCALE;
 
     // render page
     FPDF_PAGE page = FPDF_LoadPage(doc, pageIndex);
@@ -122,8 +124,8 @@ int PDFium_GetRenderPageDataSize(FPDF_DOCUMENT doc, int pageIndex)
 
     FPDF_GetPageSizeByIndex(doc, pageIndex, &pageWidth, &pageHeight);
 
-    pageWidth = pageWidth * 1.333333;
-    pageHeight = pageHeight * 1.333333;
+    pageWidth = pageWidth * PDF_SCALE;
+    pageHeight = pageHeight * PDF_SCALE;
 
     return (int)((int)pageWidth * (int)pageHeight * 4);
 }
