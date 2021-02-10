@@ -191,11 +191,13 @@
                             pageRenderData.push(Module.HEAPU8[pageRenderPtr / Uint8Array.BYTES_PER_ELEMENT + v]);
                         }
 
-                        console.log("Page render data size: " + pageRenderData.length);
+                        console.log("Page render data size: " + pageRenderData.length + " bytes");
 
                         Module._free(pageRenderPtr);
 
                         // render to canvas
+                        console.log("Rendering to canvas...");
+
                         let canvas = document.createElement('canvas');
                         let ctx = canvas.getContext('2d');
 
@@ -214,6 +216,8 @@
                         idata = null;
 
                         // add page item
+                        console.log("Adding page item...");
+
                         let image = document.createElement('img');
                         image.id = "pageImage" + (x + 1);
                         image.src = dataUri;
@@ -407,6 +411,16 @@
             }
         }
 
+        function showFileTitle(show) {
+            let fileTitle = document.getElementById('fileTitle');
+
+            if (show) {
+                fileTitle.style.display = "block";
+            } else {
+                fileTitle.style.display = "none";
+            }
+        }
+
         function showFileForm(show) {
             let fileForm = document.getElementById('fileForm');
 
@@ -414,6 +428,28 @@
                 fileForm.style.display = "block";
             } else {
                 fileForm.style.display = "none";
+            }
+        }
+
+        function showLoading(show) {
+            let loading = document.getElementById('loadingContainer');
+
+            if (show) {
+                loading.className = "loader-wrapper is-active";
+            } else {
+                loading.className = "loader-wrapper";
+            }
+
+            return false;
+        }
+
+        function showFooter(show) {
+            let footer = document.getElementById('footer');
+
+            if (show) {
+                footer.style.display = "block";
+            } else {
+                footer.style.display = "none";
             }
         }
 
@@ -610,8 +646,15 @@
                 loadFileFromURL(decodeURI(urlParamUrl));
             }
 
-            // debug console
+            // show inicial things
             showDebugConsole(debugMode);
+            showFileTitle(true);
+            showFileForm(true);
+            showFooter(true);
+
+            setTimeout(function () {
+                showLoading(false);
+            }, 500);
         }
 
         window.onload = function (e) {
@@ -631,9 +674,15 @@
             touch-action: pan-x pan-y;
         }
 
+        html,
+        body {
+            height: 100%;
+        }
+
         .footer {
             padding-bottom: 1.5rem;
             padding-top: 1.5rem;
+            display: none;
         }
 
         /* page list item */
@@ -721,18 +770,63 @@
         #pageModalImage {
             max-height: 100%;
         }
+
+        /* loader */
+        .loader-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: #fff;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity .3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+        }
+
+        .loader {
+            height: 80px;
+            width: 80px;
+            margin: 0 auto;
+        }
+
+        .is-active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        /* file title */
+        #fileTitle {
+            display: none;
+        }
+
+        /* file form */
+        #fileForm {
+            display: none;
+        }
     </style>
 </head>
 
 <body>
+    <!-- loading -->
+    <div id="loadingContainer">
+        <div class="loader-wrapper is-active">
+            <div class="loader is-loading"></div>
+        </div>
+    </div>
+
     <!-- content -->
     <section class="section is-centered">
         <div class="container">
 
             <!-- title -->
-            <h1 id="fileTitle" class="title">PDF Viewer</h1>
+            <h1 id="fileTitle" class="title" style="display: none;">PDF Viewer</h1>
 
-            <div id="fileForm">
+            <div id="fileForm" style="display: none;">
                 <br>
                 <p>1 - Select your PDF file:</p>
                 <br>
@@ -771,7 +865,7 @@
             </div>
 
             <!-- page list container -->
-            <div id="pageListContainer">
+            <div id="pageListContainer" style="display: none;">
                 <p style="font-weight: bold;" id="pageListTitle">Number of pages: 0</p>
 
                 <!-- page as a column -->
@@ -793,7 +887,7 @@
             </div>
 
             <!-- debug console -->
-            <div class="card" id="debugConsole">
+            <div class="card" id="debugConsole" style="display: none;">
                 <header class="card-header">
                     <p class="card-header-title">
                         Debug console
@@ -812,7 +906,7 @@
     </section>
 
     <!-- footer -->
-    <footer class="footer">
+    <footer id="footer" class="footer" style="display: none;">
         <div class="content has-text-centered">
             <p>
                 This application is powered by an open source project called PDF Viewer and can be found <a
