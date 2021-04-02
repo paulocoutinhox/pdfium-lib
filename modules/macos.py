@@ -87,7 +87,7 @@ def run_task_patch():
         f.replace_line_in_file(
             source_file,
             19,
-            '',
+            "",
         )
 
         f.debug("Applied: zlib - skia")
