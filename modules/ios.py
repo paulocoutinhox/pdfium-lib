@@ -99,9 +99,9 @@ def run_task_patch():
         "BUILD.gn",
     )
     if not f.file_line_has_content(
-        source_file, 1679, '#      "-Wimplicit-fallthrough",\n'
+        source_file, 1681, '#      "-Wimplicit-fallthrough",\n'
     ):
-        f.file_line_comment(source_file, 1679)
+        f.file_line_comment(source_file, 1681)
 
         f.debug("Applied: Compiler")
     else:
@@ -137,9 +137,9 @@ def run_task_patch():
         "rules.gni",
     )
     if not f.file_line_has_content(
-        source_file, 946, '#          data_deps += [ "//testing/iossim" ]\n'
+        source_file, 951, '#          data_deps += [ "//testing/iossim" ]\n'
     ):
-        f.file_line_comment(source_file, 946)
+        f.file_line_comment(source_file, 951)
 
         f.debug("Applied: iOS Simulator")
     else:
@@ -247,6 +247,8 @@ def run_task_build():
             args.append('ios_deployment_target="9.0"')
             args.append("ios_enable_code_signing=false")
             args.append("use_xcode_clang=true")
+            args.append("use_system_libjpeg=true")
+            args.append("use_system_zlib=true")
             args.append("pdf_is_complete_lib=true")
 
             if target["target_cpu"] == "arm":
