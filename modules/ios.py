@@ -247,8 +247,6 @@ def run_task_build():
             args.append('ios_deployment_target="9.0"')
             args.append("ios_enable_code_signing=false")
             args.append("use_xcode_clang=true")
-            args.append("use_system_libjpeg=true")
-            args.append("use_system_zlib=true")
             args.append("pdf_is_complete_lib=true")
 
             if target["target_cpu"] == "arm":
