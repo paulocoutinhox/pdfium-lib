@@ -35,16 +35,15 @@ RUN gclient sync
 WORKDIR /build/pdfium
 RUN git checkout 511d49d21051d736bb0f702d60b4e899bf26b485
 
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN ln -s /usr/bin/pip3 /usr/bin/pip
+
 RUN apt-get install -o APT::Immediate-Configure=false -f apt \
     && apt-get -f install \
     && dpkg --configure -a \
     && apt-get -y dist-upgrade \
     && echo n | ./build/install-build-deps.sh \
     && rm -rf /build
-
-# python
-RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
 # ninja
 RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
