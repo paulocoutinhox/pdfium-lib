@@ -711,6 +711,21 @@ def run_task_generate():
                 os.path.join(node_dir, "index.html"),
             )
 
+            # change template tags
+            f.debug("Replacing template tags...")
+
+            f.replace_in_file(
+                os.path.join(node_dir, "index.html"),
+                "{pdfium-branch}",
+                c.pdfium_git_branch,
+            )
+
+            f.replace_in_file(
+                os.path.join(node_dir, "index.html"),
+                "{pdfium-commit}",
+                c.pdfium_git_commit,
+            )
+
             # test
             f.debug(
                 "Test on browser with: python -m http.server --directory {0}".format(

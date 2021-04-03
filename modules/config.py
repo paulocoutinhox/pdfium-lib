@@ -5,6 +5,7 @@ make_task = ""
 targets = ["ios", "macos", "android"]
 
 # pdfium
+pdfium_git_branch = "4466"
 pdfium_git_commit = "511d49d21051d736bb0f702d60b4e899bf26b485"
 # ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4466
 # OBS 1: don't forget change in android docker file (docker/android/Dockerfile)

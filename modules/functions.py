@@ -202,14 +202,14 @@ def append_to_file(file, content):
 
 
 def replace_in_file(filename, old_string, new_string):
-    with open(filename) as f:
+    with open(filename, encoding="utf-8") as f:
         s = f.read()
         if old_string not in s:
             # print('"{old_string}" not found in {filename}.'.format(**locals()))
             return
 
     # Safely write the changed content, if found in the file
-    with open(filename, "w") as f:
+    with open(filename, "w", encoding="utf-8") as f:
         # print('Changing "{old_string}" to "{new_string}" in {filename}'.format(**locals()))
         s = s.replace(old_string, new_string)
         f.write(s)

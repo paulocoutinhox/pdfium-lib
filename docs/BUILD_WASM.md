@@ -86,4 +86,4 @@ docker run -v ${PWD}:/app -it pdfium-wasm node --experimental-wasm-threads --exp
 
 You can test pdfium on web browser here:
 
-https://paulo-coutinho.github.io/pdfium-lib/
+https://pdfviewer.github.io/
