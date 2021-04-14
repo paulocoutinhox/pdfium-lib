@@ -3,11 +3,13 @@ make_debug = False
 make_task = ""
 
 targets = ["ios", "macos", "android"]
-targets = ["android"]
 
 # pdfium
-pdfium_git_commit = "46ff50212421a1959bc4adbe476ffeac2c6aa593"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4408
+pdfium_git_branch = "4466"
+pdfium_git_commit = "511d49d21051d736bb0f702d60b4e899bf26b485"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4466
+# OBS 1: don't forget change in android docker file (docker/android/Dockerfile)
+# OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # macos
 configurations_macos = ["release"]

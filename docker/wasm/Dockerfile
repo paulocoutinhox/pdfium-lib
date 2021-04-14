@@ -4,9 +4,7 @@ FROM ubuntu:18.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV PROJ_TARGET="wasm"
-
 ENV JAVA_VERSION="8"
-
 ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
 # packages
@@ -35,17 +33,17 @@ WORKDIR /build
 RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN gclient sync
 WORKDIR /build/pdfium
-RUN git checkout d3664703dfa9dc530246de50a16b8e8523b676d6
+RUN git checkout 511d49d21051d736bb0f702d60b4e899bf26b485
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
-RUN apt-get install -o APT::Immediate-Configure=false -f apt 
-RUN apt-get -f install
-RUN dpkg --configure -a
-RUN apt-get -y dist-upgrade
-RUN echo n | ./build/install-build-deps.sh
-RUN rm -rf /build
+RUN apt-get install -o APT::Immediate-Configure=false -f apt \
+    && apt-get -f install \
+    && dpkg --configure -a \
+    && apt-get -y dist-upgrade \
+    && echo n | ./build/install-build-deps.sh \
+    && rm -rf /build
 
 # ninja
 RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja

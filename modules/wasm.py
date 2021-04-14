@@ -72,12 +72,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        342,
+        333,
         '  "//build/config/compiler:thin_archive",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            342,
+            333,
             '  #"//build/config/compiler:thin_archive",\n',
         )
 
@@ -115,22 +115,22 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        768,
+        819,
         '        "-m64",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            768,
+            819,
             '        #"-m64",\n',
         )
         f.replace_line_in_file(
             source_file,
-            769,
+            820,
             '        #"-march=$x64_arch",\n',
         )
         f.replace_line_in_file(
             source_file,
-            770,
+            821,
             '        #"-msse3",\n',
         )
 
@@ -148,12 +148,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        1541,
+        1592,
         '          "-Wno-ignored-pragma-optimize",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            1541,
+            1592,
             '          "-Wno-deprecated-register",\n',
         )
 
@@ -171,12 +171,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        2358,
+        2409,
         '        cflags += [ "-ggnu-pubnames" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            2358,
+            2409,
             '        #cflags += [ "-ggnu-pubnames" ]\n',
         )
 
@@ -193,17 +193,17 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        643,
+        658,
         '    cc = "$prefix/clang"\n',
     ):
         f.replace_line_in_file(
             source_file,
-            643,
+            658,
             '    cc = "emcc"\n',
         )
         f.replace_line_in_file(
             source_file,
-            644,
+            659,
             '    cxx = "em++"\n',
         )
 
@@ -245,12 +245,18 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        306,
+        316,
         '        cflags += [ "-fstack-protector" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            306,
+            316,
+            '        cflags += [ "-fno-stack-protector" ]\n',
+        )
+
+        f.replace_line_in_file(
+            source_file,
+            328,
             '        cflags += [ "-fno-stack-protector" ]\n',
         )
 
@@ -267,12 +273,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        236,
+        231,
         '      "pthread",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            236,
+            231,
             '      #"pthread",\n',
         )
 
@@ -290,12 +296,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        465,
+        483,
         '    cflags += [ "-pthread" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            465,
+            483,
             '    #cflags += [ "-pthread" ]\n',
         )
 
@@ -703,6 +709,21 @@ def run_task_generate():
             f.copy_file(
                 os.path.join(template_dir, "index.html"),
                 os.path.join(node_dir, "index.html"),
+            )
+
+            # change template tags
+            f.debug("Replacing template tags...")
+
+            f.replace_in_file(
+                os.path.join(node_dir, "index.html"),
+                "{pdfium-branch}",
+                c.pdfium_git_branch,
+            )
+
+            f.replace_in_file(
+                os.path.join(node_dir, "index.html"),
+                "{pdfium-commit}",
+                c.pdfium_git_commit,
             )
 
             # test
