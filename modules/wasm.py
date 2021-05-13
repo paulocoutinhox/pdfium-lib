@@ -551,6 +551,7 @@ def run_task_test():
             command = " ".join(
                 [
                     "em++",
+                    "{0}".format("-g" if config == "debug" else ""),
                     "-o",
                     "build/index.html",
                     "src/main.cpp",
@@ -682,6 +683,7 @@ def run_task_generate():
             command = " ".join(
                 [
                     "em++",
+                    "{0}".format("-g" if config == "debug" else "-O3"),
                     "-o",
                     html_file,
                     "-s",
@@ -690,7 +692,6 @@ def run_task_generate():
                     'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
                     "custom.cpp",
                     "@pdfium.rsp",
-                    "-O3",
                     "-std=c++11",
                     "-Wall",
                     "--no-entry",
