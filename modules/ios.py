@@ -47,9 +47,9 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 235, '#test("pdfium_unittests") {\n'):
-        f.file_line_comment_range(source_file, 235, 282)
-        f.file_line_comment_range(source_file, 375, 376)
+    if not f.file_line_has_content(source_file, 246, '#test("pdfium_unittests") {\n'):
+        f.file_line_comment_range(source_file, 246, 293)  # unit tests
+        f.file_line_comment_range(source_file, 384, 385)  # group: pdfium all tests
 
         f.debug("Applied: Build GN")
     else:
@@ -99,9 +99,9 @@ def run_task_patch():
         "BUILD.gn",
     )
     if not f.file_line_has_content(
-        source_file, 1681, '#      "-Wimplicit-fallthrough",\n'
+        source_file, 1699, '#      "-Wimplicit-fallthrough",\n'
     ):
-        f.file_line_comment(source_file, 1681)
+        f.file_line_comment(source_file, 1699)
 
         f.debug("Applied: Compiler")
     else:
@@ -127,6 +127,27 @@ def run_task_patch():
         f.debug("Applied: Carbon")
     else:
         f.debug("Skipped: Carbon")
+
+    # carbon - font
+    source_file = os.path.join(
+        source_dir,
+        "core",
+        "fpdfapi",
+        "font",
+        "cpdf_type1font.cpp",
+    )
+    if not f.file_line_has_content(
+        source_file, 17, "#include <CoreGraphics/CoreGraphics.h>\n"
+    ):
+        f.replace_line_in_file(
+            source_file,
+            17,
+            "#include <CoreGraphics/CoreGraphics.h>\n",
+        )
+
+        f.debug("Applied: Carbon - Font")
+    else:
+        f.debug("Skipped: Carbon - Font")
 
     # ios simulator
     source_file = os.path.join(

@@ -92,12 +92,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        203,
+        214,
         '    configs -= [ "//build/config/compiler:thin_archive" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            203,
+            214,
             '    #configs -= [ "//build/config/compiler:thin_archive" ]\n',
         )
 
@@ -115,22 +115,22 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        819,
+        824,
         '        "-m64",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            819,
+            824,
             '        #"-m64",\n',
         )
         f.replace_line_in_file(
             source_file,
-            820,
+            825,
             '        #"-march=$x64_arch",\n',
         )
         f.replace_line_in_file(
             source_file,
-            821,
+            826,
             '        #"-msse3",\n',
         )
 
@@ -148,12 +148,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        1592,
+        1597,
         '          "-Wno-ignored-pragma-optimize",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            1592,
+            1597,
             '          "-Wno-deprecated-register",\n',
         )
 
@@ -171,12 +171,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        2409,
+        2427,
         '        cflags += [ "-ggnu-pubnames" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            2409,
+            2427,
             '        #cflags += [ "-ggnu-pubnames" ]\n',
         )
 
@@ -245,18 +245,18 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        316,
+        315,
         '        cflags += [ "-fstack-protector" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            316,
+            315,
             '        cflags += [ "-fno-stack-protector" ]\n',
         )
 
         f.replace_line_in_file(
             source_file,
-            328,
+            327,
             '        cflags += [ "-fno-stack-protector" ]\n',
         )
 
@@ -296,12 +296,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        483,
+        482,
         '    cflags += [ "-pthread" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            483,
+            482,
             '    #cflags += [ "-pthread" ]\n',
         )
 
@@ -315,16 +315,17 @@ def run_task_patch():
         "third_party",
         "skia",
         "gn",
+        "skia",
         "BUILD.gn",
     )
     if f.file_line_has_content(
         source_file,
-        231,
+        224,
         '    libs += [ "pthread" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            231,
+            224,
             '    #libs += [ "pthread" ]\n',
         )
 
@@ -550,6 +551,7 @@ def run_task_test():
             command = " ".join(
                 [
                     "em++",
+                    "{0}".format("-g" if config == "debug" else ""),
                     "-o",
                     "build/index.html",
                     "src/main.cpp",
@@ -681,6 +683,7 @@ def run_task_generate():
             command = " ".join(
                 [
                     "em++",
+                    "{0}".format("-g" if config == "debug" else "-O3"),
                     "-o",
                     html_file,
                     "-s",
@@ -689,7 +692,6 @@ def run_task_generate():
                     'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
                     "custom.cpp",
                     "@pdfium.rsp",
-                    "-O3",
                     "-std=c++11",
                     "-Wall",
                     "--no-entry",

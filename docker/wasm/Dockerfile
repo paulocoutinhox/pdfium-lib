@@ -9,7 +9,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -33,7 +33,7 @@ WORKDIR /build
 RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN gclient sync
 WORKDIR /build/pdfium
-RUN git checkout 511d49d21051d736bb0f702d60b4e899bf26b485
+RUN git checkout 72fd656fee19235d9445796edee1e2c0c1e5e395
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
@@ -50,14 +50,14 @@ RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
 
 # dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install docopt python-slugify tqdm
+RUN pip3 install setuptools docopt python-slugify tqdm
 
 # emsdk
 RUN mkdir /emsdk
 WORKDIR /emsdk
-RUN git clone https://github.com/emscripten-core/emsdk.git .
-RUN ./emsdk install 2.0.13
-RUN ./emsdk activate 2.0.13
+RUN git clone https://github.com/emscripten-core/emsdk.git . 
+RUN ./emsdk install 2.0.20
+RUN ./emsdk activate 2.0.20
 ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
 
 # cache system libraries
