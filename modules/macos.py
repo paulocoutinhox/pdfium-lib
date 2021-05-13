@@ -51,13 +51,13 @@ def run_task_patch():
     )
     if not f.file_line_has_content(
         source_file,
-        56,
+        55,
         'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
     ):
         f.replace_line_in_file(
             source_file,
             55,
-            '\nuse_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n\n',
+            'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n\n',
         )
 
         f.debug("Applied: zlib")
@@ -75,19 +75,13 @@ def run_task_patch():
     )
     if not f.file_line_has_content(
         source_file,
-        18,
-        '  use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
+        19,
+        '      (current_cpu == "arm" || current_cpu == "arm64")\n',
     ):
         f.replace_line_in_file(
             source_file,
-            18,
-            '  use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
-        )
-
-        f.replace_line_in_file(
-            source_file,
             19,
-            "",
+            '      (current_cpu == "arm" || current_cpu == "arm64")\n',
         )
 
         f.debug("Applied: zlib - skia")
