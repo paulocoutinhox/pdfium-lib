@@ -604,6 +604,7 @@ def run_task_generate():
             gen_dir = os.path.join(root_dir, "gen")
             node_dir = os.path.join(main_dir, "node")
             http_dir = os.path.join(relative_dir, config, "node")
+            lib_file_out = os.path.join(lib_dir, "libpdfium.a")
 
             f.remove_dir(gen_dir)
             f.create_dir(gen_dir)
@@ -636,15 +637,7 @@ def run_task_generate():
 
             # copy utils files
             f.debug("Copying utils files...")
-
             f.copy_dir(utils_dir, os.path.join(gen_dir, "utils"))
-
-            # prepare files
-            f.debug("Preparing files...")
-
-            rsp_file = os.path.join(gen_dir, "utils", "pdfium.rsp")
-            f.replace_in_file(rsp_file, "{LIB_DIR}", lib_dir)
-            f.replace_in_file(rsp_file, "{INCLUDE_DIR}", include_dir)
 
             # node modules
             f.debug("Installing node modules...")
@@ -689,7 +682,20 @@ def run_task_generate():
                     "-s",
                     'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
                     "custom.cpp",
-                    "@pdfium.rsp",
+                    lib_file_out,
+                    "-I{0}".format(include_dir),
+                    "-s",
+                    "DEMANGLE_SUPPORT=1",
+                    "-s",
+                    "USE_ZLIB=1",
+                    "-s",
+                    "USE_LIBJPEG=1",
+                    "-s",
+                    "WASM=1",
+                    "-s",
+                    "ASSERTIONS=1",
+                    "-s",
+                    "ALLOW_MEMORY_GROWTH=1",
                     "-std=c++11",
                     "-Wall",
                     "--no-entry",
