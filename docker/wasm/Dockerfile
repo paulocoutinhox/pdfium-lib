@@ -52,6 +52,15 @@ RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
 RUN pip3 install --upgrade pip
 RUN pip3 install setuptools docopt python-slugify tqdm
 
+# libjpeg
+RUN mkdir /opt/libjpeg
+WORKDIR /opt/libjpeg
+RUN curl https://ijg.org/files/jpegsrc.v9c.tar.gz -o jpegsrc.v9c.tar.gz
+RUN tar -xvf jpegsrc.v9c.tar.gz
+WORKDIR /opt/libjpeg/jpeg-9c
+RUN ./configure --prefix=/usr
+RUN make && make install
+
 # emsdk
 RUN mkdir /emsdk
 WORKDIR /emsdk

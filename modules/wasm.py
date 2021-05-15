@@ -344,9 +344,7 @@ def run_task_patch():
     f.copy_file("/usr/include/zlib.h", os.path.join(source_dir, "zlib.h"))
     f.copy_file("/usr/include/zconf.h", os.path.join(source_dir, "zconf.h"))
     f.copy_file("/usr/include/jerror.h", os.path.join(source_dir, "jerror.h"))
-    f.copy_file(
-        "/usr/include/x86_64-linux-gnu/jconfig.h", os.path.join(source_dir, "jconfig.h")
-    )
+    f.copy_file("/usr/include/jconfig.h", os.path.join(source_dir, "jconfig.h"))
     f.copy_file("/usr/include/linux/limits.h", os.path.join(linux_dir, "limits.h"))
 
     f.debug("Copied!")
@@ -606,6 +604,7 @@ def run_task_generate():
             gen_dir = os.path.join(root_dir, "gen")
             node_dir = os.path.join(main_dir, "node")
             http_dir = os.path.join(relative_dir, config, "node")
+            lib_file_out = os.path.join(lib_dir, "libpdfium.a")
 
             f.remove_dir(gen_dir)
             f.create_dir(gen_dir)
@@ -638,15 +637,7 @@ def run_task_generate():
 
             # copy utils files
             f.debug("Copying utils files...")
-
             f.copy_dir(utils_dir, os.path.join(gen_dir, "utils"))
-
-            # prepare files
-            f.debug("Preparing files...")
-
-            rsp_file = os.path.join(gen_dir, "utils", "pdfium.rsp")
-            f.replace_in_file(rsp_file, "{LIB_DIR}", lib_dir)
-            f.replace_in_file(rsp_file, "{INCLUDE_DIR}", include_dir)
 
             # node modules
             f.debug("Installing node modules...")
@@ -689,9 +680,22 @@ def run_task_generate():
                     "-s",
                     'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
                     "-s",
-                    'EXTRA_EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
+                    'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
                     "custom.cpp",
-                    "@pdfium.rsp",
+                    lib_file_out,
+                    "-I{0}".format(include_dir),
+                    "-s",
+                    "DEMANGLE_SUPPORT=1",
+                    "-s",
+                    "USE_ZLIB=1",
+                    "-s",
+                    "USE_LIBJPEG=1",
+                    "-s",
+                    "WASM=1",
+                    "-s",
+                    "ASSERTIONS=1",
+                    "-s",
+                    "ALLOW_MEMORY_GROWTH=1",
                     "-std=c++11",
                     "-Wall",
                     "--no-entry",
