@@ -61,22 +61,6 @@ WORKDIR /opt/libjpeg/jpeg-9c
 RUN ./configure --prefix=/usr
 RUN make && make install
 
-# libjpeg turbo
-RUN mkdir /opt/libjpeg-turbo
-WORKDIR /opt/libjpeg-turbo
-RUN curl https://codeload.github.com/libjpeg-turbo/libjpeg-turbo/tar.gz/refs/tags/2.1.0 -o libjpeg-turbo.tar.gz
-RUN tar -xvf libjpeg-turbo.tar.gz
-WORKDIR /opt/libjpeg-turbo/libjpeg-turbo-2.1.0
-RUN mkdir build
-WORKDIR /opt/libjpeg-turbo/libjpeg-turbo-2.1.0/build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/usr \
-      -DCMAKE_BUILD_TYPE=RELEASE  \
-      -DENABLE_STATIC=TRUE       \
-      -DCMAKE_INSTALL_DOCDIR=/usr/share/doc/libjpeg-turbo-2.1.0 \
-      -DCMAKE_INSTALL_DEFAULT_LIBDIR=lib  \
-      ..
-RUN make && make install
-
 # emsdk
 RUN mkdir /emsdk
 WORKDIR /emsdk
