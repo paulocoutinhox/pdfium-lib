@@ -761,8 +761,6 @@ def run_task_publish():
     )
 
     # finish
-    f.debug("Test on browser with: https://paulo-coutinho.github.io/pdfium-lib/")
-
     f.debug("Published")
 
 

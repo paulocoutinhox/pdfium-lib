@@ -24,6 +24,62 @@
         let debugMode = false;
         let autoOpenMode = true;
 
+        // pdfium initialization
+        let FPDF = {};
+
+        Object.assign(FPDF, {
+            ANNOT: 0x01, // Set if annotations are to be rendered.
+            LCD_TEXT: 0x02, // Set if using text rendering optimized for LCD display.
+            NO_NATIVETEXT: 0x04, // Don't use the native text output available on some platforms
+            GRAYSCALE: 0x08, // Grayscale output.
+            DEBUG_INFO: 0x80, // Set if you want to get some debug info. Please discuss with Foxit first if you need to collect debug info.
+            NO_CATCH: 0x100, // Set if you don't want to catch exception.
+            RENDER_LIMITEDIMAGECACHE: 0x200, // Limit image cache size. 
+            RENDER_FORCEHALFTONE: 0x400, // Always use halftone for image stretching.
+            PRINTING: 0x800, // Render for printing.
+            REVERSE_BYTE_ORDER: 0x10, // Set whether render in a reverse Byte order, this flag only.
+            Bitmap_Gray: 1,
+            Bitmap_BGR: 2,
+            Bitmap_BGRx: 3,
+            Bitmap_BGRA: 4,
+            LAST_ERROR: { // Last error types
+                SUCCESS: 0,
+                UNKNOWN: 1,
+                FILE: 2,
+                FORMAT: 3,
+                PASSWORD: 4,
+                SECURITY: 5,
+                PAGE: 6
+            }
+        });
+
+        const I8 = Int8Array;
+        const I16 = Int16Array;
+        const I32 = Int32Array;
+        const U8 = Uint8Array;
+        const CH = U8;
+        const U16 = Uint16Array;
+        const U32 = Uint32Array;
+        const F32 = Float32Array;
+        const F64 = Float64Array;
+
+        const H = (t, s, d) => f => {
+            const [m, ...a] = heap(t, s);
+            const v = f(...a.map(x => x.p));
+
+            if (!v) {
+                m.free();
+                return d;
+            }
+
+            const r = a.map(x => x.v);
+            m.free();
+            return r;
+        };
+
+        const F = FPDF.Bitmap_BGRA;
+        const C = 4;
+
         // runtime initialized
         Module.onRuntimeInitialized = async _ => {
             moduleLoaded = true;
@@ -110,21 +166,6 @@
                 pageListContainer.style.display = "none";
                 pageList.innerHTML = "";
 
-                // map functions
-                console.log('Mapping functions...');
-
-                PDFium_Init = Module.cwrap('PDFium_Init');
-                PDFium_CreateAvailFromBuffer = Module.cwrap('PDFium_CreateAvailFromBuffer', 'number', ['number', 'number']);
-                PDFium_CreateDocFromBuffer = Module.cwrap('PDFium_CreateDocFromBuffer', 'number', ['number', 'number']);
-                PDFium_GetLastError = Module.cwrap('PDFium_GetLastError', 'string');
-                PDFium_GetPageSizeByIndex = Module.cwrap('PDFium_GetPageSizeByIndex', 'number', ['number', 'number']);
-                PDFium_GetRenderPageBitmap = Module.cwrap('PDFium_GetRenderPageBitmap', 'number', ['number', 'number', ['boolean']]);
-                PDFium_GetRenderPageDataSize = Module.cwrap('PDFium_GetRenderPageDataSize', 'number', ['number', 'number']);
-
-                FPDF_GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
-                FPDF_CloseDocument = Module.cwrap('FPDF_CloseDocument', '', ['number']);
-                FPDF_DestroyLibrary = Module.cwrap('FPDF_DestroyLibrary');
-
                 // check file size
                 console.log('Getting file size...');
 
@@ -134,7 +175,7 @@
                 // init library
                 console.log('Initializing library...');
 
-                PDFium_Init();
+                FPDF.Init();
 
                 // load document to memory
                 console.log('Loading data to buffer...');
@@ -145,17 +186,95 @@
                 // create document
                 console.log('Loading document...');
 
-                let doc = PDFium_CreateDocFromBuffer(wasmBuffer, fileSize, "");
+                let o = {
+                    wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, "")
+                };
+
+                o.getPageSize = (i = 0, s = 2) => H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(o.wasm, i, w, h)).map(v => parseInt(v) * s);
+
+                o.getRender = function (i = 0, w, h) {
+                    const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
+                    const heap = Module._malloc(w * h * C);
+
+                    for (let i = 0; i < w * h * C; i++) {
+                        Module.HEAPU8[heap + i] = 0;
+                    }
+
+                    const bmap = FPDF.Bitmap_CreateEx(w, h, F, heap, w * C);
+                    const page = FPDF.LoadPage(this.wasm, i);
+
+                    FPDF.Bitmap_FillRect(bmap, 0, 0, w, h, 0xFFFFFFFF);
+                    FPDF.RenderPageBitmap(bmap, page, 0, 0, w, h, 0, flag);
+                    FPDF.Bitmap_Destroy(bmap);
+                    FPDF.ClosePage(page);
+
+                    return heap;
+                };
+
+                o.getPageRender = function (n = 0, w, h) {
+                    let pageRenderPtr = this.getRender(n, w, h);
+                    let pageRenderData = [];
+
+                    for (let v = 0; v < w * h * C; v++) {
+                        pageRenderData.push(Module.HEAPU8[pageRenderPtr + v]);
+                    }
+
+                    Module._free(pageRenderPtr);
+
+                    return pageRenderData;
+                };
+
+                o.render = function (n = 0, canvas, scale, rotation) {
+                    const [w, h] = this.getPageSize(n, scale, rotation);
+                    const data = this.getPageRender(n, w, h, rotation);
+
+                    canvas.width = w;
+                    canvas.height = h;
+
+                    const x = canvas.getContext('2d');
+                    const i = x.createImageData(w, h);
+                    i.data.set(data);
+                    x.putImageData(i, 0, 0);
+                };
+
+                o.getLastError = function () {
+                    let lastError = FPDF.GetLastError();
+
+                    switch (lastError) {
+                        case FPDF.LAST_ERROR.SUCCESS:
+                            return "success";
+                            break;
+                        case FPDF.LAST_ERROR.UNKNOWN:
+                            return "unknown error";
+                            break;
+                        case FPDF.LAST_ERROR.FILE:
+                            return "file not found or could not be opened";
+                            break;
+                        case FPDF.LAST_ERROR.FORMAT:
+                            return "file not in PDF format or corrupted";
+                            break;
+                        case FPDF.LAST_ERROR.PASSWORD:
+                            return "password required or incorrect password";
+                            break;
+                        case FPDF.LAST_ERROR.SECURITY:
+                            return "unsupported security scheme";
+                            break;
+                        case FPDF.LAST_ERROR.PAGE:
+                            return "page not found or content error";
+                            break;
+                        default:
+                            return "unknown error";
+                    }
+                }
 
                 // check last error
-                let lastError = PDFium_GetLastError();
+                let lastError = o.getLastError();
                 console.log("Load document state: " + lastError);
-                Module._free(lastError);
 
                 // count page
                 console.log('Couting pages...');
 
-                let pages = FPDF_GetPageCount(doc);
+                let pages = FPDF.GetPageCount(o.wasm);
                 console.log('Pages: ' + pages);
 
                 // list all pages
@@ -165,48 +284,12 @@
                     for (let x = 0; x < pages; x++) {
                         console.log('Rendering page ' + (x + 1) + '...');
 
-                        // get page size
-                        let pageSizePtr = PDFium_GetPageSizeByIndex(doc, x);
-                        let pageSize = []
-
-                        for (let v = 0; v < 2; v++) {
-                            pageSize.push(Module.HEAPF64[pageSizePtr / Float64Array.BYTES_PER_ELEMENT + v])
-                        }
-
-                        Module._free(pageSizePtr);
-
-                        let pageWidth = parseInt(pageSize[0]);
-                        let pageHeight = parseInt(pageSize[1]);
-
-                        console.log("Page " + (x + 1) + " has size: " + pageWidth + "pt X " + pageHeight + "pt");
-
-                        // get page render bytes
-                        let pageRenderDataSize = PDFium_GetRenderPageDataSize(doc, x);
-
-                        let pageRenderPtr = PDFium_GetRenderPageBitmap(doc, x, true);
-                        let pageRenderData = [];
-                        let pageRenderSize = pageRenderDataSize;
-
-                        for (let v = 0; v < pageRenderSize; v++) {
-                            pageRenderData.push(Module.HEAPU8[pageRenderPtr / Uint8Array.BYTES_PER_ELEMENT + v]);
-                        }
-
-                        console.log("Page render data size: " + pageRenderData.length + " bytes");
-
-                        Module._free(pageRenderPtr);
-
                         // render to canvas
                         console.log("Rendering to canvas...");
 
                         let canvas = document.createElement('canvas');
-                        let ctx = canvas.getContext('2d');
 
-                        canvas.width = pageWidth;
-                        canvas.height = pageHeight;
-
-                        let idata = ctx.createImageData(pageWidth, pageHeight);
-                        idata.data.set(pageRenderData);
-                        ctx.putImageData(idata, 0, 0);
+                        o.render(x, canvas, 3.0, 90);
 
                         let dataUri = canvas.toDataURL();
 
@@ -272,8 +355,8 @@
 
                 Module._free(wasmBuffer);
 
-                FPDF_CloseDocument(doc);
-                FPDF_DestroyLibrary();
+                FPDF.CloseDocument(o.wasm);
+                FPDF.DestroyLibrary();
 
                 // initial state
                 buttonToInitialState();
@@ -602,7 +685,47 @@
             buttonToInitialState();
         }
 
+        function initializeFPDF() {
+            FPDF.Init = Module.cwrap('PDFium_Init');
+            FPDF.RenderPageBitmap = Module.cwrap('FPDF_RenderPageBitmap', '', ['number', 'number', 'number', 'number', 'number', 'number', 'number', 'number']);
+
+            FPDF.Bitmap_FillRect = Module.cwrap('FPDFBitmap_FillRect', '', ['number', 'number', 'number', 'number', 'number', 'number']);
+            FPDF.Bitmap_CreateEx = Module.cwrap('FPDFBitmap_CreateEx', 'number', ['number', 'number', 'number', 'number', 'number']);
+            FPDF.Bitmap_Destroy = Module.cwrap('FPDFBitmap_Destroy', '', ['number']);
+
+            FPDF.LoadPage = Module.cwrap('FPDF_LoadPage', 'number', ['number', 'number']);
+            FPDF.ClosePage = Module.cwrap('FPDF_ClosePage', '', ['number']);
+
+            FPDF.LoadMemDocument = Module.cwrap('FPDF_LoadMemDocument', 'number', ['number', 'number', 'string']);
+            FPDF.GetPageSizeByIndex = Module.cwrap('FPDF_GetPageSizeByIndex', 'number', ['number', 'number', 'number', 'number']);
+            FPDF.GetLastError = Module.cwrap('FPDF_GetLastError', 'number');
+            FPDF.GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
+            FPDF.CloseDocument = Module.cwrap('FPDF_CloseDocument', '', ['number']);
+            FPDF.DestroyLibrary = Module.cwrap('FPDF_DestroyLibrary');
+
+            window.heap = (J, s) => {
+                let E;
+                switch (J) {
+                    case Int8Array: E = Module.HEAP8; break;
+                    case Int16Array: E = Module.HEAP16; break;
+                    case Int32Array: E = Module.HEAP32; break;
+                    case Uint8Array: E = Module.HEAPU8; break;
+                    case Uint16Array: E = Module.HEAPU16; break;
+                    case Uint32Array: E = Module.HEAPU32; break;
+                    case Float32Array: E = Module.HEAPF32; break;
+                    case Float64Array: E = Module.HEAPF64; break;
+                }
+                const Z = J.BYTES_PER_ELEMENT; const m = Module._malloc(s * Z);
+                const a = Array(1 + s); a[0] = ({ s, J, Z, E, m, free: () => Module._free(m) });
+                for (let i = 0; i < s; i++) a[i + 1] = ({ p: m + (i * Z), get v() { return E[m / Z + i]; } });
+                return a;
+            };
+        }
+
         function startApp() {
+            // initialize FPDF
+            initializeFPDF();
+
             // let button start load files
             let btRun = document.getElementById('btRun');
             btRun.onclick = function () {
@@ -691,6 +814,7 @@
             display: flex;
             justify-content: center;
             padding: 2px;
+            cursor: pointer;
         }
 
         .page-list-item img {
@@ -914,7 +1038,7 @@
                 everything run only on client side.
             </p>
             <p>
-                PDFium branch "{pdfium-branch}" and commit "{pdfium-commit}".
+                PDFium branch "4505" and commit "72fd656fee19235d9445796edee1e2c0c1e5e395".
             </p>
         </div>
     </footer>
