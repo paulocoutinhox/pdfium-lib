@@ -62,9 +62,9 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if f.file_line_has_content(source_file, 18, "  cflags = []\n"):
+    if f.file_line_has_content(source_file, 19, "  cflags = []\n"):
         f.replace_line_in_file(
-            source_file, 18, '  cflags = [ "-fvisibility=default" ]\n'
+            source_file, 19, '  cflags = [ "-fvisibility=default" ]\n'
         )
 
         f.debug("Applied: Build GN Flags")

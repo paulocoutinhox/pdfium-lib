@@ -47,9 +47,9 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 246, '#test("pdfium_unittests") {\n'):
-        f.file_line_comment_range(source_file, 246, 293)  # unit tests
-        f.file_line_comment_range(source_file, 384, 385)  # group: pdfium all tests
+    if not f.file_line_has_content(source_file, 242, '#test("pdfium_unittests") {\n'):
+        f.file_line_comment_range(source_file, 242, 289)  # comment all lines of "pdfium_unittests"
+        f.file_line_comment_range(source_file, 380, 381)  # group "pdfium_all", comment all tests
 
         f.debug("Applied: Build GN")
     else:
