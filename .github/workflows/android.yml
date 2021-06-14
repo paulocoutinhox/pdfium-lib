@@ -16,12 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Remove trash
-        run: |
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
@@ -38,6 +32,12 @@ jobs:
 
       - name: Python requirements
         run: pip3 install -r requirements.txt --user
+
+      - name: Remove trash
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: Docker build
         run: docker build -t pdfium-android -f docker/android/Dockerfile docker/android
