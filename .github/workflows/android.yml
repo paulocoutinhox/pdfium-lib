@@ -16,6 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Remove trash
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v1
         with:
