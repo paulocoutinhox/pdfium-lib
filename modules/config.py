@@ -5,9 +5,9 @@ make_task = ""
 targets = ["ios", "macos", "android"]
 
 # pdfium
-pdfium_git_branch = "4505"
-pdfium_git_commit = "72fd656fee19235d9445796edee1e2c0c1e5e395"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4493
+pdfium_git_branch = "4542"
+pdfium_git_commit = "67a8dda2c2aa682028b4687f094b2b78a4b62398"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/4542
 # OBS 1: don't forget change in android docker file (docker/android/Dockerfile)
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
