@@ -49,10 +49,10 @@ def run_task_patch():
     )
     if not f.file_line_has_content(source_file, 242, '#test("pdfium_unittests") {\n'):
         f.file_line_comment_range(
-            source_file, 242, 289
+            source_file, 245, 292
         )  # comment all lines of "pdfium_unittests"
         f.file_line_comment_range(
-            source_file, 380, 381
+            source_file, 383, 384
         )  # group "pdfium_all", comment all tests
 
         f.debug("Applied: Build GN")
