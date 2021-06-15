@@ -92,12 +92,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        214,
+        217,
         '    configs -= [ "//build/config/compiler:thin_archive" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            214,
+            217,
             '    #configs -= [ "//build/config/compiler:thin_archive" ]\n',
         )
 
