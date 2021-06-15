@@ -72,14 +72,14 @@ You can test the sample using commands:
 
 ```
 python3 make.py run test-wasm
-node --experimental-wasm-threads --experimental-wasm-bulk-memory sample-wasm/build/index.js
+node sample-wasm/build/index.js
 ```
 
 or with docker you can use:
 
 ```
 docker run -v ${PWD}:/app -it pdfium-wasm python3 make.py run test-wasm
-docker run -v ${PWD}:/app -it pdfium-wasm node --experimental-wasm-threads --experimental-wasm-bulk-memory sample-wasm/build/index.js
+docker run -v ${PWD}:/app -it pdfium-wasm node sample-wasm/build/index.js
 ```
 
 ## Web demo
