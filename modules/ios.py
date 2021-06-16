@@ -59,6 +59,20 @@ def run_task_patch():
     else:
         f.debug("Skipped: Build GN")
 
+    # deprecated warning
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 53, '    cflags += [ "-Wdeprecated-copy" ]\n'
+    ):
+        f.file_line_comment(source_file, 53)
+
+        f.debug("Applied: Deprecated Warning")
+    else:
+        f.debug("Skipped: Deprecated Warning")
+
     # libjpeg
     source_file = os.path.join(
         source_dir,
@@ -102,9 +116,7 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file, 1703, '      "-Wimplicit-fallthrough",\n'
-    ):
+    if f.file_line_has_content(source_file, 1703, '      "-Wimplicit-fallthrough",\n'):
         f.file_line_comment(source_file, 1703)
 
         f.debug("Applied: Compiler")
