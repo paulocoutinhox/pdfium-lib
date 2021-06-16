@@ -33,7 +33,7 @@ WORKDIR /build
 RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN gclient sync
 WORKDIR /build/pdfium
-RUN git checkout 67a8dda2c2aa682028b4687f094b2b78a4b62398
+RUN git checkout c2ff7477dae94b94de39d11b7bde23169ea8a306
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
@@ -65,8 +65,8 @@ RUN make && make install
 RUN mkdir /emsdk
 WORKDIR /emsdk
 RUN git clone https://github.com/emscripten-core/emsdk.git . 
-RUN ./emsdk install 2.0.20
-RUN ./emsdk activate 2.0.20
+RUN ./emsdk install 2.0.24
+RUN ./emsdk activate 2.0.24
 ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
 
 # cache system libraries

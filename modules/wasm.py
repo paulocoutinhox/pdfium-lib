@@ -92,12 +92,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        214,
+        217,
         '    configs -= [ "//build/config/compiler:thin_archive" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            214,
+            217,
             '    #configs -= [ "//build/config/compiler:thin_archive" ]\n',
         )
 
@@ -115,22 +115,22 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        824,
+        835,
         '        "-m64",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            824,
+            835,
             '        #"-m64",\n',
         )
         f.replace_line_in_file(
             source_file,
-            825,
+            836,
             '        #"-march=$x64_arch",\n',
         )
         f.replace_line_in_file(
             source_file,
-            826,
+            837,
             '        #"-msse3",\n',
         )
 
@@ -148,12 +148,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        1597,
+        1608,
         '          "-Wno-ignored-pragma-optimize",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            1597,
+            1608,
             '          "-Wno-deprecated-register",\n',
         )
 
@@ -171,12 +171,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        2427,
+        2424,
         '        cflags += [ "-ggnu-pubnames" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            2427,
+            2424,
             '        #cflags += [ "-ggnu-pubnames" ]\n',
         )
 
@@ -193,17 +193,17 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        658,
+        677,
         '    cc = "$prefix/clang"\n',
     ):
         f.replace_line_in_file(
             source_file,
-            658,
+            677,
             '    cc = "emcc"\n',
         )
         f.replace_line_in_file(
             source_file,
-            659,
+            678,
             '    cxx = "em++"\n',
         )
 
@@ -245,18 +245,18 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        315,
+        335,
         '        cflags += [ "-fstack-protector" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            315,
+            335,
             '        cflags += [ "-fno-stack-protector" ]\n',
         )
 
         f.replace_line_in_file(
             source_file,
-            327,
+            347,
             '        cflags += [ "-fno-stack-protector" ]\n',
         )
 
@@ -296,12 +296,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        482,
+        496,
         '    cflags += [ "-pthread" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            482,
+            496,
             '    #cflags += [ "-pthread" ]\n',
         )
 

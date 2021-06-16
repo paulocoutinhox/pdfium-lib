@@ -49,15 +49,29 @@ def run_task_patch():
     )
     if not f.file_line_has_content(source_file, 242, '#test("pdfium_unittests") {\n'):
         f.file_line_comment_range(
-            source_file, 242, 289
+            source_file, 245, 292
         )  # comment all lines of "pdfium_unittests"
         f.file_line_comment_range(
-            source_file, 380, 381
+            source_file, 383, 384
         )  # group "pdfium_all", comment all tests
 
         f.debug("Applied: Build GN")
     else:
         f.debug("Skipped: Build GN")
+
+    # deprecated warning
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 53, '    cflags += [ "-Wdeprecated-copy" ]\n'
+    ):
+        f.file_line_comment(source_file, 53)
+
+        f.debug("Applied: Deprecated Warning")
+    else:
+        f.debug("Skipped: Deprecated Warning")
 
     # libjpeg
     source_file = os.path.join(
@@ -102,10 +116,8 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if not f.file_line_has_content(
-        source_file, 1699, '#      "-Wimplicit-fallthrough",\n'
-    ):
-        f.file_line_comment(source_file, 1699)
+    if f.file_line_has_content(source_file, 1703, '      "-Wimplicit-fallthrough",\n'):
+        f.file_line_comment(source_file, 1703)
 
         f.debug("Applied: Compiler")
     else:
