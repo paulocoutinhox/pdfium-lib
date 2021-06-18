@@ -59,7 +59,6 @@ jobs:
 
       - name: Archive
         run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py run archive-${{ matrix.config.target }}
-        if: startsWith(github.ref, 'refs/tags/')
 
       - name: Save
         uses: actions/upload-artifact@v2

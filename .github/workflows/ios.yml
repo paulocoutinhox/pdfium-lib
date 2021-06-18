@@ -104,7 +104,6 @@ jobs:
 
       - name: Archive
         run: python3 make.py run archive-${{ matrix.config.target }}
-        if: startsWith(github.ref, 'refs/tags/')
 
       - name: Save
         uses: actions/upload-artifact@v2
