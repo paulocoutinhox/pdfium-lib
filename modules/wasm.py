@@ -674,7 +674,7 @@ def run_task_generate():
             command = " ".join(
                 [
                     "em++",
-                    "{0}".format("-g" if config == "debug" else "-O2"),
+                    "{0}".format("-g" if config == "debug" else "-O3"),
                     "-o",
                     html_file,
                     "-s",
