@@ -47,7 +47,7 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 242, '#test("pdfium_unittests") {\n'):
+    if not f.file_line_has_content(source_file, 245, '#test("pdfium_unittests") {\n'):
         f.file_line_comment_range(
             source_file, 245, 292
         )  # comment all lines of "pdfium_unittests"
@@ -153,11 +153,11 @@ def run_task_patch():
         "cpdf_type1font.cpp",
     )
     if not f.file_line_has_content(
-        source_file, 17, "#include <CoreGraphics/CoreGraphics.h>\n"
+        source_file, 21, "#include <CoreGraphics/CoreGraphics.h>\n"
     ):
         f.replace_line_in_file(
             source_file,
-            17,
+            21,
             "#include <CoreGraphics/CoreGraphics.h>\n",
         )
 
