@@ -304,7 +304,7 @@ def run_task_install():
         # targets
         for target in c.targets_android:
             out_dir = "{0}-{1}-{2}".format(
-                target["target_os"], target["android_cpu"], config
+                target["target_os"], target["target_cpu"], config
             )
 
             source_lib_dir = os.path.join("build", target["target_os"], "pdfium", "out", out_dir)
