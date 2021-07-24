@@ -260,7 +260,7 @@ def run_task_patch():
         f.replace_line_in_file(
             source_file,
             21,
-            "class CPDF_OCContextInterface : public Retainable {\npublic:\n  virtual ~CPDF_OCContextInterface() = default;\n  virtual bool CheckOCGVisible(const CPDF_Dictionary* pOCGDict) const = 0;\n  virtual bool CheckObjectVisible(const CPDF_PageObject* pObj) const;\n};\n\nclass CPDF_OCContext : public CPDF_OCContextInterface {\n",
+            "class CPDF_OCContextInterface : public Retainable {\npublic:\n  virtual ~CPDF_OCContextInterface() override = default;\n  virtual bool CheckOCGVisible(const CPDF_Dictionary* pOCGDict) const = 0;\n  virtual bool CheckObjectVisible(const CPDF_PageObject* pObj) const;\n};\n\nclass CPDF_OCContext : public CPDF_OCContextInterface {\n",
         )
 
         f.debug("Applied: GDAL - OCContext H")
