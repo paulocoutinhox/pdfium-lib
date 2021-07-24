@@ -71,7 +71,142 @@ def run_task_patch():
     else:
         f.debug("Skipped: Build GN Flags")
 
-    pass
+    # gdal support patch - occontext cpp
+    source_file = os.path.join(
+        source_dir, "core", "fpdfapi", "page", "cpdf_occontext.cpp"
+    )
+    if f.file_line_has_content(
+        source_file,
+        185,
+        "bool CPDF_OCContext::CheckObjectVisible(const CPDF_PageObject* pObj) const {\n",
+    ):
+        f.replace_line_in_file(
+            source_file,
+            185,
+            "bool CPDF_OCContextInterface::CheckObjectVisible(const CPDF_PageObject* pObj) const {\n",
+        )
+
+        f.debug("Applied: GDAL - OCContext CPP")
+    else:
+        f.debug("Skipped: GDAL - OCContext CPP")
+
+    # gdal support patch - occontext h
+    source_file = os.path.join(
+        source_dir, "core", "fpdfapi", "page", "cpdf_occontext.h"
+    )
+    if f.file_line_has_content(
+        source_file, 21, "class CPDF_OCContext final : public Retainable {\n"
+    ):
+        f.replace_line_in_file(
+            source_file,
+            21,
+            "class CPDF_OCContextInterface : public Retainable {\npublic:\n  virtual ~CPDF_OCContextInterface() = default;\n  virtual bool CheckOCGVisible(const CPDF_Dictionary* pOCGDict) const = 0;\n  virtual bool CheckObjectVisible(const CPDF_PageObject* pObj) const;\n};\n\nclass CPDF_OCContext : public CPDF_OCContextInterface {\n",
+        )
+
+        f.debug("Applied: GDAL - OCContext H")
+    else:
+        f.debug("Skipped: GDAL - OCContext H")
+
+    # gdal support patch - occontext visible
+    source_file = os.path.join(
+        source_dir, "core", "fpdfapi", "page", "cpdf_occontext.h"
+    )
+    if f.file_line_has_content(
+        source_file,
+        34,
+        "  bool CheckOCGVisible(const CPDF_Dictionary* pOCGDict) const;\n",
+    ):
+        f.replace_line_in_file(
+            source_file,
+            34,
+            "  bool CheckOCGVisible(const CPDF_Dictionary* pOCGDict) const override;\n",
+        )
+        f.replace_line_in_file(source_file, 35, "\n")
+
+        f.debug("Applied: GDAL - OCContext Visible")
+    else:
+        f.debug("Skipped: GDAL - OCContext Visible")
+
+    # gdal support patch - render options - set occontext
+    source_file = os.path.join(
+        source_dir, "core", "fpdfapi", "render", "cpdf_renderoptions.h"
+    )
+    if f.file_line_has_content(
+        source_file, 70, "  void SetOCContext(RetainPtr<CPDF_OCContext> context) {\n"
+    ):
+        f.replace_line_in_file(
+            source_file,
+            70,
+            "  void SetOCContext(RetainPtr<CPDF_OCContextInterface> context) {\n",
+        )
+
+        f.debug("Applied: GDAL - Render Options Set OCContext")
+    else:
+        f.debug("Skipped: GDAL - Render Options Set OCContext")
+
+    # gdal support patch - render options - get occontext
+    source_file = os.path.join(
+        source_dir, "core", "fpdfapi", "render", "cpdf_renderoptions.h"
+    )
+    if f.file_line_has_content(
+        source_file,
+        73,
+        "  const CPDF_OCContext* GetOCContext() const { return m_pOCContext.Get(); }\n",
+    ):
+        f.replace_line_in_file(
+            source_file,
+            73,
+            "  const CPDF_OCContextInterface* GetOCContext() const { return m_pOCContext.Get(); }\n",
+        )
+
+        f.debug("Applied: GDAL - Render Options Get OCContext")
+    else:
+        f.debug("Skipped: GDAL - Render Options Get OCContext")
+
+    # gdal support patch - render options - attribute
+    source_file = os.path.join(
+        source_dir, "core", "fpdfapi", "render", "cpdf_renderoptions.h"
+    )
+    if f.file_line_has_content(
+        source_file, 80, "  RetainPtr<CPDF_OCContext> m_pOCContext;\n"
+    ):
+        f.replace_line_in_file(
+            source_file, 80, "  RetainPtr<CPDF_OCContextInterface> m_pOCContext;\n"
+        )
+
+        f.debug("Applied: GDAL - Render Options Attribute")
+    else:
+        f.debug("Skipped: GDAL - Render Options Attribute")
+
+    # gdal support patch - annotation list
+    source_file = os.path.join(source_dir, "core", "fpdfdoc", "cpdf_annotlist.cpp")
+    if f.file_line_has_content(
+        source_file,
+        249,
+        "      const CPDF_OCContext* pOCContext = pOptions->GetOCContext();\n",
+    ):
+        f.replace_line_in_file(
+            source_file,
+            249,
+            "      const auto pOCContext = pOptions->GetOCContext();\n",
+        )
+
+        f.debug("Applied: GDAL - Annotation List")
+    else:
+        f.debug("Skipped: GDAL - Annotation List")
+
+    # gdal support patch - third party build
+    source_file = os.path.join(source_dir, "third_party", "BUILD.gn")
+    if f.file_line_has_content(source_file, 396, "  sources = [\n"):
+        f.replace_line_in_file(
+            source_file,
+            396,
+            '  if (is_posix) {\n    configs += [ "//build/config/gcc:symbol_visibility_hidden" ]\n  }\n  sources = [\n',
+        )
+
+        f.debug("Applied: GDAL - Third Party Build")
+    else:
+        f.debug("Skipped: GDAL - Third Party Build")
 
 
 def run_task_build():
