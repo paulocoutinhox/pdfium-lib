@@ -355,19 +355,6 @@ def run_task_patch():
     else:
         f.debug("Skipped: GDAL - Annotation List")
 
-    # gdal support patch - third party build
-    source_file = os.path.join(source_dir, "third_party", "BUILD.gn")
-    if f.file_line_has_content(source_file, 396, "  sources = [\n"):
-        f.replace_line_in_file(
-            source_file,
-            396,
-            '  if (is_posix) {\n    configs += [ "//build/config/gcc:symbol_visibility_hidden" ]\n  }\n  sources = [\n',
-        )
-
-        f.debug("Applied: GDAL - Third Party Build")
-    else:
-        f.debug("Skipped: GDAL - Third Party Build")
-
 
 def run_task_build():
     f.debug("Building libraries...")
@@ -431,6 +418,9 @@ def run_task_build():
 
             if config == "release":
                 args.append("symbol_level=0")
+
+            # gdal args
+            args.append("use_rtti=true")
 
             args_str = " ".join(args)
 
