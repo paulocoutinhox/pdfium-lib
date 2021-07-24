@@ -242,9 +242,10 @@ def run_task_build():
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
-            args.append("is_component_build=true")
+            args.append("is_component_build=false")
             args.append("pdf_is_standalone=true")
             args.append("pdf_bundle_freetype=true")
+            args.append("pdf_is_complete_lib=true")
 
             if config == "release":
                 args.append("symbol_level=0")
