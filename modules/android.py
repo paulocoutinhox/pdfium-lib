@@ -188,7 +188,7 @@ def run_task_patch():
         f.replace_line_in_file(
             source_file,
             249,
-            "      const auto pOCContext = pOptions->GetOCContext();\n",
+            "      const auto* pOCContext = pOptions->GetOCContext();\n",
         )
 
         f.debug("Applied: GDAL - Annotation List")
