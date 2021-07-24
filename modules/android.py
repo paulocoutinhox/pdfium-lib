@@ -304,10 +304,10 @@ def run_task_install():
         # targets
         for target in c.targets_android:
             out_dir = "{0}-{1}-{2}".format(
-                target["target_os"], target["target_cpu"], config
+                target["target_os"], target["android_cpu"], config
             )
 
-            source_lib_dir = os.path.join("build", "android", "pdfium", "out", out_dir)
+            source_lib_dir = os.path.join("build", target["target_os"], "pdfium", "out", out_dir)
 
             target_lib_path = os.path.join(
                 "build",
@@ -351,7 +351,7 @@ def run_task_install():
             for include_dir in include_dirs:
                 source_include_dir = os.path.join(pdfium_dir, include_dir)
                 target_include_dir = os.path.join(
-                    target_dir, target["target_cpu"], "include", "pdfium", include_dir
+                    target_dir, target["android_cpu"], "include", "pdfium", include_dir
                 )
 
                 f.remove_dir(target_include_dir)
