@@ -294,8 +294,11 @@ def run_task_install():
 
     # configs
     for config in c.configurations_android:
-        f.remove_dir(os.path.join("build", "android", config))
-        f.create_dir(os.path.join("build", "android", config))
+        target_dir = os.path.join("build", "android", config)
+        pdfium_dir = os.path.join("build", "android", "pdfium")
+
+        f.remove_dir(target_dir)
+        f.create_dir(target_dir)
 
         # targets
         for target in c.targets_android:
@@ -305,31 +308,60 @@ def run_task_install():
 
             source_lib_dir = os.path.join("build", "android", "pdfium", "out", out_dir)
 
-            lib_dir = os.path.join("build", "android", config, "lib")
-            target_dir = os.path.join(lib_dir, target["android_cpu"])
+            target_lib_path = os.path.join(
+                "build",
+                target["target_os"],
+                config,
+                target["android_cpu"],
+                "lib",
+            )
 
-            f.remove_dir(target_dir)
-            f.create_dir(target_dir)
+            f.remove_dir(target_lib_path)
+            f.create_dir(target_lib_path)
 
             for basename in os.listdir(source_lib_dir):
-                if basename.endswith(".so"):
+                if basename.endswith(".so") or basename.endswith(".a"):
                     pathname = os.path.join(source_lib_dir, basename)
 
                     if os.path.isfile(pathname):
-                        f.copy_file2(pathname, target_dir)
+                        f.copy_file2(pathname, target_lib_path)
 
-        # include
-        include_dir = os.path.join("build", "android", "pdfium", "public")
-        target_include_dir = os.path.join("build", "android", config, "include")
-        f.remove_dir(target_include_dir)
-        f.create_dir(target_include_dir)
+            # include
+            include_dirs = [
+                os.path.join("build"),
+                os.path.join("constants"),
+                os.path.join("fpdfsdk"),
+                os.path.join("core", "fxge"),
+                os.path.join("core", "fxge", "agg"),
+                os.path.join("core", "fxge", "dib"),
+                os.path.join("core", "fpdfdoc"),
+                os.path.join("core", "fpdfapi", "parser"),
+                os.path.join("core", "fpdfapi", "page"),
+                os.path.join("core", "fpdfapi", "render"),
+                os.path.join("core", "fxcrt"),
+                os.path.join("third_party", "agg23"),
+                os.path.join("third_party", "base"),
+                os.path.join("third_party", "base", "allocator", "partition_allocator"),
+                os.path.join("third_party", "base", "numerics"),
+                os.path.join("public"),
+                os.path.join("public", "cpp"),
+            ]
 
-        for basename in os.listdir(include_dir):
-            if basename.endswith(".h"):
-                pathname = os.path.join(include_dir, basename)
+            for include_dir in include_dirs:
+                source_include_dir = os.path.join(pdfium_dir, include_dir)
+                target_include_dir = os.path.join(
+                    target_dir, target["target_cpu"], "include", "pdfium", include_dir
+                )
 
-                if os.path.isfile(pathname):
-                    f.copy_file2(pathname, target_include_dir)
+                f.remove_dir(target_include_dir)
+                f.create_dir(target_include_dir)
+
+                for basename in os.listdir(source_include_dir):
+                    if basename.endswith(".h"):
+                        pathname = os.path.join(source_include_dir, basename)
+
+                        if os.path.isfile(pathname):
+                            f.copy_file2(pathname, target_include_dir)
 
 
 def run_task_test():

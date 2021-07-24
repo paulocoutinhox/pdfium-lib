@@ -464,9 +464,11 @@ def run_task_install():
 
     # configs
     for config in c.configurations_ios:
-        f.remove_dir(os.path.join("build", "ios", config))
-        f.create_dir(os.path.join("build", "ios", config))
-        f.create_dir(os.path.join("build", "ios", config, "lib"))
+        target_dir = os.path.join("build", "ios", config)
+        pdfium_dir = os.path.join("build", "ios", "pdfium")
+
+        f.remove_dir(target_dir)
+        f.create_dir(target_dir)
 
         # targets
         for target in c.targets_ios:
@@ -484,42 +486,49 @@ def run_task_install():
                 "build",
                 target["target_os"],
                 config,
+                target["target_cpu"],
                 "lib",
-                "libpdfium_{0}.a".format(target["target_cpu"]),
+                "libpdfium.a",
             )
 
             f.copy_file(source_lib_path, target_lib_path)
 
-        # universal
-        folder = os.path.join("build", "ios", config, "lib", "*.a")
-        files = glob.glob(folder)
-        files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "ios", config, "lib", "libpdfium.a")
+            # include
+            include_dirs = [
+                os.path.join("build"),
+                os.path.join("constants"),
+                os.path.join("fpdfsdk"),
+                os.path.join("core", "fxge"),
+                os.path.join("core", "fxge", "agg"),
+                os.path.join("core", "fxge", "dib"),
+                os.path.join("core", "fpdfdoc"),
+                os.path.join("core", "fpdfapi", "parser"),
+                os.path.join("core", "fpdfapi", "page"),
+                os.path.join("core", "fpdfapi", "render"),
+                os.path.join("core", "fxcrt"),
+                os.path.join("third_party", "agg23"),
+                os.path.join("third_party", "base"),
+                os.path.join("third_party", "base", "allocator", "partition_allocator"),
+                os.path.join("third_party", "base", "numerics"),
+                os.path.join("public"),
+                os.path.join("public", "cpp"),
+            ]
 
-        f.debug("Merging libraries (lipo)...")
-        command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
-        check_call(command, shell=True)
+            for include_dir in include_dirs:
+                source_include_dir = os.path.join(pdfium_dir, include_dir)
+                target_include_dir = os.path.join(
+                    target_dir, target["target_cpu"], "include", "pdfium", include_dir
+                )
 
-        f.debug("File data...")
-        command = " ".join(["file", lib_file_out])
-        check_call(command, shell=True)
+                f.remove_dir(target_include_dir)
+                f.create_dir(target_include_dir)
 
-        f.debug("File size...")
-        command = " ".join(["ls", "-lh ", lib_file_out])
-        check_call(command, shell=True)
+                for basename in os.listdir(source_include_dir):
+                    if basename.endswith(".h"):
+                        pathname = os.path.join(source_include_dir, basename)
 
-        # include
-        include_dir = os.path.join("build", "ios", "pdfium", "public")
-        target_include_dir = os.path.join("build", "ios", config, "include")
-        f.remove_dir(target_include_dir)
-        f.create_dir(target_include_dir)
-
-        for basename in os.listdir(include_dir):
-            if basename.endswith(".h"):
-                pathname = os.path.join(include_dir, basename)
-
-                if os.path.isfile(pathname):
-                    f.copy_file2(pathname, target_include_dir)
+                        if os.path.isfile(pathname):
+                            f.copy_file2(pathname, target_include_dir)
 
 
 def run_task_test():
