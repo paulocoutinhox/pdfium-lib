@@ -520,7 +520,6 @@ def run_task_install():
                     target_dir, target["target_cpu"], "include", "pdfium", include_dir
                 )
 
-                f.remove_dir(target_include_dir)
                 f.create_dir(target_include_dir)
 
                 for basename in os.listdir(source_include_dir):

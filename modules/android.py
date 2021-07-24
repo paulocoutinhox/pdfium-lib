@@ -307,7 +307,7 @@ def run_task_install():
                 target["target_os"], target["target_cpu"], config
             )
 
-            source_lib_dir = os.path.join("build", target["target_os"], "pdfium", "out", out_dir)
+            source_lib_dir = os.path.join("build", target["target_os"], "pdfium", "out", out_dir, "obj")
 
             target_lib_path = os.path.join(
                 "build",
@@ -354,7 +354,6 @@ def run_task_install():
                     target_dir, target["android_cpu"], "include", "pdfium", include_dir
                 )
 
-                f.remove_dir(target_include_dir)
                 f.create_dir(target_include_dir)
 
                 for basename in os.listdir(source_include_dir):
