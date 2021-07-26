@@ -515,16 +515,32 @@ def run_task_install():
                 os.path.join("public", "cpp"),
             ]
 
+            f.debug("Include directories to copy: {0}".format(include_dirs))
+
             for include_dir in include_dirs:
                 source_include_dir = os.path.join(pdfium_dir, include_dir)
                 target_include_dir = os.path.join(
                     target_dir, target["target_cpu"], "include", "pdfium", include_dir
                 )
 
+                f.debug(
+                    "Copying directory: {0} to {1}...".format(
+                        source_include_dir, target_include_dir
+                    )
+                )
+
                 if os.path.isdir(source_include_dir):
                     f.create_dir(target_include_dir)
 
-                    for basename in os.listdir(source_include_dir):
+                    files = os.listdir(source_include_dir)
+
+                    f.debug(
+                        "Files inside directory {0}: {1}".format(
+                            source_include_dir, files
+                        )
+                    )
+
+                    for basename in files:
                         if basename.endswith(".h"):
                             pathname = os.path.join(source_include_dir, basename)
 
