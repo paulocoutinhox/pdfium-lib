@@ -520,14 +520,19 @@ def run_task_install():
                     target_dir, target["target_cpu"], "include", "pdfium", include_dir
                 )
 
-                f.create_dir(target_include_dir)
+                if os.path.isdir(source_include_dir):
+                    f.create_dir(target_include_dir)
 
-                for basename in os.listdir(source_include_dir):
-                    if basename.endswith(".h"):
-                        pathname = os.path.join(source_include_dir, basename)
+                    for basename in os.listdir(source_include_dir):
+                        if basename.endswith(".h"):
+                            pathname = os.path.join(source_include_dir, basename)
 
-                        if os.path.isfile(pathname):
-                            f.copy_file2(pathname, target_include_dir)
+                            if os.path.isfile(pathname):
+                                f.copy_file2(pathname, target_include_dir)
+                else:
+                    f.error(
+                        "Header directory not exists: {0}".format(source_include_dir)
+                    )
 
 
 def run_task_test():
