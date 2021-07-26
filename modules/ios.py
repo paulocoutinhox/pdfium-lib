@@ -575,9 +575,6 @@ def run_task_archive():
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-            filter=lambda x: (
-                None if "_" in x.name and not x.name.endswith(".h") else x
-            ),
         )
 
     tar.close()
