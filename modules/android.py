@@ -253,6 +253,7 @@ def run_task_build():
             # gdal args
             args.append("use_rtti=true")
             args.append("use_custom_libcxx=true")
+            args.append("libcpp_is_static=true")
 
             args_str = " ".join(args)
 
