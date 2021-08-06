@@ -231,6 +231,27 @@ def run_task_patch():
     else:
         f.debug("Skipped: Core FXGE")
 
+    # clang 12
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1230, '      cflags += [ "-ffile-compilation-dir=." ]\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1230,
+            '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]\n',
+        )
+
+        f.debug("Applied: Clang 12")
+    else:
+        f.debug("Skipped: Clang 12")
+
 
 def run_task_build():
     f.debug("Building libraries...")
