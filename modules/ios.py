@@ -47,12 +47,12 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 245, '#test("pdfium_unittests") {\n'):
+    if not f.file_line_has_content(source_file, 244, '#test("pdfium_unittests") {\n'):
         f.file_line_comment_range(
-            source_file, 245, 292
+            source_file, 244, 291
         )  # comment all lines of "pdfium_unittests"
         f.file_line_comment_range(
-            source_file, 383, 384
+            source_file, 382, 383
         )  # group "pdfium_all", comment all tests
 
         f.debug("Applied: Build GN")
@@ -116,8 +116,8 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(source_file, 1703, '      "-Wimplicit-fallthrough",\n'):
-        f.file_line_comment(source_file, 1703)
+    if f.file_line_has_content(source_file, 1705, '      "-Wimplicit-fallthrough",\n'):
+        f.file_line_comment(source_file, 1705)
 
         f.debug("Applied: Compiler")
     else:
@@ -153,11 +153,11 @@ def run_task_patch():
         "cpdf_type1font.cpp",
     )
     if not f.file_line_has_content(
-        source_file, 21, "#include <CoreGraphics/CoreGraphics.h>\n"
+        source_file, 22, "#include <CoreGraphics/CoreGraphics.h>\n"
     ):
         f.replace_line_in_file(
             source_file,
-            21,
+            22,
             "#include <CoreGraphics/CoreGraphics.h>\n",
         )
 
@@ -174,9 +174,9 @@ def run_task_patch():
         "rules.gni",
     )
     if not f.file_line_has_content(
-        source_file, 951, '#          data_deps += [ "//testing/iossim" ]\n'
+        source_file, 954, '#          data_deps += [ "//testing/iossim" ]\n'
     ):
-        f.file_line_comment(source_file, 951)
+        f.file_line_comment(source_file, 954)
 
         f.debug("Applied: iOS Simulator")
     else:
