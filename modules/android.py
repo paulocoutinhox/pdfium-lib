@@ -123,7 +123,6 @@ def run_task_build():
             args.append("is_component_build=true")
             args.append("pdf_is_standalone=true")
             args.append("pdf_bundle_freetype=true")
-            args.append("pdf_is_complete_lib=true")
 
             if config == "release":
                 args.append("symbol_level=0")
