@@ -92,12 +92,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        216,
+        219,
         '    configs -= [ "//build/config/compiler:thin_archive" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            216,
+            219,
             '    #configs -= [ "//build/config/compiler:thin_archive" ]\n',
         )
 
@@ -115,22 +115,22 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        846,
+        853,
         '        "-m64",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            846,
+            853,
             '        #"-m64",\n',
         )
         f.replace_line_in_file(
             source_file,
-            847,
+            854,
             '        #"-march=$x64_arch",\n',
         )
         f.replace_line_in_file(
             source_file,
-            848,
+            855,
             '        #"-msse3",\n',
         )
 
@@ -148,12 +148,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        1621,
+        1626,
         '          "-Wno-ignored-pragma-optimize",\n',
     ):
         f.replace_line_in_file(
             source_file,
-            1621,
+            1626,
             '          "-Wno-deprecated-register",\n',
         )
 
@@ -171,12 +171,12 @@ def run_task_patch():
     )
     if f.file_line_has_content(
         source_file,
-        2426,
+        2406,
         '        cflags += [ "-ggnu-pubnames" ]\n',
     ):
         f.replace_line_in_file(
             source_file,
-            2426,
+            2406,
             '        #cflags += [ "-ggnu-pubnames" ]\n',
         )
 

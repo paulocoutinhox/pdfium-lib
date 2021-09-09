@@ -47,12 +47,12 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 244, '#test("pdfium_unittests") {\n'):
+    if not f.file_line_has_content(source_file, 247, '#test("pdfium_unittests") {\n'):
         f.file_line_comment_range(
-            source_file, 244, 291
+            source_file, 247, 294
         )  # comment all lines of "pdfium_unittests"
         f.file_line_comment_range(
-            source_file, 382, 383
+            source_file, 385, 386
         )  # group "pdfium_all", comment all tests
 
         f.debug("Applied: Build GN")
@@ -65,9 +65,9 @@ def run_task_patch():
         "BUILD.gn",
     )
     if f.file_line_has_content(
-        source_file, 53, '    cflags += [ "-Wdeprecated-copy" ]\n'
+        source_file, 56, '    cflags += [ "-Wdeprecated-copy" ]\n'
     ):
-        f.file_line_comment(source_file, 53)
+        f.file_line_comment(source_file, 56)
 
         f.debug("Applied: Deprecated Warning")
     else:
@@ -116,8 +116,8 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(source_file, 1705, '      "-Wimplicit-fallthrough",\n'):
-        f.file_line_comment(source_file, 1705)
+    if f.file_line_has_content(source_file, 1707, '      "-Wimplicit-fallthrough",\n'):
+        f.file_line_comment(source_file, 1707)
 
         f.debug("Applied: Compiler")
     else:
@@ -240,11 +240,11 @@ def run_task_patch():
         "BUILD.gn",
     )
     if f.file_line_has_content(
-        source_file, 1230, '      cflags += [ "-ffile-compilation-dir=." ]\n'
+        source_file, 1237, '      cflags += [ "-ffile-compilation-dir=." ]\n'
     ):
         f.replace_line_in_file(
             source_file,
-            1230,
+            1237,
             '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]\n',
         )
 
