@@ -93,6 +93,9 @@ jobs:
       - name: Patch
         run: python3 make.py run patch-${{ matrix.config.target }}
 
+      - name: Patch - Check
+        run: python3 make.py run patch-${{ matrix.config.target }}
+
       - name: Build
         run: python3 make.py run build-${{ matrix.config.target }}
 

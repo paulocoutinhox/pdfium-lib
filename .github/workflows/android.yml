@@ -51,6 +51,9 @@ jobs:
       - name: Patch
         run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run patch-${{ matrix.config.target }}
 
+      - name: Patch - Check
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run patch-${{ matrix.config.target }}
+
       - name: Build
         run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run build-${{ matrix.config.target }}
 
