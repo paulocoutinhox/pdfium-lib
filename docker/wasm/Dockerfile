@@ -65,8 +65,8 @@ RUN make && make install
 RUN mkdir /emsdk
 WORKDIR /emsdk
 RUN git clone https://github.com/emscripten-core/emsdk.git . 
-RUN ./emsdk install 2.0.26
-RUN ./emsdk activate 2.0.26
+RUN ./emsdk install 2.0.29
+RUN ./emsdk activate 2.0.29
 ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
 
 # cache system libraries
