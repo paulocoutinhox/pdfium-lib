@@ -47,13 +47,12 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 247, '#test("pdfium_unittests") {\n'):
-        f.file_line_comment_range(
-            source_file, 247, 294
-        )  # comment all lines of "pdfium_unittests"
-        f.file_line_comment_range(
-            source_file, 385, 386
-        )  # group "pdfium_all", comment all tests
+    if not f.file_line_has_content(source_file, 408, '#test("pdfium_unittests") {\n'):
+        # comment all lines of "pdfium_unittests"
+        f.file_line_comment_range(source_file, 408, 455)
+
+        # group "pdfium_all", comment all tests (pdfium_embeddertests and pdfium_unittests)
+        f.file_line_comment_range(source_file, 546, 547)
 
         f.debug("Applied: Build GN")
     else:
@@ -65,9 +64,9 @@ def run_task_patch():
         "BUILD.gn",
     )
     if f.file_line_has_content(
-        source_file, 56, '    cflags += [ "-Wdeprecated-copy" ]\n'
+        source_file, 217, '    cflags += [ "-Wdeprecated-copy" ]\n'
     ):
-        f.file_line_comment(source_file, 56)
+        f.file_line_comment(source_file, 217)
 
         f.debug("Applied: Deprecated Warning")
     else:
@@ -116,8 +115,8 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(source_file, 1707, '      "-Wimplicit-fallthrough",\n'):
-        f.file_line_comment(source_file, 1707)
+    if f.file_line_has_content(source_file, 1611, '      "-Wimplicit-fallthrough",\n'):
+        f.file_line_comment(source_file, 1611)
 
         f.debug("Applied: Compiler")
     else:
@@ -174,9 +173,9 @@ def run_task_patch():
         "rules.gni",
     )
     if not f.file_line_has_content(
-        source_file, 954, '#          data_deps += [ "//testing/iossim" ]\n'
+        source_file, 964, '#          data_deps += [ "//testing/iossim" ]\n'
     ):
-        f.file_line_comment(source_file, 954)
+        f.file_line_comment(source_file, 964)
 
         f.debug("Applied: iOS Simulator")
     else:
@@ -240,11 +239,11 @@ def run_task_patch():
         "BUILD.gn",
     )
     if f.file_line_has_content(
-        source_file, 1237, '      cflags += [ "-ffile-compilation-dir=." ]\n'
+        source_file, 1262, '      cflags += [ "-ffile-compilation-dir=." ]\n'
     ):
         f.replace_line_in_file(
             source_file,
-            1237,
+            1262,
             '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]\n',
         )
 

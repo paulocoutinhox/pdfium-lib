@@ -54,7 +54,7 @@ WORKDIR /build
 RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN gclient sync
 WORKDIR /build/pdfium
-RUN git checkout affa0ec49277441f4f42efcf8d0894d82e2d4604
+RUN git checkout 31722577db9dc12a249ca6cdf2ff34e51a998360
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
