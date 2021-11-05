@@ -130,14 +130,8 @@
                 resetOnLoad();
 
                 let response = await fetch(url);
-                let data = await response.blob();
-                let metadata = {
-                    type: 'application/pdf'
-                };
-
-                let file = new File([data], "file.pdf", metadata);
-
-                let fileByteArray = await fileToByteArray(file);
+                let fileBuffer = await response.arrayBuffer();
+                let fileByteArray = new Uint8Array(fileBuffer);
 
                 if (fileByteArray.length <= 0) {
                     throw { message: "The PDF file is invalid" };
