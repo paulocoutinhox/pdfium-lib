@@ -51,12 +51,12 @@ def run_task_patch():
     )
     if not f.file_line_has_content(
         source_file,
-        55,
+        57,
         'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n',
     ):
         f.replace_line_in_file(
             source_file,
-            55,
+            57,
             'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")\n\n',
         )
 

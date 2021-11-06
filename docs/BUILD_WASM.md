@@ -2,17 +2,17 @@
 
 1. Execute all **general** steps
 
-2. PDFium linux dependencies
-```./build/linux/pdfium/build/install-build-deps.sh```
-
-3. Get Emscripten SDK:  
+2. Get Emscripten SDK:  
 ```python3 make.py run build-emsdk```  
 
-4. Get PDFium:  
+3. Get PDFium:  
 ```python3 make.py run build-pdfium-wasm```  
 
-5. Patch:  
+4. Patch:  
 ```python3 make.py run patch-wasm```  
+
+5. PDFium Linux dependencies
+```./build/linux/pdfium/build/install-build-deps.sh```
 
 6. Compile:  
 ```python3 make.py run build-wasm```  

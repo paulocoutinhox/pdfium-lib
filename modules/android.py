@@ -50,8 +50,8 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if f.file_line_has_content(source_file, 25, "  ]\n"):
-        f.replace_line_in_file(source_file, 25, '    "FPDFSDK_EXPORTS",\n  ]\n')
+    if f.file_line_has_content(source_file, 26, "  ]\n"):
+        f.replace_line_in_file(source_file, 26, '    "FPDFSDK_EXPORTS",\n  ]\n')
 
         f.debug("Applied: Build GN")
     else:
@@ -70,8 +70,6 @@ def run_task_patch():
         f.debug("Applied: Build GN Flags")
     else:
         f.debug("Skipped: Build GN Flags")
-
-    pass
 
 
 def run_task_build():
