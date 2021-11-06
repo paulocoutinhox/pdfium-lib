@@ -333,6 +333,29 @@ def run_task_patch():
     else:
         f.debug("Skipped: skia pthread")
 
+    # compiler bitwise
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file,
+        1534,
+        '            "-Wno-bitwise-instead-of-logical",\n',
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1534,
+            '            #"-Wno-bitwise-instead-of-logical",\n',
+        )
+
+        f.debug("Applied: compiler bitwise")
+    else:
+        f.debug("Skipped: compiler bitwise")
+
     # copy files required
     f.debug("Copying required files...")
 
