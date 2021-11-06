@@ -9,7 +9,9 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl ninja-build zip unzip tar python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl ninja-build zip unzip tar software-properties-common openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
+    add-apt-repository ppa:deadsnakes/ppa && \
+    apt-get install -y python3.9 python3-pip && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
