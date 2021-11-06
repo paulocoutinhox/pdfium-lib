@@ -8,7 +8,7 @@
 3. Patch:  
 ```python3 make.py run patch-android```  
 
-4. PDFium android dependencies
+4. PDFium Android dependencies
 ```./build/android/pdfium/build/install-build-deps-android.sh```
 
 5. Compile:  

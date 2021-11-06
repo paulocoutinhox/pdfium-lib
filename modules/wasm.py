@@ -519,10 +519,16 @@ def run_task_test():
     current_dir = os.getcwd()
     sample_dir = os.path.join(current_dir, "sample-wasm")
     build_dir = os.path.join(sample_dir, "build")
-    http_dir = os.path.join("sample-wasm", "build")
+    http_dir = os.path.join(sample_dir, "build")
 
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
+            f.debug(
+                'Generating test files to arch "{0}" and configuration "{1}"...'.format(
+                    target["target_cpu"], config
+                )
+            )
+
             lib_file_out = os.path.join(
                 current_dir,
                 "build",

@@ -4,6 +4,8 @@
 
 int main(int argc, char **argv)
 {
+    // sample: https://github.com/lukas-w/pdfium/blob/master/docs/getting-started.md
+
     std::cout << "Starting..." << std::endl;
 
     FPDF_LIBRARY_CONFIG config;
