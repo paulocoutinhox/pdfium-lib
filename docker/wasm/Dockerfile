@@ -61,6 +61,11 @@ WORKDIR /opt/libjpeg/jpeg-9c
 RUN ./configure --prefix=/usr
 RUN make && make install
 
+# nodejs and npm
+RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN apt-get install -y nodejs
+RUN npm install -g npm@latest
+
 # emsdk
 RUN mkdir /emsdk
 WORKDIR /emsdk
@@ -72,11 +77,6 @@ ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
 # cache system libraries
 RUN bash -c 'echo "int main() { return 0; }" > /tmp/main.cc'
 RUN bash -c 'source /emsdk/emsdk_env.sh && em++ -s USE_ZLIB=1 -s USE_LIBJPEG=1 -s USE_PTHREADS=1 -s ASSERTIONS=1 -o /tmp/main.html /tmp/main.cc'
-
-# nodejs and npm
-RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-RUN apt-get install -y nodejs
-RUN npm install -g npm@latest
 
 # working dir
 WORKDIR /app

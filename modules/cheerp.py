@@ -577,25 +577,13 @@ def run_task_test():
             # build
             command = " ".join(
                 [
-                    "em++",
+                    "cc",
                     "{0}".format("-g" if config == "debug" else ""),
                     "-o",
                     "build/index.html",
                     "src/main.cpp",
                     lib_file_out,
                     "-I{0}".format(include_dir),
-                    "-s",
-                    "DEMANGLE_SUPPORT=1",
-                    "-s",
-                    "USE_ZLIB=1",
-                    "-s",
-                    "USE_LIBJPEG=1",
-                    "-s",
-                    "WASM=1",
-                    "-s",
-                    "ASSERTIONS=1",
-                    "-s",
-                    "ALLOW_MEMORY_GROWTH=1",
                     "--embed-file",
                     "assets/web-assembly.pdf",
                 ]
@@ -702,29 +690,13 @@ def run_task_generate():
 
             command = " ".join(
                 [
-                    "em++",
+                    "cc",
                     "{0}".format("-g" if config == "debug" else "-O3"),
                     "-o",
                     html_file,
-                    "-s",
-                    'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
-                    "-s",
-                    'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
                     "custom.cpp",
                     lib_file_out,
                     "-I{0}".format(include_dir),
-                    "-s",
-                    "DEMANGLE_SUPPORT=1",
-                    "-s",
-                    "USE_ZLIB=1",
-                    "-s",
-                    "USE_LIBJPEG=1",
-                    "-s",
-                    "WASM=1",
-                    "-s",
-                    "ASSERTIONS=1",
-                    "-s",
-                    "ALLOW_MEMORY_GROWTH=1",
                     "-std=c++11",
                     "-Wall",
                     "--no-entry",
@@ -834,7 +806,7 @@ def run_task_archive():
     f.debug("Archiving...")
 
     current_dir = os.getcwd()
-    output_filename = os.path.join(current_dir, "wasm.tgz")
+    output_filename = os.path.join(current_dir, "cheerp.tgz")
 
     tar = tarfile.open(output_filename, "w:gz")
 

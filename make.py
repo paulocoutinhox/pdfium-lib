@@ -53,6 +53,16 @@ Tasks:
   - publish-wasm
   - publish-to-web-wasm
   - archive-wasm  
+
+  - build-pdfium-cheerp
+  - patch-cheerp
+  - build-cheerp
+  - install-cheerp
+  - test-cheerp
+  - generate-cheerp
+  - publish-cheerp
+  - publish-to-web-cheerp
+  - archive-cheerp  
 """
 
 from docopt import docopt
@@ -64,6 +74,7 @@ import modules.ios as ios
 import modules.macos as macos
 import modules.android as android
 import modules.wasm as wasm
+import modules.cheerp as cheerp
 
 
 def main(options):
@@ -224,6 +235,46 @@ def main(options):
     # archive - wasm
     elif make_task == "archive-wasm":
         wasm.run_task_archive()
+
+    #######################
+    # CHEERP
+    #######################
+
+    # build pdfium - cheerp
+    elif make_task == "build-pdfium-cheerp":
+        cheerp.run_task_build_pdfium()
+
+    # patch - cheerp
+    elif make_task == "patch-cheerp":
+        cheerp.run_task_patch()
+
+    # build - cheerp
+    elif make_task == "build-cheerp":
+        cheerp.run_task_build()
+
+    # install - cheerp
+    elif make_task == "install-cheerp":
+        cheerp.run_task_install()
+
+    # test - cheerp
+    elif make_task == "test-cheerp":
+        cheerp.run_task_test()
+
+    # generate - cheerp
+    elif make_task == "generate-cheerp":
+        cheerp.run_task_generate()
+
+    # publish - cheerp
+    elif make_task == "publish-cheerp":
+        cheerp.run_task_publish()
+
+    # publish to web - cheerp
+    elif make_task == "publish-to-web-cheerp":
+        cheerp.run_task_publish_to_web()
+
+    # archive - cheerp
+    elif make_task == "archive-cheerp":
+        cheerp.run_task_archive()
 
     #######################
     # Invalid
