@@ -20,6 +20,12 @@ RUN echo "America/Sao_Paulo" > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
 RUN /bin/echo -e "LANG=\"en_US.UTF-8\"" > /etc/default/local
 
+# python
+RUN python --version
+RUN python3 --version
+RUN pip --version
+RUN pip3 --version
+
 # cmake
 ADD https://cmake.org/files/v3.11/cmake-3.11.4-Linux-x86_64.sh /tmp/cmake-3.11.4-Linux-x86_64.sh
 RUN mkdir /opt/cmake
