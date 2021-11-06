@@ -9,7 +9,7 @@ ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl ninja-build zip unzip tar python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -17,6 +17,13 @@ RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build
 RUN echo "America/Sao_Paulo" > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
 RUN /bin/echo -e "LANG=\"en_US.UTF-8\"" > /etc/default/local
+
+# cmake
+ADD https://cmake.org/files/v3.11/cmake-3.11.4-Linux-x86_64.sh /tmp/cmake-3.11.4-Linux-x86_64.sh
+RUN mkdir /opt/cmake
+RUN sh /tmp/cmake-3.11.4-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
+RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
+RUN cmake --version
 
 # java
 ENV PATH=${PATH}:${JAVA_HOME}/bin
