@@ -21,9 +21,7 @@ RUN dpkg-reconfigure -f noninteractive tzdata
 RUN /bin/echo -e "LANG=\"en_US.UTF-8\"" > /etc/default/local
 
 # python
-RUN python --version
 RUN python3 --version
-RUN pip --version
 RUN pip3 --version
 
 # cmake
