@@ -25,9 +25,9 @@ RUN python3 --version
 RUN pip3 --version
 
 # cmake
-ADD https://cmake.org/files/v3.21/cmake-3.21.0-linux-x86_64.sh /tmp/cmake-3.21.0-Linux-x86_64.sh
+ADD https://cmake.org/files/v3.20/cmake-3.20.0-linux-x86_64.sh /tmp/cmake-3.20.0-Linux-x86_64.sh
 RUN mkdir /opt/cmake
-RUN sh /tmp/cmake-3.21.0-linux-x86_64.sh --prefix=/opt/cmake --skip-license
+RUN sh /tmp/cmake-3.20.0-linux-x86_64.sh --prefix=/opt/cmake --skip-license
 RUN ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
 RUN cmake --version
 
