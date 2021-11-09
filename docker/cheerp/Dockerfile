@@ -109,10 +109,18 @@ RUN make install
 RUN CHEERP_PREFIX=/opt/cheerp ../build-bc-libs.sh genericjs
 
 # cheerp - c++ library
+WORKDIR /cheerp/cheerp-compiler/libcxx
+RUN mkdir build
+WORKDIR /cheerp/cheerp-compiler/libcxx/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/cheerp/share/cmake/Modules/CheerpToolchain.cmake -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXX_ENABLE_ASSERTIONS=OFF -DLIBCXX_CXX_ABI_INCLUDE_PATHS=/cheerp/cheerp-compiler/libcxxabi/include -DLIBCXX_CXX_ABI=libcxxabi -DCMAKE_CXX_FLAGS="-fexceptions" ..
+RUN make
+RUN make install
+
+# cheerp - c++ abi library
 WORKDIR /cheerp/cheerp-compiler/libcxxabi
 RUN mkdir build
 WORKDIR /cheerp/cheerp-compiler/libcxxabi/build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/cheerp/share/cmake/Modules/CheerpToolchain.cmake -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_ASSERTIONS=OFF -DLIBCXXABI_LIBCXX_PATH=/cheerp/cheerp-compiler/cheerp-libcxx/ -DLIBCXXABI_LIBCXX_INCLUDES=$CHEERP_SRC/cheerp-compiler/libcxx/include -DLIBCXXABI_ENABLE_THREADS=0 -DLLVM_CONFIG=/opt/cheerp/bin/llvm-config ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/cheerp/share/cmake/Modules/CheerpToolchain.cmake -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_ASSERTIONS=OFF -DLIBCXXABI_LIBCXX_PATH=/cheerp/cheerp-compiler/cheerp-libcxx/ -DLIBCXXABI_LIBCXX_INCLUDES=/cheerp/cheerp-compiler/libcxx/include -DLIBCXXABI_ENABLE_THREADS=0 -DLLVM_CONFIG=/opt/cheerp/bin/llvm-config ..
 RUN make
 RUN make install
 
