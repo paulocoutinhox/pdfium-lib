@@ -26,6 +26,7 @@ RUN pip3 --version
 
 # cmake
 RUN curl -O https://cmake.org/files/v3.21/cmake-3.21.0-linux-x86_64.sh
+RUN chmod +x cmake-3.21.0-linux-x86_64.sh
 RUN mv cmake-3.21.0-linux-x86_64.sh /tmp/cmake-3.21.0-Linux-x86_64.sh
 RUN mkdir /opt/cmake
 RUN sh /tmp/cmake-3.21.0-linux-x86_64.sh --prefix=/opt/cmake --skip-license
