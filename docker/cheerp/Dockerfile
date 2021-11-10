@@ -7,6 +7,8 @@ ENV PROJ_TARGET="cheerp"
 ENV JAVA_VERSION="8"
 ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
 # packages
 RUN apt-get -y update && \
     apt-get install -y software-properties-common && \
