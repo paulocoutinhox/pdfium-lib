@@ -1,17 +1,19 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 
 # general
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV PROJ_TARGET="wasm"
+ENV PROJ_TARGET="cheerp"
 ENV JAVA_VERSION="8"
 ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
 # packages
-RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl ninja-build zip unzip tar software-properties-common openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get install -y python3.9 python3-pip && \
+RUN apt-get -y update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:leaningtech-dev/cheerp-ppa && \
+    apt-get -y update && \
+    apt-get install -y build-essential sudo file git wget curl ninja-build zip unzip tar software-properties-common openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen python3 python3-pip cheerp-core --no-install-recommends && \
+    apt-get upgrade && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -45,8 +47,8 @@ RUN gclient sync
 WORKDIR /build/pdfium
 RUN git checkout 31722577db9dc12a249ca6cdf2ff34e51a998360
 
-RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN ln -s /usr/bin/pip3 /usr/bin/pip
+RUN ln -sf /usr/bin/python3 /usr/bin/python
+RUN ln -sf /usr/bin/pip3 /usr/bin/pip
 
 RUN apt-get install -o APT::Immediate-Configure=false -f apt \
     && apt-get -f install \
@@ -76,90 +78,7 @@ RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 RUN apt-get install -y nodejs
 RUN npm install -g npm@latest
 
-# cheerp
-RUN mkdir /cheerp
-WORKDIR /cheerp
-RUN git clone https://github.com/leaningtech/cheerp-compiler
-RUN git clone https://github.com/leaningtech/cheerp-utils
-RUN git clone https://github.com/leaningtech/cheerp-newlib
-RUN git clone https://github.com/leaningtech/cheerp-libs
-
-# cheerp - compiler
-WORKDIR /cheerp/cheerp-compiler
-RUN mkdir build
-WORKDIR /cheerp/cheerp-compiler/build
-RUN cmake -C ../llvm/CheerpCmakeConf.cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_PROJECTS=clang -G Ninja ../llvm/
-RUN ninja -j4
-RUN ninja install
-
-# cheerp - utils
-WORKDIR /cheerp/cheerp-utils
-RUN mkdir build
-WORKDIR /cheerp/cheerp-utils/build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp ..
-RUN make install
-
-# cheerp - c library
-WORKDIR /cheerp/cheerp-newlib/newlib
-RUN mkdir build
-WORKDIR /cheerp/cheerp-newlib/newlib/build
-RUN ../configure --host=cheerp-genericjs --with-cxx-headers=/cheerp/cheerp-compiler/libcxx/include --prefix=/opt/cheerp --enable-newlib-io-long-long --enable-newlib-iconv --enable-newlib-iconv-encodings=utf-16,utf-8,ucs_2 --enable-newlib-mb --enable-newlib-nano-formatted-io
-RUN make
-RUN make install
-RUN CHEERP_PREFIX=/opt/cheerp ../build-bc-libs.sh genericjs
-
-# cheerp - c++ library
-WORKDIR /cheerp/cheerp-compiler/libcxx
-RUN mkdir build
-WORKDIR /cheerp/cheerp-compiler/libcxx/build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/cheerp/share/cmake/Modules/CheerpToolchain.cmake -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXX_ENABLE_ASSERTIONS=OFF -DLIBCXX_CXX_ABI_INCLUDE_PATHS=/cheerp/cheerp-compiler/libcxxabi/include -DLIBCXX_CXX_ABI=libcxxabi -DCMAKE_CXX_FLAGS="-fexceptions" ..
-RUN make
-RUN make install
-
-# cheerp - c++ abi library
-WORKDIR /cheerp/cheerp-compiler/libcxxabi
-RUN mkdir build
-WORKDIR /cheerp/cheerp-compiler/libcxxabi/build
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/cheerp/share/cmake/Modules/CheerpToolchain.cmake -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_ASSERTIONS=OFF -DLIBCXXABI_LIBCXX_PATH=/cheerp/cheerp-compiler/cheerp-libcxx/ -DLIBCXXABI_LIBCXX_INCLUDES=/cheerp/cheerp-compiler/libcxx/include -DLIBCXXABI_ENABLE_THREADS=0 -DLLVM_CONFIG=/opt/cheerp/bin/llvm-config ..
-RUN make
-RUN make install
-
-# cheerp - libraries
-WORKDIR /cheerp/cheerp-libs
-RUN make -C webgles install INSTALL_PREFIX=/opt/cheerp CHEERP_PREFIX=/opt/cheerp
-RUN make -C wasm install INSTALL_PREFIX=/opt/cheerp CHEERP_PREFIX=/opt/cheerp
-RUN make -C stdlibs install_genericjs INSTALL_PREFIX=/opt/cheerp CHEERP_PREFIX=/opt/cheerp
-
-# cheerp - asm.js/wasm version of standard libraries
-WORKDIR /cheerp/cheerp-newlib/newlib
-RUN mkdir build_asmjs
-WORKDIR /cheerp/cheerp-newlib/newlib/build_asmjs
-RUN ../configure --host=cheerp-asmjs --with-cxx-headers=/cheerp/cheerp-compiler/libcxx/include --prefix=/opt/cheerp --enable-newlib-io-long-long --enable-newlib-iconv --enable-newlib-iconv-encodings=utf-16,utf-8,ucs_2 --enable-newlib-mb --enable-newlib-nano-formatted-io
-RUN make
-RUN make install
-RUN CHEERP_PREFIX=/opt/cheerp ../build-bc-libs.sh asmjs
-
-# cheerp - c++ library
-WORKDIR /cheerp/cheerp-compiler/libcxx
-RUN mkdir build_asmjs
-WORKDIR /cheerp/cheerp-compiler/libcxx/build_asmjs
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/cheerp/share/cmake/Modules/CheerpWasmToolchain.cmake -DLIBCXX_ENABLE_SHARED=OFF -DLIBCXX_ENABLE_ASSERTIONS=OFF -DLIBCXX_CXX_ABI_INCLUDE_PATHS=/cheerp/cheerp-compiler/libcxxabi/include -DLIBCXX_CXX_ABI=libcxxabi -DCMAKE_CXX_FLAGS="-fexceptions" ..
-RUN make
-RUN make install
-
-# cheerp - c++ abi library
-WORKDIR /cheerp/cheerp-compiler/libcxxabi
-RUN mkdir build_asmjs
-WORKDIR /cheerp/cheerp-compiler/libcxxabi/build_asmjs
-RUN cmake -DCMAKE_INSTALL_PREFIX=/opt/cheerp -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=/opt/cheerp/share/cmake/Modules/CheerpWasmToolchain.cmake -DLIBCXXABI_ENABLE_SHARED=OFF -DLIBCXXABI_ENABLE_ASSERTIONS=OFF -DLIBCXXABI_LIBCXX_PATH=/cheerp/cheerp-compiler/libcxx/ -DLIBCXXABI_LIBCXX_INCLUDES=/cheerp/cheerp-compiler/libcxx/include -DLIBCXXABI_ENABLE_THREADS=0 -DLLVM_CONFIG=/opt/cheerp/bin/llvm-config ..
-RUN make
-RUN make install
-
-# cheerp - libraries
-WORKDIR /cheerp/cheerp-libs
-RUN make -C stdlibs install_asmjs INSTALL_PREFIX=/opt/cheerp CHEERP_PREFIX=/opt/cheerp
-
-# version
+# compiler version
 RUN cc --version
 
 # test
