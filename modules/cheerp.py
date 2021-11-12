@@ -199,12 +199,12 @@ def run_task_patch():
         f.replace_line_in_file(
             source_file,
             740,
-            '    cc = "emcc"\n',
+            '    cc = "/opt/cheerp/bin/clang"\n',
         )
         f.replace_line_in_file(
             source_file,
             741,
-            '    cxx = "em++"\n',
+            '    cxx = "/opt/cheerp/bin/clang++"\n',
         )
 
         f.debug("Applied: gcc toolchain")
@@ -355,6 +355,209 @@ def run_task_patch():
         f.debug("Applied: compiler bitwise")
     else:
         f.debug("Skipped: compiler bitwise")
+
+    # clang 12
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1262, '      cflags += [ "-ffile-compilation-dir=." ]\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1262,
+            '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]\n',
+        )
+
+        f.debug("Applied: Clang 12")
+    else:
+        f.debug("Skipped: Clang 12")
+
+    # clang - warning - (no-misleading-indentation)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1690, '        "-Wno-misleading-indentation",\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1690,
+            '        #"-Wno-misleading-indentation",\n',
+        )
+
+        f.debug("Applied: Clang warning (no-misleading-indentation)")
+    else:
+        f.debug("Skipped: Clang warning (no-misleading-indentation)")
+
+    # clang - warning - (enum-compare-conditional)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1511, '          "-Wenum-compare-conditional",\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1511,
+            '          #"-Wenum-compare-conditional",\n',
+        )
+
+        f.debug("Applied: Clang warning (enum-compare-conditional)")
+    else:
+        f.debug("Skipped: Clang warning (enum-compare-conditional)")
+
+    # clang - warning - (no-psabi) - 1
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(source_file, 1441, '      cflags += [ "-Wno-psabi" ]\n'):
+        f.replace_line_in_file(
+            source_file,
+            1441,
+            '      #cflags += [ "-Wno-psabi" ]\n',
+        )
+
+        f.debug("Applied: Clang warning (no-psabi - 1)")
+    else:
+        f.debug("Skipped: Clang warning (no-psabi - 1)")
+
+    # clang - warning - (no-psabi) - 2
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(source_file, 1516, '          "-Wno-psabi",\n'):
+        f.replace_line_in_file(
+            source_file,
+            1516,
+            '          #"-Wno-psabi",\n',
+        )
+
+        f.debug("Applied: Clang warning (no-psabi - 2)")
+    else:
+        f.debug("Skipped: Clang warning (no-psabi - 2)")
+
+    # clang - warning - (no-builtin-assume-aligned-alignment)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1523, '          "-Wno-builtin-assume-aligned-alignment",\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1523,
+            '          #"-Wno-builtin-assume-aligned-alignment",\n',
+        )
+
+        f.debug("Applied: Clang warning (no-builtin-assume-aligned-alignment)")
+    else:
+        f.debug("Skipped: Clang warning (no-builtin-assume-aligned-alignment)")
+
+    # clang - warning - (no-unused-but-set-parameter)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1530, '            "-Wno-unused-but-set-parameter",\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1530,
+            '            #"-Wno-unused-but-set-parameter",\n',
+        )
+
+        f.debug("Applied: Clang warning (no-unused-but-set-parameter)")
+    else:
+        f.debug("Skipped: Clang warning (no-unused-but-set-parameter)")
+
+    # clang - warning - (no-unused-but-set-variable)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1531, '            "-Wno-unused-but-set-variable",\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1531,
+            '            #"-Wno-unused-but-set-variable",\n',
+        )
+
+        f.debug("Applied: Clang warning (no-unused-but-set-variable)")
+    else:
+        f.debug("Skipped: Clang warning (no-unused-but-set-variable)")
+
+    # clang - warning - (max-tokens)
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 1544, '          cflags += [ "-Wmax-tokens" ]\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            1544,
+            '          #cflags += [ "-Wmax-tokens" ]\n',
+        )
+
+        f.debug("Applied: Clang warning (max-tokens)")
+    else:
+        f.debug("Skipped: Clang warning (max-tokens)")
+
+    # clang - warning - (deprecated-copy)
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+    if f.file_line_has_content(
+        source_file, 217, '    cflags += [ "-Wdeprecated-copy" ]\n'
+    ):
+        f.replace_line_in_file(
+            source_file,
+            217,
+            '    #cflags += [ "-Wdeprecated-copy" ]\n',
+        )
+
+        f.debug("Applied: Clang warning (deprecated-copy)")
+    else:
+        f.debug("Skipped: Clang warning (deprecated-copy)")
 
     # copy files required
     f.debug("Copying required files...")
@@ -577,7 +780,7 @@ def run_task_test():
             # build
             command = " ".join(
                 [
-                    "cc",
+                    "/opt/cheerp/bin/clang++",
                     "{0}".format("-g" if config == "debug" else ""),
                     "-o",
                     "build/index.html",
@@ -690,7 +893,7 @@ def run_task_generate():
 
             command = " ".join(
                 [
-                    "cc",
+                    "/opt/cheerp/bin/clang++",
                     "{0}".format("-g" if config == "debug" else "-O3"),
                     "-o",
                     html_file,

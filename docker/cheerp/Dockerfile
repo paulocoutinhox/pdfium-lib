@@ -52,6 +52,10 @@ RUN git checkout 31722577db9dc12a249ca6cdf2ff34e51a998360
 RUN ln -sf /usr/bin/python3 /usr/bin/python
 RUN ln -sf /usr/bin/pip3 /usr/bin/pip
 
+# chromium dependencies
+# https://chromium.googlesource.com/chromium/src/+/refs/heads/main/build/install-build-deps.sh
+RUN sed -i "s/} snapcraft/} /gi" build/install-build-deps.sh
+
 RUN apt-get install -o APT::Immediate-Configure=false -f apt \
     && apt-get -f install \
     && dpkg --configure -a \
@@ -81,11 +85,12 @@ RUN apt-get install -y nodejs
 RUN npm install -g npm@latest
 
 # compiler version
-RUN cc --version
+RUN /opt/cheerp/bin/clang --version
+RUN /opt/cheerp/bin/clang++ --version
 
 # test
 RUN bash -c 'echo "int main() { return 0; }" > /tmp/main.cc'
-RUN bash -c 'cc -o /tmp/main.html /tmp/main.cc'
+RUN bash -c '/opt/cheerp/bin/clang++ -o /tmp/main.html /tmp/main.cc'
 
 # working dir
 WORKDIR /app
