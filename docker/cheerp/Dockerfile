@@ -12,7 +12,7 @@ RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selectio
 # packages
 RUN apt-get -y update && \
     apt-get install -y software-properties-common && \
-    add-apt-repository ppa:leaningtech-dev/cheerp-ppa && \
+    add-apt-repository ppa:leaningtech-dev/cheerp-nightly-ppa && \
     apt-get -y update && \
     apt-get install -y build-essential sudo file git wget curl ninja-build zip unzip tar software-properties-common openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen python3 python3-pip cheerp-core --no-install-recommends && \
     apt-get upgrade && \
