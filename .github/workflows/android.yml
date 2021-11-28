@@ -1,4 +1,4 @@
-name: PDFium - Android
+name: Android
 
 on: [push]
 
@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "Ubuntu Latest", os: "ubuntu-20.04", target: "android" }
+          - { name: "Ubuntu", os: "ubuntu-20.04", target: "android" }
         python-version: [3.7]
 
     steps:
