@@ -7,10 +7,10 @@
 <h1 align="center">PDFium Library</h1>
 
 <p align="center">
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions"><img src="https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20iOS/badge.svg" alt="PDFium - iOS"></a>
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions"><img src="https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20macOS/badge.svg" alt="PDFium - macOS"></a>
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions"><img src="https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20Android/badge.svg" alt="PDFium - Android"></a>
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions"><img src="https://github.com/paulo-coutinho/pdfium-lib/workflows/PDFium%20-%20WASM/badge.svg" alt="PDFium - WASM"></a>
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/ios.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/ios.yml/badge.svg" alt="PDFium - iOS"></a>
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/macos.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/macos.yml/badge.svg" alt="PDFium - macOS"></a>
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/android.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/android.yml/badge.svg" alt="PDFium - Android"></a>
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/wasm.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/wasm.yml/badge.svg" alt="PDFium - WASM"></a>
 </p>
 
 <p align="center">
