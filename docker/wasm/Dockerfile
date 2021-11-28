@@ -9,6 +9,7 @@ ENV JAVA_VERSION="8"
 ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
 ENV PYTHONIOENCODING="utf8"
+ENV LC_ALL=C.UTF-8
 
 # packages
 RUN apt-get -y update
@@ -53,7 +54,7 @@ RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
 
 # dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install setuptools docopt python-slugify tqdm pygemstones
+RUN pip3 install setuptools docopt pygemstones
 
 # libjpeg
 RUN mkdir /opt/libjpeg

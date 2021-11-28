@@ -38,7 +38,7 @@ def run_task_patch():
         )
 
         if line_numbers:
-            f.file_line_prepend_range(
+            f.prepend_to_file_line_range(
                 source_file, line_numbers[0], line_numbers[1], "#"
             )
 
@@ -65,7 +65,7 @@ def run_task_patch():
         )
 
         if line_numbers:
-            f.file_line_prepend_range(
+            f.prepend_to_file_line_range(
                 source_file, line_numbers[0], line_numbers[1], "#"
             )
 
@@ -87,7 +87,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: pdfium - embeddertests", l.GREEN)
     else:
         l.bullet("Skipped: pdfium - embeddertests", l.PURPLE)
@@ -104,7 +104,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: pdfium - unittests", l.GREEN)
     else:
         l.bullet("Skipped: pdfium - unittests", l.PURPLE)
@@ -125,7 +125,7 @@ def run_task_patch():
 
     if line_number:
         content = "  treat_warnings_as_errors = false"
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: compiler warning as error", l.GREEN)
     else:
         l.bullet("Skipped: compiler warning as error", l.PURPLE)
@@ -146,7 +146,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: libjpeg", l.GREEN)
     else:
         l.bullet("Skipped: libjpeg", l.PURPLE)
@@ -188,7 +188,7 @@ def run_task_patch():
 
     if line_number:
         content = "#include <CoreGraphics/CoreGraphics.h>\n#include <CoreFoundation/CFString.h>"
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: carbon", l.GREEN)
     else:
         l.bullet("Skipped: carbon", l.PURPLE)
@@ -209,7 +209,7 @@ def run_task_patch():
 
     if line_number:
         content = "#include <CoreGraphics/CoreGraphics.h>"
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: carbon - font", l.GREEN)
     else:
         l.bullet("Skipped: carbon - font", l.PURPLE)
@@ -229,7 +229,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: ios simulator", l.GREEN)
     else:
         l.bullet("Skipped: ios simulator", l.PURPLE)
@@ -292,7 +292,7 @@ def run_task_patch():
 
     if line_number:
         content = 'if (current_cpu == "arm64") {'
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: arm neon", l.GREEN)
     else:
         l.bullet("Skipped: arm neon", l.PURPLE)
@@ -307,7 +307,7 @@ def run_task_patch():
 
     if line_number:
         content = "  if (is_mac || is_ios) {"
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: core fxge", l.GREEN)
     else:
         l.bullet("Skipped: core fxge", l.PURPLE)
@@ -328,7 +328,7 @@ def run_task_patch():
 
     if line_number:
         content = '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]'
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: clang 12", l.GREEN)
     else:
         l.bullet("Skipped: clang 12", l.PURPLE)

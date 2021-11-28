@@ -41,7 +41,7 @@ def run_task_patch():
             l.bullet("Skipped: build gn", l.PURPLE)
         else:
             content = '  defines = [\n    "FPDFSDK_EXPORTS",'
-            f.replace_line_in_file(source_file, line_number, content, new_line=True)
+            f.set_file_line_content(source_file, line_number, content, new_line=True)
             l.bullet("Applied: build gn", l.GREEN)
     else:
         l.bullet("Error: build gn", l.RED)
@@ -60,13 +60,13 @@ def run_task_patch():
     if line_number:
         content = '  cflags = [ "-fvisibility=default" ]'
 
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
 
         line_number = f.get_file_line_number_with_content(
             source_file, line_content, strip=True
         )
 
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
 
         l.bullet("Applied: build gn flags", l.GREEN)
     else:

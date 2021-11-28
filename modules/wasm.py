@@ -36,7 +36,7 @@ def run_task_patch():
 
     if line_number:
         content = "#define ARCH_CPU_X86_FAMILY 1\n#define ARCH_CPU_32_BITS 1\n#define ARCH_CPU_LITTLE_ENDIAN 1"
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: build config", l.GREEN)
     else:
         l.bullet("Skipped: build config", l.PURPLE)
@@ -55,7 +55,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: compiler thin archive", l.GREEN)
     else:
         l.bullet("Skipped: compiler thin archive", l.PURPLE)
@@ -72,7 +72,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: build thin archive", l.GREEN)
     else:
         l.bullet("Skipped: build thin archive", l.PURPLE)
@@ -92,7 +92,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: m64", l.GREEN)
     else:
         l.bullet("Skipped: m64", l.PURPLE)
@@ -112,7 +112,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: x64 arch", l.GREEN)
     else:
         l.bullet("Skipped: x64 arch", l.PURPLE)
@@ -154,7 +154,7 @@ def run_task_patch():
 
     if line_number:
         content = '          "-Wno-deprecated-register",'
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: pragma optimize", l.GREEN)
     else:
         l.bullet("Skipped: pragma optimize", l.PURPLE)
@@ -174,7 +174,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: pubnames", l.GREEN)
     else:
         l.bullet("Skipped: pubnames", l.PURPLE)
@@ -194,7 +194,7 @@ def run_task_patch():
 
     if line_number:
         content = '    cc = "emcc"'
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: gcc toolchain - 1", l.GREEN)
     else:
         l.bullet("Skipped: gcc toolchain - 1", l.PURPLE)
@@ -214,7 +214,7 @@ def run_task_patch():
 
     if line_number:
         content = '    cxx = "em++"'
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: gcc toolchain - 2", l.GREEN)
     else:
         l.bullet("Skipped: gcc toolchain - 2", l.PURPLE)
@@ -235,7 +235,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "//")
+        f.prepend_to_file_line(source_file, line_number, "//")
         l.bullet("Applied: partition allocator", l.GREEN)
     else:
         l.bullet("Skipped: partition allocator", l.PURPLE)
@@ -275,7 +275,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: build pthread", l.GREEN)
     else:
         l.bullet("Skipped: build pthread", l.PURPLE)
@@ -295,7 +295,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: compiler pthread", l.GREEN)
     else:
         l.bullet("Skipped: compiler pthread", l.PURPLE)
@@ -316,7 +316,7 @@ def run_task_patch():
     )
 
     if line_number:
-        f.file_line_prepend(source_file, line_number, "#")
+        f.prepend_to_file_line(source_file, line_number, "#")
         l.bullet("Applied: skia pthread", l.GREEN)
     else:
         l.bullet("Skipped: skia pthread", l.PURPLE)

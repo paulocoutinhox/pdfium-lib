@@ -36,7 +36,7 @@ def run_task_patch():
 
     if line_number:
         content = 'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")'
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: zlib", l.GREEN)
     else:
         l.bullet("Skipped: zlib", l.PURPLE)
@@ -60,7 +60,7 @@ def run_task_patch():
 
     if line_number:
         content = '(current_cpu == "arm" || current_cpu == "arm64")'
-        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
         l.bullet("Applied: skia - zlib", l.GREEN)
     else:
         l.bullet("Skipped: skia - zlib", l.PURPLE)
