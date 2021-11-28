@@ -8,7 +8,7 @@ import modules.config as c
 
 
 # -----------------------------------------------------------------------------
-def get_pdfium_by_target(target):
+def get_pdfium_by_target(target, append_target_os=None):
     l.colored("Building PDFium...", l.YELLOW)
 
     build_dir = os.path.join("build", target)
@@ -28,6 +28,14 @@ def get_pdfium_by_target(target):
         "https://pdfium.googlesource.com/pdfium.git",
     ]
     r.run(command, cwd=cwd)
+
+    if append_target_os:
+        l.colored(
+            "Appending target os ({0}) to gclient file...".format(append_target_os),
+            l.YELLOW,
+        )
+        gclient_file = os.path.join(build_dir, ".gclient")
+        f.append_to_file(gclient_file, "target_os = [ '{0}' ]".format(append_target_os))
 
     l.colored("Syncing repository with gclient...", l.YELLOW)
 
