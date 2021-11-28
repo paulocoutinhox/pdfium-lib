@@ -50,7 +50,7 @@ RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
 
 # dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install setuptools docopt python-slugify tqdm
+RUN pip3 install setuptools docopt python-slugify tqdm pygemstones
 
 # libjpeg
 RUN mkdir /opt/libjpeg
@@ -64,7 +64,7 @@ RUN make && make install
 # emsdk
 RUN mkdir /emsdk
 WORKDIR /emsdk
-RUN git clone https://github.com/emscripten-core/emsdk.git . 
+RUN git clone https://github.com/emscripten-core/emsdk.git .
 RUN ./emsdk install 2.0.24
 RUN ./emsdk activate 2.0.24
 ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"

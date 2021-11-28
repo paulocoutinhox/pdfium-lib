@@ -71,7 +71,7 @@ RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
 
 # dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install docopt python-slugify tqdm
+RUN pip3 install docopt python-slugify tqdm pygemstones
 
 # working dir
 WORKDIR /app
