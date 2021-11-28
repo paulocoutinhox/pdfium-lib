@@ -1,47 +1,22 @@
-import glob
 import os
 import tarfile
-from subprocess import check_call
+
+from pygemstones.io import file as f
+from pygemstones.system import runner as r
+from pygemstones.util import log as l
 
 import modules.config as c
-import modules.functions as f
+import modules.pdfium as p
 
 
+# -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    f.debug("Building PDFium...")
-
-    target = "android"
-    build_dir = os.path.join("build", target)
-    f.create_dir(build_dir)
-
-    target_dir = os.path.join(build_dir, "pdfium")
-    f.remove_dir(target_dir)
-
-    cwd = build_dir
-    command = " ".join(
-        [
-            "gclient",
-            "config",
-            "--unmanaged",
-            "https://pdfium.googlesource.com/pdfium.git",
-        ]
-    )
-    check_call(command, cwd=cwd, shell=True)
-
-    gclient_file = os.path.join(build_dir, ".gclient")
-    f.append_to_file(gclient_file, "target_os = [ 'android' ]")
-
-    cwd = build_dir
-    command = " ".join(["gclient", "sync"])
-    check_call(command, cwd=cwd, shell=True)
-
-    cwd = target_dir
-    command = " ".join(["git", "checkout", c.pdfium_git_commit])
-    check_call(command, cwd=cwd, shell=True)
+    p.get_pdfium_by_target("android", "android")
 
 
+# -----------------------------------------------------------------------------
 def run_task_patch():
-    f.debug("Patching...")
+    l.colored("Patching files...", l.YELLOW)
 
     source_dir = os.path.join("build", "android", "pdfium")
 
@@ -50,32 +25,61 @@ def run_task_patch():
         source_dir,
         "BUILD.gn",
     )
-    if f.file_line_has_content(source_file, 26, "  ]\n"):
-        f.replace_line_in_file(source_file, 26, '    "FPDFSDK_EXPORTS",\n  ]\n')
 
-        f.debug("Applied: Build GN")
+    line_content = "defines = ["
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        line_content = '"FPDFSDK_EXPORTS",'
+        line_number_to_add = f.get_file_line_number_with_content(
+            source_file, line_content, strip=True
+        )
+
+        if line_number_to_add:
+            l.bullet("Skipped: build gn", l.PURPLE)
+        else:
+            content = '  defines = [\n    "FPDFSDK_EXPORTS",'
+            f.set_file_line_content(source_file, line_number, content, new_line=True)
+            l.bullet("Applied: build gn", l.GREEN)
     else:
-        f.debug("Skipped: Build GN")
+        l.bullet("Error: build gn", l.RED)
 
     # build gn flags
     source_file = os.path.join(
         source_dir,
         "BUILD.gn",
     )
-    if f.file_line_has_content(source_file, 19, "  cflags = []\n"):
-        f.replace_line_in_file(
-            source_file, 19, '  cflags = [ "-fvisibility=default" ]\n'
+
+    line_content = "cflags = []"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = '  cflags = [ "-fvisibility=default" ]'
+
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+
+        line_number = f.get_file_line_number_with_content(
+            source_file, line_content, strip=True
         )
 
-        f.debug("Applied: Build GN Flags")
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+
+        l.bullet("Applied: build gn flags", l.GREEN)
     else:
-        f.debug("Skipped: Build GN Flags")
+        l.bullet("Skipped: build gn flags", l.PURPLE)
+
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_build():
-    f.debug("Building libraries...")
+    l.colored("Building libraries...", l.YELLOW)
 
-    current_dir = os.getcwd()
+    current_dir = f.current_dir()
 
     # configs
     for config in c.configurations_android:
@@ -89,8 +93,7 @@ def run_task_build():
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
             )
 
-            f.remove_dir(main_dir)
-            f.create_dir(main_dir)
+            f.recreate_dir(main_dir)
 
             os.chdir(
                 os.path.join(
@@ -101,10 +104,11 @@ def run_task_build():
             )
 
             # generating files...
-            f.debug(
+            l.colored(
                 'Generating files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
-                )
+                ),
+                l.YELLOW,
             )
 
             arg_is_debug = "true" if config == "debug" else "false"
@@ -127,48 +131,47 @@ def run_task_build():
 
             args_str = " ".join(args)
 
-            command = " ".join(
-                [
-                    "gn",
-                    "gen",
-                    "out/{0}-{1}-{2}".format(
-                        target["target_os"], target["target_cpu"], config
-                    ),
-                    "--args='{0}'".format(args_str),
-                ]
-            )
-            check_call(command, shell=True)
+            command = [
+                "gn",
+                "gen",
+                "out/{0}-{1}-{2}".format(
+                    target["target_os"], target["target_cpu"], config
+                ),
+                "--args='{0}'".format(args_str),
+            ]
+            r.run_as_shell(" ".join(command))
 
             # compiling...
-            f.debug(
+            l.colored(
                 'Compiling to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
-                )
+                ),
+                l.YELLOW,
             )
 
-            command = " ".join(
-                [
-                    "ninja",
-                    "-C",
-                    "out/{0}-{1}-{2}".format(
-                        target["target_os"], target["target_cpu"], config
-                    ),
-                    "pdfium",
-                    "-v",
-                ]
-            )
-            check_call(command, shell=True)
+            command = [
+                "ninja",
+                "-C",
+                "out/{0}-{1}-{2}".format(
+                    target["target_os"], target["target_cpu"], config
+                ),
+                "pdfium",
+                "-v",
+            ]
+            r.run(command)
 
             os.chdir(current_dir)
 
+    l.ok()
 
+
+# -----------------------------------------------------------------------------
 def run_task_install():
-    f.debug("Installing libraries...")
+    l.colored("Installing libraries...", l.YELLOW)
 
     # configs
     for config in c.configurations_android:
-        f.remove_dir(os.path.join("build", "android", config))
-        f.create_dir(os.path.join("build", "android", config))
+        f.recreate_dir(os.path.join("build", "android", config))
 
         # targets
         for target in c.targets_android:
@@ -181,32 +184,34 @@ def run_task_install():
             lib_dir = os.path.join("build", "android", config, "lib")
             target_dir = os.path.join(lib_dir, target["android_cpu"])
 
-            f.remove_dir(target_dir)
-            f.create_dir(target_dir)
+            f.recreate_dir(target_dir)
 
             for basename in os.listdir(source_lib_dir):
                 if basename.endswith(".so"):
                     pathname = os.path.join(source_lib_dir, basename)
 
                     if os.path.isfile(pathname):
-                        f.copy_file2(pathname, target_dir)
+                        f.copy_file(pathname, os.path.join(target_dir, basename))
 
         # include
         include_dir = os.path.join("build", "android", "pdfium", "public")
         target_include_dir = os.path.join("build", "android", config, "include")
-        f.remove_dir(target_include_dir)
-        f.create_dir(target_include_dir)
+
+        f.recreate_dir(target_include_dir)
 
         for basename in os.listdir(include_dir):
             if basename.endswith(".h"):
                 pathname = os.path.join(include_dir, basename)
 
                 if os.path.isfile(pathname):
-                    f.copy_file2(pathname, target_include_dir)
+                    f.copy_file(pathname, os.path.join(target_include_dir, basename))
+
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_test():
-    f.debug("Testing...")
+    l.colored("Testing...", l.YELLOW)
 
     for config in c.configurations_android:
         for target in c.targets_android:
@@ -214,12 +219,15 @@ def run_task_test():
                 "build", "android", config, "lib", target["android_cpu"]
             )
 
-            command = " ".join(["file", os.path.join(lib_dir, "libpdfium.so")])
-            check_call(command, shell=True)
+            command = ["file", os.path.join(lib_dir, "libpdfium.cr.so")]
+            r.run(command)
+
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_archive():
-    f.debug("Archiving...")
+    l.colored("Archiving...", l.YELLOW)
 
     current_dir = os.getcwd()
     lib_dir = os.path.join(current_dir, "build", "android")
@@ -242,3 +250,5 @@ def run_task_archive():
         )
 
     tar.close()
+
+    l.ok()

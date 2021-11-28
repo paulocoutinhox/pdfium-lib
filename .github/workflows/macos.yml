@@ -1,4 +1,4 @@
-name: PDFium - macOS
+name: macOS
 
 on: [push]
 
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "macOS Latest Clang", os: "macos-latest", target: "macos" }
+          - { name: "macOS", os: "macos-latest", target: "macos" }
         python-version: [3.7]
 
     steps:
@@ -80,7 +80,7 @@ jobs:
         run: pip3 install -r requirements.txt --user
 
       - name: Depot tools
-        run: python3 make.py run build-depot-tools
+        run: python3 make.py build-depot-tools
 
       - name: Environment
         run: |
@@ -88,25 +88,25 @@ jobs:
           echo "FORCE_MAC_SDK_MIN=10.15" >> $GITHUB_ENV
 
       - name: PDFium
-        run: python3 make.py run build-pdfium-${{ matrix.config.target }}
+        run: python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: python3 make.py run patch-${{ matrix.config.target }}
+        run: python3 make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
-        run: python3 make.py run patch-${{ matrix.config.target }}
+        run: python3 make.py patch-${{ matrix.config.target }}
 
       - name: Build
-        run: python3 make.py run build-${{ matrix.config.target }}
+        run: python3 make.py build-${{ matrix.config.target }}
 
       - name: Install
-        run: python3 make.py run install-${{ matrix.config.target }}
+        run: python3 make.py install-${{ matrix.config.target }}
 
       - name: Test
-        run: python3 make.py run test-${{ matrix.config.target }}
+        run: python3 make.py test-${{ matrix.config.target }}
 
       - name: Archive
-        run: python3 make.py run archive-${{ matrix.config.target }}
+        run: python3 make.py archive-${{ matrix.config.target }}
 
       - name: Save
         uses: actions/upload-artifact@v2

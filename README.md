@@ -1,51 +1,85 @@
-# PDFium Library
+<p align="center">
+    <a href="https://github.com/paulo-coutinho/pdfium-lib" target="_blank" rel="noopener noreferrer">
+        <img width="120" src="extras/images/logo.png" alt="PDFium Library Logo">
+    </a>
+</p>
 
-![PDFium - iOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20iOS/badge.svg)
-![PDFium - macOS](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20macOS/badge.svg)
-![PDFium - Android](https://github.com/prsolucoes/pdfium-lib/workflows/PDFium%20-%20Android/badge.svg)
-![PDFium - WASM](https://github.com/paulo-coutinho/pdfium-lib/workflows/PDFium%20-%20WASM/badge.svg)
+<h1 align="center">PDFium Library</h1>
 
-This project compile PDFium to all supported platforms. Current project compiles to:  
+<p align="center">
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/ios.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/ios.yml/badge.svg" alt="PDFium - iOS"></a>
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/macos.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/macos.yml/badge.svg" alt="PDFium - macOS"></a>
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/android.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/android.yml/badge.svg" alt="PDFium - Android"></a>
+  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/wasm.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/wasm.yml/badge.svg" alt="PDFium - WASM"></a>
+</p>
+
+<p align="center">
+Project to compile PDFium library to multiple platforms.
+</p>
+
+<br>
+
+
+## Platforms
+
+This project currently compiles to these platforms:
 
 - [x] iOS device (armv7, arm64)
 - [x] iOS simulator (x86_64)
 - [X] Android (armv7, armv8, x86, x86_64)
 - [x] macOS (x86_64, arm64)
+- [x] WASM (web assembly)
+
+Platforms in roadmap:
+
 - [ ] Linux
 - [ ] Windows
-- [x] WASM (web assembly)
+
+Obs: PDFium project is from Google and i only patch it to compile to all platforms above. Check all oficial details and PDFium license here:
+
+https://pdfium.googlesource.com/
 
 ## Web demo
 
-You can test pdfium on web browser here:
+Since this project generate WASM version, i published a demo that you can test PDFium direct on web browser here:
 
 https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf
 
 ## Requirements
 
-1. ninja (brew install ninja)  
-2. python
-3. pip
+1. Ninja Build
+2. Python 3
+3. PIP
 
-Obs: Only python version 3 is supported
+## How to compile
 
-## How to compile (general)
+These are the `general` steps that need be executed `before all` others platforms steps.
 
-1. Get the source:  
-```git clone https://github.com/prsolucoes/pdfium-lib.git```  
-```cd pdfium-lib```  
+1. Get the source:
 
-2. Install pip requirements:  
-```pip3 install -r requirements.txt``` 
+```
+git clone https://github.com/paulo-coutinho/pdfium-lib.git
+cd pdfium-lib
+```
 
-3. Get Google Depot Tools:  
-```python3 make.py run build-depot-tools```  
-```export PATH=$PATH:$PWD/build/depot-tools```  
+2. Install PIP requirements:
+
+```
+pip install -r requirements.txt
+```
+
+3. Get Google Depot Tools:
+
+```
+python make.py build-depot-tools
+export PATH=$PATH:$PWD/build/depot-tools
+```
 
 Obs:
-- The file **make.py** need be executed with python version 3.  
-- These steps you only need make one time.  
-- If you change **pdfium** git commit revision on file **modules/config.py** only execute step 4.
+
+- The file `make.py` need be executed with Python version 3.
+- These steps you only need make `one` time.
+- If you change `pdfium` git commit revision, edit file `modules/config.py` and execute `step 4`.
 
 ## How to compile for iOS
 
@@ -72,3 +106,17 @@ https://github.com/paulo-coutinho/pdfium-lib/releases
 ## How to include files and extend pdfium
 
 Check tutorial here: [How to include files](docs/HOW_TO_INCLUDE_FILES.md)
+
+## Buy me a coffee
+
+Support the continuous development of this project.
+
+<a href='https://ko-fi.com/paulocoutinho' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+## License
+
+This license informations is about this personal project, not the Google PDFium Library.
+
+[MIT](http://opensource.org/licenses/MIT)
+
+Copyright (c) 2018-2021, Paulo Coutinho

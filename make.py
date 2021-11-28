@@ -5,7 +5,7 @@
 Make tool
 
 Usage:
-  make.py run <task-name>
+  make.py <task-name>
   make.py [options]
   make.py -h | --help  
 
@@ -56,13 +56,14 @@ Tasks:
 """
 
 from docopt import docopt
+from pygemstones.system import bootstrap as b
+from pygemstones.util import log as l
 
+import modules.android as android
 import modules.common as common
-import modules.functions as f
 import modules.config as c
 import modules.ios as ios
 import modules.macos as macos
-import modules.android as android
 import modules.wasm as wasm
 
 
@@ -71,34 +72,31 @@ def main(options):
     if ("--debug" in options and options["--debug"]) or (
         "-d" in options and options["-d"]
     ):
-        c.make_debug = True
+        c.debug = True
 
-    if c.make_debug:
-        f.debug("You have executed with options:")
-        f.message(str(options))
-        f.message("")
+    if c.debug:
+        l.bold("You have executed with options:", l.YELLOW)
+        l.m(str(options))
+        l.m("")
 
     # bind options
     if "<task-name>" in options:
-        make_task = options["<task-name>"]
-
-    # validate data
-    f.debug("Validating data...")
+        task = options["<task-name>"]
 
     # validate task
-    if not make_task:
-        f.error("Task is invalid")
+    if not task:
+        l.e("Task is invalid. Use 'python make.py -h' for help.")
 
     # build depot tools
-    if make_task == "format":
+    if task == "format":
         common.run_task_format()
 
     # build depot tools
-    elif make_task == "build-depot-tools":
+    elif task == "build-depot-tools":
         common.run_task_build_depot_tools()
 
     # build depot tools
-    elif make_task == "build-emsdk":
+    elif task == "build-emsdk":
         common.run_task_build_emsdk()
 
     #######################
@@ -106,27 +104,27 @@ def main(options):
     #######################
 
     # build pdfium - ios
-    elif make_task == "build-pdfium-ios":
+    elif task == "build-pdfium-ios":
         ios.run_task_build_pdfium()
 
     # patch - ios
-    elif make_task == "patch-ios":
+    elif task == "patch-ios":
         ios.run_task_patch()
 
     # build - ios
-    elif make_task == "build-ios":
+    elif task == "build-ios":
         ios.run_task_build()
 
     # install - ios
-    elif make_task == "install-ios":
+    elif task == "install-ios":
         ios.run_task_install()
 
     # test - ios
-    elif make_task == "test-ios":
+    elif task == "test-ios":
         ios.run_task_test()
 
     # archive - ios
-    elif make_task == "archive-ios":
+    elif task == "archive-ios":
         ios.run_task_archive()
 
     #######################
@@ -134,27 +132,27 @@ def main(options):
     #######################
 
     # build pdfium - macos
-    elif make_task == "build-pdfium-macos":
+    elif task == "build-pdfium-macos":
         macos.run_task_build_pdfium()
 
     # patch - macos
-    elif make_task == "patch-macos":
+    elif task == "patch-macos":
         macos.run_task_patch()
 
     # build - macos
-    elif make_task == "build-macos":
+    elif task == "build-macos":
         macos.run_task_build()
 
     # install - macos
-    elif make_task == "install-macos":
+    elif task == "install-macos":
         macos.run_task_install()
 
     # test - macos
-    elif make_task == "test-macos":
+    elif task == "test-macos":
         macos.run_task_test()
 
     # archive - macos
-    elif make_task == "archive-macos":
+    elif task == "archive-macos":
         macos.run_task_archive()
 
     #######################
@@ -162,27 +160,27 @@ def main(options):
     #######################
 
     # build pdfium - android
-    elif make_task == "build-pdfium-android":
+    elif task == "build-pdfium-android":
         android.run_task_build_pdfium()
 
     # patch - android
-    elif make_task == "patch-android":
+    elif task == "patch-android":
         android.run_task_patch()
 
     # build - android
-    elif make_task == "build-android":
+    elif task == "build-android":
         android.run_task_build()
 
     # install - android
-    elif make_task == "install-android":
+    elif task == "install-android":
         android.run_task_install()
 
     # test - android
-    elif make_task == "test-android":
+    elif task == "test-android":
         android.run_task_test()
 
     # archive - android
-    elif make_task == "archive-android":
+    elif task == "archive-android":
         android.run_task_archive()
 
     #######################
@@ -190,39 +188,39 @@ def main(options):
     #######################
 
     # build pdfium - wasm
-    elif make_task == "build-pdfium-wasm":
+    elif task == "build-pdfium-wasm":
         wasm.run_task_build_pdfium()
 
     # patch - wasm
-    elif make_task == "patch-wasm":
+    elif task == "patch-wasm":
         wasm.run_task_patch()
 
     # build - wasm
-    elif make_task == "build-wasm":
+    elif task == "build-wasm":
         wasm.run_task_build()
 
     # install - wasm
-    elif make_task == "install-wasm":
+    elif task == "install-wasm":
         wasm.run_task_install()
 
     # test - wasm
-    elif make_task == "test-wasm":
+    elif task == "test-wasm":
         wasm.run_task_test()
 
     # generate - wasm
-    elif make_task == "generate-wasm":
+    elif task == "generate-wasm":
         wasm.run_task_generate()
 
     # publish - wasm
-    elif make_task == "publish-wasm":
+    elif task == "publish-wasm":
         wasm.run_task_publish()
 
     # publish to web - wasm
-    elif make_task == "publish-to-web-wasm":
+    elif task == "publish-to-web-wasm":
         wasm.run_task_publish_to_web()
 
     # archive - wasm
-    elif make_task == "archive-wasm":
+    elif task == "archive-wasm":
         wasm.run_task_archive()
 
     #######################
@@ -231,13 +229,13 @@ def main(options):
 
     # invalid
     else:
-        f.error("Task is invalid")
-
-    f.message("")
-    f.debug("FINISHED!")
+        l.e("Task is invalid")
 
 
 if __name__ == "__main__":
+    # initialization
+    b.init()
+
     # main CLI entrypoint
-    args = docopt(__doc__, version="1.1.0")
+    args = docopt(__doc__, version="2.0.0")
     main(args)

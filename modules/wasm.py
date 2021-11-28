@@ -1,46 +1,24 @@
-import glob
 import os
 import tarfile
-from subprocess import check_call
+
+from pygemstones.io import file as f
+from pygemstones.system import runner as r
+from pygemstones.util import log as l
 
 import modules.config as c
-import modules.functions as f
+import modules.pdfium as p
 
 
+# -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    f.debug("Building PDFium...")
-
-    target = "linux"
-    build_dir = os.path.join("build", target)
-    f.create_dir(build_dir)
-
-    target_dir = os.path.join(build_dir, "pdfium")
-    f.remove_dir(target_dir)
-
-    cwd = build_dir
-    command = " ".join(
-        [
-            "gclient",
-            "config",
-            "--unmanaged",
-            "https://pdfium.googlesource.com/pdfium.git",
-        ]
-    )
-    check_call(command, cwd=cwd, shell=True)
-
-    cwd = build_dir
-    command = " ".join(["gclient", "sync"])
-    check_call(command, cwd=cwd, shell=True)
-
-    cwd = target_dir
-    command = " ".join(["git", "checkout", c.pdfium_git_commit])
-    check_call(command, cwd=cwd, shell=True)
+    p.get_pdfium_by_target("wasm")
 
 
+# -----------------------------------------------------------------------------
 def run_task_patch():
-    f.debug("Patching...")
+    l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "linux", "pdfium")
+    source_dir = os.path.join("build", "wasm", "pdfium")
 
     # build config
     source_file = os.path.join(
@@ -48,20 +26,20 @@ def run_task_patch():
         "build",
         "build_config.h",
     )
-    if f.file_line_has_content(
-        source_file,
-        201,
-        "#error Please add support for your architecture in build/build_config.h\n",
-    ):
-        f.replace_line_in_file(
-            source_file,
-            201,
-            "#define ARCH_CPU_X86_FAMILY 1\n#define ARCH_CPU_32_BITS 1\n#define ARCH_CPU_LITTLE_ENDIAN 1\n",
-        )
 
-        f.debug("Applied: build config")
+    line_content = (
+        "#error Please add support for your architecture in build/build_config.h"
+    )
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "#define ARCH_CPU_X86_FAMILY 1\n#define ARCH_CPU_32_BITS 1\n#define ARCH_CPU_LITTLE_ENDIAN 1"
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: build config", l.GREEN)
     else:
-        f.debug("Skipped: build config")
+        l.bullet("Skipped: build config", l.PURPLE)
 
     # compiler thin archive
     source_file = os.path.join(
@@ -70,42 +48,36 @@ def run_task_patch():
         "config",
         "BUILDCONFIG.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        333,
-        '  "//build/config/compiler:thin_archive",\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            333,
-            '  #"//build/config/compiler:thin_archive",\n',
-        )
 
-        f.debug("Applied: compiler thin archive")
+    line_content = '"//build/config/compiler:thin_archive",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: compiler thin archive", l.GREEN)
     else:
-        f.debug("Skipped: compiler thin archive")
+        l.bullet("Skipped: compiler thin archive", l.PURPLE)
 
     # build thin archive
     source_file = os.path.join(
         source_dir,
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        380,
-        '    configs -= [ "//build/config/compiler:thin_archive" ]\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            380,
-            '    #configs -= [ "//build/config/compiler:thin_archive" ]\n',
-        )
 
-        f.debug("Applied: build thin archive")
+    line_content = 'configs -= [ "//build/config/compiler:thin_archive" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: build thin archive", l.GREEN)
     else:
-        f.debug("Skipped: build thin archive")
+        l.bullet("Skipped: build thin archive", l.PURPLE)
 
-    # compiler
+    # m64
     source_file = os.path.join(
         source_dir,
         "build",
@@ -113,30 +85,58 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        878,
-        '        "-m64",\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            878,
-            '        #"-m64",\n',
-        )
-        f.replace_line_in_file(
-            source_file,
-            879,
-            '        #"-march=$x64_arch",\n',
-        )
-        f.replace_line_in_file(
-            source_file,
-            880,
-            '        #"-msse3",\n',
-        )
 
-        f.debug("Applied: compiler")
+    line_content = '"-m64",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: m64", l.GREEN)
     else:
-        f.debug("Skipped: compiler")
+        l.bullet("Skipped: m64", l.PURPLE)
+
+    # x64 arch
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+
+    line_content = '"-march=$x64_arch",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: x64 arch", l.GREEN)
+    else:
+        l.bullet("Skipped: x64 arch", l.PURPLE)
+
+    # msse3
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+
+    line_content = '"-msse3",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = '#"-msse3",'
+        f.replace_in_file(source_file, line_content, content)
+        l.bullet("Applied: msse3", l.GREEN)
+    else:
+        l.bullet("Skipped: msse3", l.PURPLE)
 
     # pragma optimize
     source_file = os.path.join(
@@ -146,20 +146,18 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        1520,
-        '          "-Wno-ignored-pragma-optimize",\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            1520,
-            '          "-Wno-deprecated-register",\n',
-        )
 
-        f.debug("Applied: pragma optimize")
+    line_content = '"-Wno-ignored-pragma-optimize",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = '          "-Wno-deprecated-register",'
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: pragma optimize", l.GREEN)
     else:
-        f.debug("Skipped: pragma optimize")
+        l.bullet("Skipped: pragma optimize", l.PURPLE)
 
     # pubnames
     source_file = os.path.join(
@@ -169,47 +167,57 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        2308,
-        '        cflags += [ "-ggnu-pubnames" ]\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            2308,
-            '        #cflags += [ "-ggnu-pubnames" ]\n',
-        )
 
-        f.debug("Applied: pubnames")
+    line_content = 'cflags += [ "-ggnu-pubnames" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: pubnames", l.GREEN)
     else:
-        f.debug("Skipped: pubnames")
+        l.bullet("Skipped: pubnames", l.PURPLE)
 
-    # gcc toolchain
+    # gcc toolchain - 1
     source_file = os.path.join(
         source_dir,
         "build",
         "toolchain",
         "gcc_toolchain.gni",
     )
-    if f.file_line_has_content(
-        source_file,
-        740,
-        '    cc = "$prefix/clang"\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            740,
-            '    cc = "emcc"\n',
-        )
-        f.replace_line_in_file(
-            source_file,
-            741,
-            '    cxx = "em++"\n',
-        )
 
-        f.debug("Applied: gcc toolchain")
+    line_content = 'cc = "$prefix/clang"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = '    cc = "emcc"'
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: gcc toolchain - 1", l.GREEN)
     else:
-        f.debug("Skipped: gcc toolchain")
+        l.bullet("Skipped: gcc toolchain - 1", l.PURPLE)
+
+    # gcc toolchain - 2
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "toolchain",
+        "gcc_toolchain.gni",
+    )
+
+    line_content = 'cxx = "$prefix/clang++"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = '    cxx = "em++"'
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: gcc toolchain - 2", l.GREEN)
+    else:
+        l.bullet("Skipped: gcc toolchain - 2", l.PURPLE)
 
     # partition allocator
     source_file = os.path.join(
@@ -220,20 +228,17 @@ def run_task_patch():
         "partition_allocator",
         "spin_lock.cc",
     )
-    if f.file_line_has_content(
-        source_file,
-        54,
-        '#warning "Processor yield not supported on this architecture."\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            54,
-            '//#warning "Processor yield not supported on this architecture."\n',
-        )
 
-        f.debug("Applied: partition allocator")
+    line_content = '#warning "Processor yield not supported on this architecture."'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "//")
+        l.bullet("Applied: partition allocator", l.GREEN)
     else:
-        f.debug("Skipped: partition allocator")
+        l.bullet("Skipped: partition allocator", l.PURPLE)
 
     # compiler stack protector
     source_file = os.path.join(
@@ -243,26 +248,18 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        335,
-        '        cflags += [ "-fstack-protector" ]\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            335,
-            '        cflags += [ "-fno-stack-protector" ]\n',
-        )
 
-        f.replace_line_in_file(
-            source_file,
-            347,
-            '        cflags += [ "-fno-stack-protector" ]\n',
-        )
+    line_content = 'cflags += [ "-fstack-protector" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
 
-        f.debug("Applied: compiler stack protector")
+    if line_number:
+        content = 'cflags += [ "-fno-stack-protector" ]'
+        f.replace_in_file(source_file, line_content, content)
+        l.bullet("Applied: compiler stack protector", l.GREEN)
     else:
-        f.debug("Skipped: compiler stack protector")
+        l.bullet("Skipped: compiler stack protector", l.PURPLE)
 
     # build pthread
     source_file = os.path.join(
@@ -271,20 +268,17 @@ def run_task_patch():
         "config",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        231,
-        '      "pthread",\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            231,
-            '      #"pthread",\n',
-        )
 
-        f.debug("Applied: build pthread")
+    line_content = '"pthread",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: build pthread", l.GREEN)
     else:
-        f.debug("Skipped: build pthread")
+        l.bullet("Skipped: build pthread", l.PURPLE)
 
     # compiler pthread
     source_file = os.path.join(
@@ -294,20 +288,17 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        497,
-        '    cflags += [ "-pthread" ]\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            497,
-            '    #cflags += [ "-pthread" ]\n',
-        )
 
-        f.debug("Applied: compiler pthread")
+    line_content = 'cflags += [ "-pthread" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: compiler pthread", l.GREEN)
     else:
-        f.debug("Skipped: compiler pthread")
+        l.bullet("Skipped: compiler pthread", l.PURPLE)
 
     # skia pthread
     source_file = os.path.join(
@@ -318,22 +309,20 @@ def run_task_patch():
         "skia",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        224,
-        '    libs += [ "pthread" ]\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            224,
-            '    #libs += [ "pthread" ]\n',
-        )
 
-        f.debug("Applied: skia pthread")
+    line_content = 'libs += [ "pthread" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: skia pthread", l.GREEN)
     else:
-        f.debug("Skipped: skia pthread")
+        l.bullet("Skipped: skia pthread", l.PURPLE)
 
     # compiler bitwise
+    # obs: this is not required for emscripten 3.0.0+
     source_file = os.path.join(
         source_dir,
         "build",
@@ -341,26 +330,23 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file,
-        1534,
-        '            "-Wno-bitwise-instead-of-logical",\n',
-    ):
-        f.replace_line_in_file(
-            source_file,
-            1534,
-            '            #"-Wno-bitwise-instead-of-logical",\n',
-        )
 
-        f.debug("Applied: compiler bitwise")
+    line_content = '"-Wno-bitwise-instead-of-logical",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: compiler bitwise", l.GREEN)
     else:
-        f.debug("Skipped: compiler bitwise")
+        l.bullet("Skipped: compiler bitwise", l.PURPLE)
 
     # copy files required
-    f.debug("Copying required files...")
+    l.colored("Copying required files...", l.YELLOW)
 
-    linux_dir = os.path.join(source_dir, "linux")
-    f.create_dir(linux_dir)
+    pdfium_linux_dir = os.path.join(source_dir, "linux")
+    f.create_dir(pdfium_linux_dir)
 
     f.copy_file("/usr/include/jpeglib.h", os.path.join(source_dir, "jpeglib.h"))
     f.copy_file("/usr/include/jmorecfg.h", os.path.join(source_dir, "jmorecfg.h"))
@@ -368,15 +354,18 @@ def run_task_patch():
     f.copy_file("/usr/include/zconf.h", os.path.join(source_dir, "zconf.h"))
     f.copy_file("/usr/include/jerror.h", os.path.join(source_dir, "jerror.h"))
     f.copy_file("/usr/include/jconfig.h", os.path.join(source_dir, "jconfig.h"))
-    f.copy_file("/usr/include/linux/limits.h", os.path.join(linux_dir, "limits.h"))
+    f.copy_file(
+        "/usr/include/linux/limits.h", os.path.join(pdfium_linux_dir, "limits.h")
+    )
 
-    f.debug("Copied!")
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_build():
-    f.debug("Building libraries...")
+    l.colored("Building libraries...", l.YELLOW)
 
-    current_dir = os.getcwd()
+    current_dir = f.current_dir()
 
     # configs
     for config in c.configurations_wasm:
@@ -390,8 +379,7 @@ def run_task_build():
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
             )
 
-            f.remove_dir(main_dir)
-            f.create_dir(main_dir)
+            f.recreate_dir(main_dir)
 
             os.chdir(
                 os.path.join(
@@ -402,10 +390,11 @@ def run_task_build():
             )
 
             # generating files...
-            f.debug(
+            l.colored(
                 'Generating files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
-                )
+                ),
+                l.YELLOW,
             )
 
             arg_is_debug = "true" if config == "debug" else "false"
@@ -434,52 +423,48 @@ def run_task_build():
 
             args_str = " ".join(args)
 
-            command = " ".join(
-                [
-                    "gn",
-                    "gen",
-                    "out/{0}-{1}-{2}".format(
-                        target["target_os"], target["target_cpu"], config
-                    ),
-                    "--args='{0}'".format(args_str),
-                ]
-            )
-            check_call(command, shell=True)
+            command = [
+                "gn",
+                "gen",
+                "out/{0}-{1}-{2}".format(
+                    target["target_os"], target["target_cpu"], config
+                ),
+                "--args='{0}'".format(args_str),
+            ]
+            r.run_as_shell(" ".join(command))
 
             # compiling...
-            f.debug(
+            l.colored(
                 'Compiling to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
-                )
+                ),
+                l.YELLOW,
             )
 
-            command = " ".join(
-                [
-                    "ninja",
-                    "-C",
-                    "out/{0}-{1}-{2}".format(
-                        target["target_os"], target["target_cpu"], config
-                    ),
-                    "pdfium",
-                    "-v",
-                ]
-            )
-            check_call(command, shell=True)
+            command = [
+                "ninja",
+                "-C",
+                "out/{0}-{1}-{2}".format(
+                    target["target_os"], target["target_cpu"], config
+                ),
+                "pdfium",
+                "-v",
+            ]
+            r.run(command)
 
             os.chdir(current_dir)
 
+    l.ok()
 
+
+# -----------------------------------------------------------------------------
 def run_task_install():
-    f.debug("Installing libraries...")
+    l.colored("Installing libraries...", l.YELLOW)
 
     # configs
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
-            f.remove_dir(
-                os.path.join("build", target["target_os"], target["target_cpu"], config)
-            )
-
-            f.create_dir(
+            f.recreate_dir(
                 os.path.join("build", target["target_os"], target["target_cpu"], config)
             )
 
@@ -511,45 +496,50 @@ def run_task_install():
             f.copy_file(source_lib_path, target_lib_path)
 
             # check file
-            f.debug("File data...")
-            command = " ".join(["file", target_lib_path])
-            check_call(command, shell=True)
+            l.colored("File data...", l.YELLOW)
+            command = ["file", target_lib_path]
+            r.run_as_shell(" ".join(command))
 
-            f.debug("File size...")
-            command = " ".join(["ls", "-lh ", target_lib_path])
-            check_call(command, shell=True)
+            l.colored("File size...", l.YELLOW)
+            command = ["ls", "-lh ", target_lib_path]
+            r.run_as_shell(" ".join(command))
 
             # include
-            include_dir = os.path.join("build", "linux", "pdfium", "public")
+            include_dir = os.path.join("build", "wasm", "pdfium", "public")
             target_include_dir = os.path.join(
                 "build", target["target_os"], target["target_cpu"], config, "include"
             )
 
-            f.remove_dir(target_include_dir)
-            f.create_dir(target_include_dir)
+            f.recreate_dir(target_include_dir)
 
             for basename in os.listdir(include_dir):
                 if basename.endswith(".h"):
                     pathname = os.path.join(include_dir, basename)
 
                     if os.path.isfile(pathname):
-                        f.copy_file2(pathname, target_include_dir)
+                        f.copy_file(
+                            pathname, os.path.join(target_include_dir, basename)
+                        )
+
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_test():
-    f.debug("Testing...")
+    l.colored("Testing...", l.YELLOW)
 
-    current_dir = os.getcwd()
+    current_dir = f.current_dir()
     sample_dir = os.path.join(current_dir, "sample-wasm")
     build_dir = os.path.join(sample_dir, "build")
     http_dir = os.path.join(sample_dir, "build")
 
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
-            f.debug(
+            l.colored(
                 'Generating test files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
-                )
+                ),
+                l.YELLOW,
             )
 
             lib_file_out = os.path.join(
@@ -571,48 +561,49 @@ def run_task_test():
                 "include",
             )
 
-            f.remove_dir(build_dir)
-            f.create_dir(build_dir)
+            f.recreate_dir(build_dir)
 
             # build
-            command = " ".join(
-                [
-                    "em++",
-                    "{0}".format("-g" if config == "debug" else ""),
-                    "-o",
-                    "build/index.html",
-                    "src/main.cpp",
-                    lib_file_out,
-                    "-I{0}".format(include_dir),
-                    "-s",
-                    "DEMANGLE_SUPPORT=1",
-                    "-s",
-                    "USE_ZLIB=1",
-                    "-s",
-                    "USE_LIBJPEG=1",
-                    "-s",
-                    "WASM=1",
-                    "-s",
-                    "ASSERTIONS=1",
-                    "-s",
-                    "ALLOW_MEMORY_GROWTH=1",
-                    "--embed-file",
-                    "assets/web-assembly.pdf",
-                ]
-            )
-            check_call(command, cwd=sample_dir, shell=True)
+            command = [
+                "em++",
+                "{0}".format("-g" if config == "debug" else ""),
+                "-o",
+                "build/index.html",
+                "src/main.cpp",
+                lib_file_out,
+                "-I{0}".format(include_dir),
+                "-s",
+                "DEMANGLE_SUPPORT=1",
+                "-s",
+                "USE_ZLIB=1",
+                "-s",
+                "USE_LIBJPEG=1",
+                "-s",
+                "WASM=1",
+                "-s",
+                "ASSERTIONS=1",
+                "-s",
+                "ALLOW_MEMORY_GROWTH=1",
+                "--embed-file",
+                "assets/web-assembly.pdf",
+            ]
+            r.run_as_shell(" ".join(command), cwd=sample_dir)
 
-            f.debug(
+            l.colored(
                 "Test on browser with: python -m http.server --directory {0}".format(
                     http_dir
-                )
+                ),
+                l.YELLOW,
             )
 
+    l.ok()
 
+
+# -----------------------------------------------------------------------------
 def run_task_generate():
-    f.debug("Generating...")
+    l.colored("Generating...", l.YELLOW)
 
-    current_dir = os.getcwd()
+    current_dir = f.current_dir()
 
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
@@ -635,11 +626,10 @@ def run_task_generate():
             http_dir = os.path.join(relative_dir, config, "node")
             lib_file_out = os.path.join(lib_dir, "libpdfium.a")
 
-            f.remove_dir(gen_dir)
-            f.create_dir(gen_dir)
+            f.recreate_dir(gen_dir)
 
             # doxygen
-            f.debug("Doxygen...")
+            l.colored("Doxygen...", l.YELLOW)
 
             doxygen_file = os.path.join(
                 current_dir,
@@ -649,97 +639,90 @@ def run_task_generate():
                 "Doxyfile",
             )
 
-            command = " ".join(
-                [
-                    "doxygen",
-                    doxygen_file,
-                ]
-            )
-            check_call(command, cwd=include_dir, shell=True)
+            command = [
+                "doxygen",
+                doxygen_file,
+            ]
+            r.run_as_shell(" ".join(command), cwd=include_dir)
 
             # copy xml files
-            f.debug("Copying xml files...")
+            l.colored("Copying xml files...", l.YELLOW)
 
             xml_dir = os.path.join(include_dir, "xml")
             f.copy_dir(xml_dir, os.path.join(gen_dir, "xml"))
             f.remove_dir(xml_dir)
 
             # copy utils files
-            f.debug("Copying utils files...")
+            l.colored("Copying utils files...", l.YELLOW)
             f.copy_dir(utils_dir, os.path.join(gen_dir, "utils"))
 
             # node modules
-            f.debug("Installing node modules...")
+            l.colored("Installing node modules...", l.YELLOW)
 
             gen_utils_dir = os.path.join(
                 gen_dir,
                 "utils",
             )
 
-            command = " ".join(
-                [
-                    "npm",
-                    "install",
-                ]
-            )
-            check_call(command, cwd=gen_utils_dir, shell=True)
+            command = [
+                "npm",
+                "install",
+            ]
+            r.run_as_shell(" ".join(command), cwd=gen_utils_dir)
 
             # generate
-            f.debug("Compiling with emscripten...")
+            l.colored("Compiling with emscripten...", l.YELLOW)
 
             gen_out_dir = os.path.join(
                 gen_dir,
                 "out",
             )
 
-            f.remove_dir(gen_out_dir)
-            f.create_dir(gen_out_dir)
+            f.recreate_dir(gen_out_dir)
 
             html_file = os.path.join(
                 gen_out_dir,
                 "pdfium.html",
             )
 
-            command = " ".join(
-                [
-                    "em++",
-                    "{0}".format("-g" if config == "debug" else "-O3"),
-                    "-o",
-                    html_file,
-                    "-s",
-                    'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
-                    "-s",
-                    'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
-                    "custom.cpp",
-                    lib_file_out,
-                    "-I{0}".format(include_dir),
-                    "-s",
-                    "DEMANGLE_SUPPORT=1",
-                    "-s",
-                    "USE_ZLIB=1",
-                    "-s",
-                    "USE_LIBJPEG=1",
-                    "-s",
-                    "WASM=1",
-                    "-s",
-                    "ASSERTIONS=1",
-                    "-s",
-                    "ALLOW_MEMORY_GROWTH=1",
-                    "-std=c++11",
-                    "-Wall",
-                    "--no-entry",
-                ]
-            )
-            check_call(command, cwd=gen_utils_dir, shell=True)
+            command = [
+                "em++",
+                "{0}".format("-g" if config == "debug" else "-O3"),
+                "-o",
+                html_file,
+                "-s",
+                'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
+                "-s",
+                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
+                "custom.cpp",
+                lib_file_out,
+                "-I{0}".format(include_dir),
+                "-s",
+                "DEMANGLE_SUPPORT=1",
+                "-s",
+                "USE_ZLIB=1",
+                "-s",
+                "USE_LIBJPEG=1",
+                "-s",
+                "WASM=1",
+                "-s",
+                "ASSERTIONS=1",
+                "-s",
+                "ALLOW_MEMORY_GROWTH=1",
+                "-std=c++11",
+                "-Wall",
+                "--no-entry",
+            ]
+            r.run_as_shell(" ".join(command), cwd=gen_utils_dir)
 
             # copy files
-            f.debug("Copying compiled files...")
+            l.colored("Copying compiled files...", l.YELLOW)
 
             f.remove_dir(node_dir)
             f.copy_dir(gen_out_dir, node_dir)
 
             # copy template files
-            f.debug("Copying template files...")
+            l.colored("Copying template files...", l.YELLOW)
 
             f.copy_file(
                 os.path.join(template_dir, "index.html"),
@@ -747,7 +730,7 @@ def run_task_generate():
             )
 
             # change template tags
-            f.debug("Replacing template tags...")
+            l.colored("Replacing template tags...", l.YELLOW)
 
             f.replace_in_file(
                 os.path.join(node_dir, "index.html"),
@@ -762,21 +745,23 @@ def run_task_generate():
             )
 
             # test
-            f.debug(
+            l.colored(
                 "Test on browser with: python -m http.server --directory {0}".format(
                     http_dir
-                )
+                ),
+                l.YELLOW,
             )
 
-    f.debug("Generated")
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_publish():
-    f.debug("Publishing...")
+    l.colored("Publishing...", l.YELLOW)
 
-    current_dir = os.getcwd()
-    publish_dir = os.path.join(current_dir, "build", "linux", "publish")
-    node_dir = os.path.join(current_dir, "build", "linux", "x64", "release", "node")
+    current_dir = f.current_dir()
+    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm", "x64", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -790,15 +775,16 @@ def run_task_publish():
     )
 
     # finish
-    f.debug("Published")
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_publish_to_web():
-    f.debug("Publishing...")
+    l.colored("Publishing...", l.YELLOW)
 
     current_dir = os.getcwd()
-    publish_dir = os.path.join(current_dir, "build", "linux", "publish")
-    node_dir = os.path.join(current_dir, "build", "linux", "x64", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm", "x64", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -813,25 +799,26 @@ def run_task_publish_to_web():
 
     # clone gh-pages branch
     command = "git init ."
-    check_call(command, cwd=publish_dir, shell=True)
+    r.run_as_shell(command, cwd=publish_dir)
 
     command = "git add ."
-    check_call(command, cwd=publish_dir, shell=True)
+    r.run_as_shell(command, cwd=publish_dir)
 
     command = 'git commit -m "new version published"'
-    check_call(command, cwd=publish_dir, shell=True)
+    r.run_as_shell(command, cwd=publish_dir)
 
     command = 'git push "git@github.com:pdfviewer/pdfviewer.github.io.git" master:master --force'
-    check_call(command, cwd=publish_dir, shell=True)
+    r.run_as_shell(command, cwd=publish_dir)
 
     # finish
-    f.debug("Test on browser with: https://pdfviewer.github.io/")
+    l.colored("Test on browser: https://pdfviewer.github.io/", l.YELLOW)
 
-    f.debug("Published")
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_archive():
-    f.debug("Archiving...")
+    l.colored("Archiving...", l.YELLOW)
 
     current_dir = os.getcwd()
     output_filename = os.path.join(current_dir, "wasm.tgz")
@@ -853,3 +840,5 @@ def run_task_archive():
             )
 
     tar.close()
+
+    l.ok()

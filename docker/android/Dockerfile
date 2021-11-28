@@ -11,19 +11,23 @@ ENV ANDROID_BUILD_TOOLS="30.0.2"
 ENV ANDROID_SDK_TOOLS_REV="4333796"
 ENV ANDROID_CMAKE_REV="3.6.4111459"
 ENV ANDROID_CMAKE_REV_3_10="3.10.2.4988404"
-ENV GRADLE_VERSION="6.1.1"
-ENV JAVA_VERSION="8"
-
-ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
-ENV GRADLE_HOME="/opt/gradle-6.1.1"
 ENV ANDROID_HOME="/opt/android-sdk-linux"
 ENV ANDROID_NDK_HOME="/opt/android-ndk-linux"
+
+ENV GRADLE_VERSION="6.1.1"
+ENV GRADLE_HOME="/opt/gradle-6.1.1"
+
+ENV JAVA_VERSION="8"
+ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
+
+ENV PYTHONIOENCODING="utf8"
+ENV LC_ALL=C.UTF-8
 
 ENV PATH ${PATH}:${ANDROID_HOME}/platform-tools/:${ANDROID_NDK_HOME}:${ANDROID_HOME}/ndk-bundle:${ANDROID_HOME}/tools/bin/
 
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release tzdata --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python2.7 python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release tzdata python3-setuptools --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
@@ -54,7 +58,7 @@ WORKDIR /build
 RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN gclient sync
 WORKDIR /build/pdfium
-RUN git checkout 31722577db9dc12a249ca6cdf2ff34e51a998360
+RUN git checkout 64a3691918bca26c4d233c8c897d926a39e4a8b7
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
@@ -71,7 +75,7 @@ RUN ln -nsf /opt/depot-tools/ninja-linux64 /usr/bin/ninja
 
 # dependencies
 RUN pip3 install --upgrade pip
-RUN pip3 install docopt python-slugify tqdm
+RUN pip3 install setuptools docopt pygemstones
 
 # working dir
 WORKDIR /app
