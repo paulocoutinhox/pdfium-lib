@@ -1,0 +1,40 @@
+# http://editorconfig.org
+root = true
+
+[*]
+indent_size = 4
+indent_style = space
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# YAML
+[*.{yml,md}]
+indent_style = space
+indent_size = 2
+
+# HTML
+[*.html]
+indent_size = 2
+
+# Json
+[*.json]
+indent_size = 2
+insert_final_newline = false
+
+# Makefile
+[{Makefile,**.mk}]
+indent_style = tab
+
+# Python
+[*.py]
+max_line_length = 119
+
+# Batch
+[*.bat]
+indent_style = tab
+
+# TOML
+[*.toml]
+indent_size = 2

@@ -46,25 +46,25 @@ jobs:
         run: docker run -v ${PWD}:/app -i -t=false pdfium-android echo "test"
 
       - name: PDFium
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run build-pdfium-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run patch-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run patch-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py patch-${{ matrix.config.target }}
 
       - name: Build
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run build-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py build-${{ matrix.config.target }}
 
       - name: Install
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run install-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py install-${{ matrix.config.target }}
 
       - name: Test
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run test-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py test-${{ matrix.config.target }}
 
       - name: Archive
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py run archive-${{ matrix.config.target }}
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-android python3 make.py archive-${{ matrix.config.target }}
 
       - name: Save
         uses: actions/upload-artifact@v2

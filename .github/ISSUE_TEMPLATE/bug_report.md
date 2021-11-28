@@ -26,8 +26,7 @@ If applicable, add screenshots to help explain your problem.
 **System (please complete the following information):**
  - OS: [e.g. Ubuntu]
  - Version [e.g. 18.04]
- - Conan [e.g. 1.18.0]
- - Target [e.g. android_aar]
+ - Target [e.g. wasm]
 
 **Additional context**
 Add any other context about the problem here.

@@ -2,3 +2,4 @@ docopt
 python-slugify
 tqdm
 black
+pygemstones
