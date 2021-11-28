@@ -1,76 +1,134 @@
 import glob
 import os
 import tarfile
-from subprocess import check_call
+
+from pygemstones.io import file as f
+from pygemstones.system import runner as r
+from pygemstones.util import log as l
 
 import modules.config as c
-import modules.functions as f
+import modules.pdfium as p
 
 
+# -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    f.debug("Building PDFium...")
-
-    target = "ios"
-    build_dir = os.path.join("build", target)
-    f.create_dir(build_dir)
-
-    target_dir = os.path.join(build_dir, "pdfium")
-    f.remove_dir(target_dir)
-
-    cwd = build_dir
-    command = " ".join(
-        [
-            "gclient",
-            "config",
-            "--unmanaged",
-            "https://pdfium.googlesource.com/pdfium.git",
-        ]
-    )
-    check_call(command, cwd=cwd, shell=True)
-
-    cwd = build_dir
-    command = " ".join(["gclient", "sync"])
-    check_call(command, cwd=cwd, shell=True)
-
-    cwd = target_dir
-    command = " ".join(["git", "checkout", c.pdfium_git_commit])
-    check_call(command, cwd=cwd, shell=True)
+    p.get_pdfium_by_target("ios")
 
 
+# -----------------------------------------------------------------------------
 def run_task_patch():
-    f.debug("Patching...")
+    l.colored("Patching files...", l.YELLOW)
 
     source_dir = os.path.join("build", "ios", "pdfium")
 
-    # build gn
+    # build gn - tests 1
     source_file = os.path.join(
         source_dir,
         "BUILD.gn",
     )
-    if not f.file_line_has_content(source_file, 408, '#test("pdfium_unittests") {\n'):
-        # comment all lines of "pdfium_unittests"
-        f.file_line_comment_range(source_file, 408, 455)
 
-        # group "pdfium_all", comment all tests (pdfium_embeddertests and pdfium_unittests)
-        f.file_line_comment_range(source_file, 546, 547)
+    line_content = 'test("pdfium_unittests") {'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
 
-        f.debug("Applied: Build GN")
+    if line_number:
+        line_numbers = f.get_file_line_numbers_with_enclosing_tags(
+            source_file, "{", "}", start_from=line_number
+        )
+
+        if line_numbers:
+            f.file_line_prepend_range(
+                source_file, line_numbers[0], line_numbers[1], "#"
+            )
+
+            l.bullet("Applied: build gn - tests 1", l.GREEN)
+        else:
+            l.bullet("Error: build gn - tests 1", l.RED)
     else:
-        f.debug("Skipped: Build GN")
+        l.bullet("Skipped: build gn - tests 1", l.PURPLE)
 
-    # deprecated warning
+    # build gn - tests 2
     source_file = os.path.join(
         source_dir,
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file, 217, '    cflags += [ "-Wdeprecated-copy" ]\n'
-    ):
-        f.file_line_comment(source_file, 217)
 
-        f.debug("Applied: Deprecated Warning")
+    line_content = 'test("pdfium_embeddertests") {'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        line_numbers = f.get_file_line_numbers_with_enclosing_tags(
+            source_file, "{", "}", start_from=line_number
+        )
+
+        if line_numbers:
+            f.file_line_prepend_range(
+                source_file, line_numbers[0], line_numbers[1], "#"
+            )
+
+            l.bullet("Applied: build gn - tests 2", l.GREEN)
+        else:
+            l.bullet("Error: build gn - tests 2", l.RED)
     else:
-        f.debug("Skipped: Deprecated Warning")
+        l.bullet("Skipped: build gn - tests 2", l.PURPLE)
+
+    # pdfium - embeddertests
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+
+    line_content = '":pdfium_embeddertests",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.file_line_prepend(source_file, line_number, "#")
+        l.bullet("Applied: pdfium - embeddertests", l.GREEN)
+    else:
+        l.bullet("Skipped: pdfium - embeddertests", l.PURPLE)
+
+    # pdfium - unittests
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+
+    line_content = '":pdfium_unittests",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.file_line_prepend(source_file, line_number, "#")
+        l.bullet("Applied: pdfium - unittests", l.GREEN)
+    else:
+        l.bullet("Skipped: pdfium - unittests", l.PURPLE)
+
+    # compiler warning as error
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "compiler.gni",
+    )
+
+    line_content = "treat_warnings_as_errors = true"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "  treat_warnings_as_errors = false"
+        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: compiler warning as error", l.GREEN)
+    else:
+        l.bullet("Skipped: compiler warning as error", l.PURPLE)
 
     # libjpeg
     source_file = os.path.join(
@@ -79,16 +137,19 @@ def run_task_patch():
         "libjpeg_turbo",
         "BUILD.gn",
     )
-    if not f.file_line_has_content(
-        source_file,
-        13,
-        '#assert(!is_ios, "This is not used on iOS, don\'t drag it in unintentionally")\n',
-    ):
-        f.file_line_comment(source_file, 13)
 
-        f.debug("Applied: Lib JPEG")
+    line_content = (
+        'assert(!is_ios, "This is not used on iOS, don\'t drag it in unintentionally")'
+    )
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.file_line_prepend(source_file, line_number, "#")
+        l.bullet("Applied: libjpeg", l.GREEN)
     else:
-        f.debug("Skipped: Lib JPEG")
+        l.bullet("Skipped: libjpeg", l.PURPLE)
 
     # ios automatically manage certs
     source_file = os.path.join(
@@ -98,29 +159,18 @@ def run_task_patch():
         "ios",
         "ios_sdk_overrides.gni",
     )
-    if not f.file_has_content(source_file, "ios_automatically_manage_certs"):
-        f.append_to_file(
-            source_file, "if (is_ios) { ios_automatically_manage_certs = true }"
-        )
 
-        f.debug("Applied: iOS Automatically Manage Certs")
-    else:
-        f.debug("Skipped: iOS Automatically Manage Certs")
-
-    # compiler
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
+    line_content = "if (is_ios) { ios_automatically_manage_certs = true }"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
     )
-    if f.file_line_has_content(source_file, 1611, '      "-Wimplicit-fallthrough",\n'):
-        f.file_line_comment(source_file, 1611)
 
-        f.debug("Applied: Compiler")
+    if not line_number:
+        content = "if (is_ios) { ios_automatically_manage_certs = true }"
+        f.append_to_file(source_file, content)
+        l.bullet("Applied: ios automatically manage certs", l.GREEN)
     else:
-        f.debug("Skipped: Compiler")
+        l.bullet("Skipped: ios automatically manage certs", l.PURPLE)
 
     # carbon
     source_file = os.path.join(
@@ -130,18 +180,18 @@ def run_task_patch():
         "apple",
         "fx_quartz_device.h",
     )
-    if not f.file_line_has_content(
-        source_file, 10, "#include <CoreGraphics/CoreGraphics.h>\n"
-    ):
-        f.replace_line_in_file(
-            source_file,
-            10,
-            "#include <CoreGraphics/CoreGraphics.h>\n#include <CoreFoundation/CFString.h>\n",
-        )
 
-        f.debug("Applied: Carbon")
+    line_content = "#include <Carbon/Carbon.h>"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "#include <CoreGraphics/CoreGraphics.h>\n#include <CoreFoundation/CFString.h>"
+        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: carbon", l.GREEN)
     else:
-        f.debug("Skipped: Carbon")
+        l.bullet("Skipped: carbon", l.PURPLE)
 
     # carbon - font
     source_file = os.path.join(
@@ -151,18 +201,18 @@ def run_task_patch():
         "font",
         "cpdf_type1font.cpp",
     )
-    if not f.file_line_has_content(
-        source_file, 22, "#include <CoreGraphics/CoreGraphics.h>\n"
-    ):
-        f.replace_line_in_file(
-            source_file,
-            22,
-            "#include <CoreGraphics/CoreGraphics.h>\n",
-        )
 
-        f.debug("Applied: Carbon - Font")
+    line_content = "#include <Carbon/Carbon.h>"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "#include <CoreGraphics/CoreGraphics.h>"
+        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: carbon - font", l.GREEN)
     else:
-        f.debug("Skipped: Carbon - Font")
+        l.bullet("Skipped: carbon - font", l.PURPLE)
 
     # ios simulator
     source_file = os.path.join(
@@ -172,16 +222,19 @@ def run_task_patch():
         "ios",
         "rules.gni",
     )
-    if not f.file_line_has_content(
-        source_file, 964, '#          data_deps += [ "//testing/iossim" ]\n'
-    ):
-        f.file_line_comment(source_file, 964)
 
-        f.debug("Applied: iOS Simulator")
+    line_content = 'data_deps += [ "//testing/iossim" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.file_line_prepend(source_file, line_number, "#")
+        l.bullet("Applied: ios simulator", l.GREEN)
     else:
-        f.debug("Skipped: iOS Simulator")
+        l.bullet("Skipped: ios simulator", l.PURPLE)
 
-    # 32bits constexpr
+    # 32bits constexpr - 1
     source_file = os.path.join(
         source_dir,
         "third_party",
@@ -190,45 +243,74 @@ def run_task_patch():
         "partition_allocator",
         "address_space_randomization.h",
     )
-    if f.file_line_has_content(
-        source_file, 248, "  constexpr ALWAYS_INLINE uintptr_t ASLRMask() {\n"
-    ):
-        f.replace_line_in_file(
-            source_file,
-            248,
-            "  PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLRMask() {\n",
-        )
-        f.replace_line_in_file(
-            source_file,
-            251,
-            "  PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLROffset() {\n",
-        )
 
-        f.debug("Applied: 32bits constexpr")
+    line_content = "constexpr ALWAYS_INLINE uintptr_t ASLRMask() {"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLRMask() {"
+        f.replace_in_file(source_file, line_content, content)
+        l.bullet("Applied: 32bits constexpr - 1", l.GREEN)
     else:
-        f.debug("Skipped: 32bits constexpr")
+        l.bullet("Skipped: 32bits constexpr - 1", l.PURPLE)
 
-    # ARM Neon
+    # 32bits constexpr - 2
+    source_file = os.path.join(
+        source_dir,
+        "third_party",
+        "base",
+        "allocator",
+        "partition_allocator",
+        "address_space_randomization.h",
+    )
+
+    line_content = "constexpr ALWAYS_INLINE uintptr_t ASLROffset() {"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLROffset() {"
+        f.replace_in_file(source_file, line_content, content)
+        l.bullet("Applied: 32bits constexpr - 2", l.GREEN)
+    else:
+        l.bullet("Skipped: 32bits constexpr - 2", l.PURPLE)
+
+    # arm neon
     source_file = os.path.join(
         source_dir,
         "build_overrides",
         "build.gni",
     )
-    if f.file_line_has_content(source_file, 18, 'if (current_cpu == "arm") {\n'):
-        f.replace_line_in_file(source_file, 18, 'if (current_cpu == "arm64") {\n')
 
-        f.debug("Applied: ARM Neon")
+    line_content = 'if (current_cpu == "arm") {'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = 'if (current_cpu == "arm64") {'
+        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: arm neon", l.GREEN)
     else:
-        f.debug("Skipped: ARM Neon")
+        l.bullet("Skipped: arm neon", l.PURPLE)
 
     # core fxge
     source_file = os.path.join(source_dir, "core", "fxge", "BUILD.gn")
-    if f.file_line_has_content(source_file, 167, "  if (is_mac) {\n"):
-        f.replace_line_in_file(source_file, 167, "  if (is_mac || is_ios) {\n")
 
-        f.debug("Applied: Core FXGE")
+    line_content = "if (is_mac) {"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "  if (is_mac || is_ios) {"
+        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: core fxge", l.GREEN)
     else:
-        f.debug("Skipped: Core FXGE")
+        l.bullet("Skipped: core fxge", l.PURPLE)
 
     # clang 12
     source_file = os.path.join(
@@ -238,24 +320,27 @@ def run_task_patch():
         "compiler",
         "BUILD.gn",
     )
-    if f.file_line_has_content(
-        source_file, 1262, '      cflags += [ "-ffile-compilation-dir=." ]\n'
-    ):
-        f.replace_line_in_file(
-            source_file,
-            1262,
-            '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]\n',
-        )
 
-        f.debug("Applied: Clang 12")
+    line_content = 'cflags += [ "-ffile-compilation-dir=." ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]'
+        f.replace_line_in_file(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: clang 12", l.GREEN)
     else:
-        f.debug("Skipped: Clang 12")
+        l.bullet("Skipped: clang 12", l.PURPLE)
+
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_build():
-    f.debug("Building libraries...")
+    l.colored("Building libraries...", l.YELLOW)
 
-    current_dir = os.getcwd()
+    current_dir = f.current_dir()
 
     # configs
     for config in c.configurations_ios:
@@ -269,8 +354,7 @@ def run_task_build():
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
             )
 
-            f.remove_dir(main_dir)
-            f.create_dir(main_dir)
+            f.recreate_dir(main_dir)
 
             os.chdir(
                 os.path.join(
@@ -281,10 +365,11 @@ def run_task_build():
             )
 
             # generating files...
-            f.debug(
+            l.colored(
                 'Generating files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
-                )
+                ),
+                l.YELLOW,
             )
 
             arg_is_debug = "true" if config == "debug" else "false"
@@ -317,48 +402,47 @@ def run_task_build():
 
             args_str = " ".join(args)
 
-            command = " ".join(
-                [
-                    "gn",
-                    "gen",
-                    "out/{0}-{1}-{2}".format(
-                        target["target_os"], target["target_cpu"], config
-                    ),
-                    "--args='{0}'".format(args_str),
-                ]
-            )
-            check_call(command, shell=True)
+            command = [
+                "gn",
+                "gen",
+                "out/{0}-{1}-{2}".format(
+                    target["target_os"], target["target_cpu"], config
+                ),
+                "--args='{0}'".format(args_str),
+            ]
+            r.run_as_shell(" ".join(command))
 
             # compiling...
-            f.debug(
+            l.colored(
                 'Compiling to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
-                )
+                ),
+                l.YELLOW,
             )
 
-            command = " ".join(
-                [
-                    "ninja",
-                    "-C",
-                    "out/{0}-{1}-{2}".format(
-                        target["target_os"], target["target_cpu"], config
-                    ),
-                    "pdfium",
-                    "-v",
-                ]
-            )
-            check_call(command, shell=True)
+            command = [
+                "ninja",
+                "-C",
+                "out/{0}-{1}-{2}".format(
+                    target["target_os"], target["target_cpu"], config
+                ),
+                "pdfium",
+                "-v",
+            ]
+            r.run(command)
 
             os.chdir(current_dir)
 
+    l.ok()
 
+
+# -----------------------------------------------------------------------------
 def run_task_install():
-    f.debug("Installing libraries...")
+    l.colored("Installing libraries...", l.YELLOW)
 
     # configs
     for config in c.configurations_ios:
-        f.remove_dir(os.path.join("build", "ios", config))
-        f.create_dir(os.path.join("build", "ios", config))
+        f.recreate_dir(os.path.join("build", "ios", config))
         f.create_dir(os.path.join("build", "ios", config, "lib"))
 
         # targets
@@ -389,44 +473,50 @@ def run_task_install():
         files_str = " ".join(files)
         lib_file_out = os.path.join("build", "ios", config, "lib", "libpdfium.a")
 
-        f.debug("Merging libraries (lipo)...")
-        command = " ".join(["lipo", "-create", files_str, "-o", lib_file_out])
-        check_call(command, shell=True)
+        l.colored("Merging libraries (lipo)...", l.YELLOW)
+        command = ["lipo", "-create", files_str, "-o", lib_file_out]
+        r.run_as_shell(" ".join(command))
 
-        f.debug("File data...")
-        command = " ".join(["file", lib_file_out])
-        check_call(command, shell=True)
+        l.colored("File data...", l.YELLOW)
+        command = ["file", lib_file_out]
+        r.run_as_shell(" ".join(command))
 
-        f.debug("File size...")
-        command = " ".join(["ls", "-lh ", lib_file_out])
-        check_call(command, shell=True)
+        l.colored("File size...", l.YELLOW)
+        command = ["ls", "-lh ", lib_file_out]
+        r.run_as_shell(" ".join(command))
 
         # include
         include_dir = os.path.join("build", "ios", "pdfium", "public")
         target_include_dir = os.path.join("build", "ios", config, "include")
-        f.remove_dir(target_include_dir)
-        f.create_dir(target_include_dir)
+
+        f.recreate_dir(target_include_dir)
 
         for basename in os.listdir(include_dir):
             if basename.endswith(".h"):
                 pathname = os.path.join(include_dir, basename)
 
                 if os.path.isfile(pathname):
-                    f.copy_file2(pathname, target_include_dir)
+                    f.copy_file(pathname, os.path.join(target_include_dir, basename))
+
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_test():
-    f.debug("Testing...")
+    l.colored("Testing...", l.YELLOW)
 
     for config in c.configurations_ios:
         lib_dir = os.path.join("build", "ios", config, "lib")
 
-        command = " ".join(["file", os.path.join(lib_dir, "libpdfium.a")])
-        check_call(command, shell=True)
+        command = ["file", os.path.join(lib_dir, "libpdfium.a")]
+        r.run(command)
+
+    l.ok()
 
 
+# -----------------------------------------------------------------------------
 def run_task_archive():
-    f.debug("Archiving...")
+    l.colored("Archiving...", l.YELLOW)
 
     current_dir = os.getcwd()
     lib_dir = os.path.join(current_dir, "build", "ios")
@@ -444,3 +534,5 @@ def run_task_archive():
         )
 
     tar.close()
+
+    l.ok()
