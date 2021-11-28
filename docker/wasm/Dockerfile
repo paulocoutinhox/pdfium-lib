@@ -4,12 +4,15 @@ FROM ubuntu:18.04
 ARG DEBIAN_FRONTEND=noninteractive
 
 ENV PROJ_TARGET="wasm"
+
 ENV JAVA_VERSION="8"
 ENV JAVA_HOME="/usr/lib/jvm/java-8-openjdk-amd64/"
 
+ENV PYTHONIOENCODING="utf8"
+
 # packages
 RUN apt-get -y update
-RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen --no-install-recommends && \
+RUN apt-get install -y build-essential sudo file git wget curl cmake ninja-build zip unzip tar python3 python3-pip openjdk-${JAVA_VERSION}-jdk nano lsb-release libglib2.0-dev tzdata doxygen python3-setuptools --no-install-recommends && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get clean
 
