@@ -35,7 +35,7 @@ Platforms in roadmap:
 - [ ] Linux
 - [ ] Windows
 
-Obs: PDFium project is from Google and i only patch it to compile to all platforms above. Check all oficial details and PDFIum license here:
+Obs: PDFium project is from Google and i only patch it to compile to all platforms above. Check all oficial details and PDFium license here:
 
 https://pdfium.googlesource.com/
 

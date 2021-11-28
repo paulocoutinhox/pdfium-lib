@@ -17,7 +17,7 @@ def run_task_build_pdfium():
 
 # -----------------------------------------------------------------------------
 def run_task_patch():
-    l.colored("Patching...", l.YELLOW)
+    l.colored("Patching files...", l.YELLOW)
 
     source_dir = os.path.join("build", "macos", "pdfium")
 
@@ -72,7 +72,7 @@ def run_task_patch():
 def run_task_build():
     l.colored("Building libraries...", l.YELLOW)
 
-    current_dir = os.getcwd()
+    current_dir = f.current_dir()
 
     # configs
     for config in c.configurations_macos:

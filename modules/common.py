@@ -5,6 +5,8 @@ from pygemstones.io import file as f
 from pygemstones.system import runner as r
 from pygemstones.util import log as l
 
+import modules.config as c
+
 
 # -----------------------------------------------------------------------------
 def run_task_build_depot_tools():
@@ -50,11 +52,11 @@ def run_task_build_emsdk():
     r.run(command, cwd)
 
     cwd = tools_dir
-    command = " ".join(["./emsdk", "install", "latest"])
+    command = " ".join(["./emsdk", "install", c.emsdk_version])
     r.run_as_shell(command, cwd)
 
     cwd = tools_dir
-    command = " ".join(["./emsdk", "activate", "latest"])
+    command = " ".join(["./emsdk", "activate", c.emsdk_version])
     r.run_as_shell(command, cwd)
 
     cwd = tools_dir
@@ -73,7 +75,7 @@ def run_task_format():
         l.e("Black is not installed, check: https://github.com/psf/black")
 
     # start
-    l.colored("Formating...", l.YELLOW)
+    l.colored("Formating files...", l.YELLOW)
 
     # make.py
     command = [
