@@ -799,19 +799,19 @@ def run_task_publish_to_web():
 
     # clone gh-pages branch
     command = "git init ."
-    r.run_as_shell(" ".join(command), cwd=publish_dir)
+    r.run_as_shell(command, cwd=publish_dir)
 
     command = "git add ."
-    r.run_as_shell(" ".join(command), cwd=publish_dir)
+    r.run_as_shell(command, cwd=publish_dir)
 
     command = 'git commit -m "new version published"'
-    r.run_as_shell(" ".join(command), cwd=publish_dir)
+    r.run_as_shell(command, cwd=publish_dir)
 
     command = 'git push "git@github.com:pdfviewer/pdfviewer.github.io.git" master:master --force'
-    r.run_as_shell(" ".join(command), cwd=publish_dir)
+    r.run_as_shell(command, cwd=publish_dir)
 
     # finish
-    l.colored("Test on browser with: https://pdfviewer.github.io/", l.YELLOW)
+    l.colored("Test on browser: https://pdfviewer.github.io/", l.YELLOW)
 
     l.ok()
 
