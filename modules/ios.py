@@ -312,6 +312,34 @@ def run_task_patch():
     else:
         l.bullet("Skipped: core fxge", l.PURPLE)
 
+    # mllvm - 1
+    source_file = os.path.join(source_dir, "build", "config", "compiler", "BUILD.gn")
+
+    line_content = '"-mllvm",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line_range(source_file, line_number, line_number + 1, "#")
+        l.bullet("Applied: mllvm - 1", l.GREEN)
+    else:
+        l.bullet("Skipped: mllvm - 1", l.PURPLE)
+
+    # mllvm - 2
+    source_file = os.path.join(source_dir, "build", "config", "compiler", "BUILD.gn")
+
+    line_content = 'ldflags += [ "-Wl,-mllvm,-instcombine-lower-dbg-declare=0" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: mllvm - 2", l.GREEN)
+    else:
+        l.bullet("Skipped: mllvm - 2", l.PURPLE)
+
     # clang 12
     source_file = os.path.join(
         source_dir,
