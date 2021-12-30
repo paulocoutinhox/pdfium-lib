@@ -10,7 +10,7 @@ pdfium_git_commit = "187d077faebb81a2bbc11d777ece46830cf5cd8f"
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # emsdk
-emsdk_version = "2.0.24"
+emsdk_version = "3.1.0"
 # OBS 1: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # macos
