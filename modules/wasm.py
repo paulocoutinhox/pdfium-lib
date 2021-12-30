@@ -187,7 +187,7 @@ def run_task_patch():
         "gcc_toolchain.gni",
     )
 
-    line_content = 'cc = "$prefix/clang"'
+    line_content = 'cc = "${prefix}/clang"'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
@@ -207,7 +207,7 @@ def run_task_patch():
         "gcc_toolchain.gni",
     )
 
-    line_content = 'cxx = "$prefix/clang++"'
+    line_content = 'cxx = "${prefix}/clang++"'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
@@ -320,27 +320,6 @@ def run_task_patch():
         l.bullet("Applied: skia pthread", l.GREEN)
     else:
         l.bullet("Skipped: skia pthread", l.PURPLE)
-
-    # compiler bitwise
-    # obs: this is not required for emscripten 3.0.0+
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = '"-Wno-bitwise-instead-of-logical",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: compiler bitwise", l.GREEN)
-    else:
-        l.bullet("Skipped: compiler bitwise", l.PURPLE)
 
     # copy files required
     l.colored("Copying required files...", l.YELLOW)
