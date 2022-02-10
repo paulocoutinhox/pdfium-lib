@@ -586,6 +586,19 @@
                 pageModalImage.src = page.src;
             }
 
+            const prevLink = document.querySelector('.page-prev');
+            const nextLink = document.querySelector('.page-next');
+            if (currentPageIndex === 1) {
+                prevLink.classList.add('disabled')
+            } else {
+                prevLink.classList.remove('disabled')
+            }
+            if (currentPageIndex === pages.length) {
+                nextLink.classList.add('disabled')
+            } else {
+                nextLink.classList.remove('disabled')
+            }
+
             openModal();
         }
 
@@ -852,6 +865,12 @@
             border-radius: 0 3px 3px 0;
             user-select: none;
             -webkit-user-select: none;
+        }
+
+        .page-prev.disabled,
+        .page-next.disabled {
+            cursor: not-allowed;
+            color: unset;
         }
 
         .page-next {
