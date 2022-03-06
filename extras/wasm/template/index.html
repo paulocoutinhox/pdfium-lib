@@ -148,6 +148,111 @@
             }
         }
 
+        class Page {
+            constructor(index, o) {
+                this.index = index;
+                this.src = null;
+                this.o = o;
+            }
+
+            render() {
+                let canvas = document.createElement('canvas');
+                this.o.render(this.index, canvas, 3.0, 90);
+                let dataUri = canvas.toDataURL();
+                this.updateImage(dataUri);
+            }
+
+            createImage() {
+                let image = document.createElement('img');
+                let pageIndex = this.index;
+                image.id = "pageImage" + (pageIndex + 1);
+                image.src = '';
+                image.className = "page-list-item";
+
+                return image;
+            }
+
+            updateImage(dataUri) {
+                this.src = dataUri;
+
+                // update image in pageList
+                let pageIndex = this.index;
+                let image = document.getElementById("pageImage" + (pageIndex + 1));
+                image.src = dataUri;
+                image.onclick = function () {
+                    openModal();
+                    changeCurrentPageItem(pageIndex + 1);
+                };
+
+                const container = image.closest('.column');
+                const loaderWrapper = container.querySelector('.page-loader-wrapper');
+                if (loaderWrapper) {
+                    container.removeChild(loaderWrapper);
+                }
+            }
+
+            get loaded() {
+                return this.src !== null;
+            }
+        }
+
+        class Doc {
+            constructor(pagesCount, o) {
+                this.pages = Array(pagesCount).fill(null)
+                this.o = o;
+
+                this.onCreate();
+            }
+
+            onCreate() {
+                for (let i = 0; i < this.pages.length; i++) {
+                    this.pages[i] = new Page(i, this.o);
+                }
+            }
+
+            getPage(index) {
+                let page = this.pages[index];
+                if (!page) {
+                    page = new Page(index);
+                    this.pages[index] = page;
+                }
+
+                return page;
+            }
+
+            renderPages() {
+                const wasmBuffer = this.o.wasmBuffer;
+                const wasm = this.o.wasm;
+                doc.pages.forEach(async function (page, index) {
+                    if (!page.loaded) {
+                        setTimeout(function () {
+                            page.render();
+                            if (index === doc.pages.length - 1) {
+                                Module._free(wasmBuffer);
+
+                                FPDF.CloseDocument(wasm);
+                                FPDF.DestroyLibrary();
+                            }
+                        });
+                    }
+                })
+            }
+
+            setLoading(pageList) {
+                let images = pageList.querySelectorAll(".column img");
+                let width = images[0].offsetWidth + "px";
+                let height = images[0].offsetHeight + "px";
+                images.forEach((img) => {
+                    if (!img.getAttribute("src")) {
+                        img.style.width = width;
+                        img.style.height = height;
+                    }
+                })
+            }
+        }
+
+        let doc;
+
         async function processPDF(fileByteArray) {
             try {
                 // html general
@@ -181,7 +286,8 @@
                 console.log('Loading document...');
 
                 let o = {
-                    wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, "")
+                    wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
+                    wasmBuffer,
                 };
 
                 o.getPageSize = (i = 0, s = 2) => H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(o.wasm, i, w, h)).map(v => parseInt(v) * s);
@@ -275,34 +381,18 @@
                 if (pages > 0) {
                     console.log('Rendering ' + pages + ' PDF pages...');
 
+                    doc = new Doc(pages, o);
+
                     for (let x = 0; x < pages; x++) {
                         console.log('Rendering page ' + (x + 1) + '...');
 
                         // render to canvas
                         console.log("Rendering to canvas...");
 
-                        let canvas = document.createElement('canvas');
-
-                        o.render(x, canvas, 3.0, 90);
-
-                        let dataUri = canvas.toDataURL();
-
-                        pageRenderData = null;
-                        canvas = null;
-                        ctx = null;
-                        idata = null;
-
                         // add page item
                         console.log("Adding page item...");
 
-                        let image = document.createElement('img');
-                        image.id = "pageImage" + (x + 1);
-                        image.src = dataUri;
-                        image.className = "page-list-item";
-                        image.onclick = function () {
-                            openModal();
-                            changeCurrentPageItem(x + 1);
-                        };
+                        const image = doc.getPage(x).createImage();
 
                         let content = document.createElement('div');
                         content.className = "content";
@@ -316,15 +406,31 @@
                         card.className = "card";
                         card.appendChild(cardContent);
 
+                        let loaderContent = document.createElement('span');
+                        loaderContent.className = "loader";
+
+                        let loader = document.createElement('div');
+                        loader.className = "page-loader-wrapper";
+                        loader.appendChild(loaderContent);
+
                         let column = document.createElement('div');
                         column.className = "column is-half-mobile is-one-third-tablet is-one-third-desktop is-one-third-widescreen is-one-quarter-fullhd";
+                        column.style.position = "relative";
                         column.appendChild(card);
+                        column.appendChild(loader);
 
                         pageList.appendChild(column);
 
                         // show results
                         console.log('Page ' + (x + 1) + ' rendered');
                     }
+
+                    let firstPage = await doc.getPage(0);
+                    firstPage.render();
+
+                    setTimeout(function () {
+                        doc.setLoading(pageList);
+                    })
 
                     pageListTitle.innerHTML = "Number of pages: " + pages;
 
@@ -346,11 +452,6 @@
 
                 // clean memory
                 console.log('Cleaning objects...');
-
-                Module._free(wasmBuffer);
-
-                FPDF.CloseDocument(o.wasm);
-                FPDF.DestroyLibrary();
 
                 // initial state
                 buttonToInitialState();
@@ -548,6 +649,10 @@
             if (typeof modal != "undefined") {
                 modal.className = "modal";
             }
+
+            setTimeout(function () {
+                doc.renderPages();
+            }, 500)
         }
 
         function modalIsOpened() {
@@ -578,6 +683,11 @@
                 currentPageIndex = 1;
             } else {
                 currentPageIndex = index;
+            }
+
+            let currentPage = doc.getPage(currentPageIndex - 1);
+            if (!currentPage.loaded) {
+                currentPage.render();
             }
 
             let page = pages[currentPageIndex - 1];
@@ -886,6 +996,22 @@
         /* page list */
         #pageList .card-content {
             padding: 0;
+        }
+
+        .page-loader-wrapper .loader {
+            -webkit-animation: spinAround .5s infinite linear;
+            animation: spinAround .5s infinite linear;
+            border: 2px solid #dbdbdb;
+            border-radius: 9999px;
+            border-right-color: transparent;
+            border-top-color: transparent;
+            content: "";
+            display: block;
+            height: 2em;
+            width: 2em;
+            position: absolute;
+            left: calc(50% - 1em);
+            top: calc(50% - 1em);
         }
 
         /*  modal */
