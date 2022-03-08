@@ -287,7 +287,7 @@
 
                 let o = {
                     wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
-                    wasmBuffer,
+                    wasmBuffer: wasmBuffer,
                 };
 
                 o.getPageSize = (i = 0, s = 2) => H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(o.wasm, i, w, h)).map(v => parseInt(v) * s);
