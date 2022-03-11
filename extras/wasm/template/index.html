@@ -23,10 +23,10 @@
         let moduleLoaded = false;
         let debugMode = false;
         let autoOpenMode = true;
-
-        // pdfium initialization
+        let doc;
         let FPDF = {};
 
+        // pdfium initialization
         Object.assign(FPDF, {
             ANNOT: 0x01, // Set if annotations are to be rendered.
             LCD_TEXT: 0x02, // Set if using text rendering optimized for LCD display.
@@ -79,6 +79,113 @@
 
         const F = FPDF.Bitmap_BGRA;
         const C = 4;
+
+        // classes
+        class Page {
+            constructor(index, o) {
+                this.index = index;
+                this.src = null;
+                this.o = o;
+            }
+
+            render() {
+                let canvas = document.createElement('canvas');
+                this.o.render(this.index, canvas, 3.0, 90);
+                let dataUri = canvas.toDataURL();
+                this.updateImage(dataUri);
+            }
+
+            createImage() {
+                let image = document.createElement('img');
+                let pageIndex = this.index;
+                image.id = "pageImage" + (pageIndex + 1);
+                image.src = '';
+                image.className = "page-list-item";
+
+                return image;
+            }
+
+            updateImage(dataUri) {
+                this.src = dataUri;
+
+                // update image in pageList
+                let pageIndex = this.index;
+                let image = document.getElementById("pageImage" + (pageIndex + 1));
+                image.src = dataUri;
+                image.onclick = function () {
+                    openModal();
+                    changeCurrentPageItem(pageIndex + 1);
+                };
+
+                const container = image.closest('.column');
+                const loaderWrapper = container.querySelector('.page-loader-wrapper');
+                if (loaderWrapper) {
+                    container.removeChild(loaderWrapper);
+                }
+            }
+
+            get loaded() {
+                return this.src !== null;
+            }
+        }
+
+        class Doc {
+            constructor(pagesCount, o) {
+                this.pages = Array(pagesCount).fill(null)
+                this.o = o;
+
+                this.onCreate();
+            }
+
+            onCreate() {
+                for (let i = 0; i < this.pages.length; i++) {
+                    this.pages[i] = new Page(i, this.o);
+                }
+            }
+
+            getPage(index) {
+                let page = this.pages[index];
+
+                if (!page) {
+                    page = new Page(index);
+                    this.pages[index] = page;
+                }
+
+                return page;
+            }
+
+            renderPages() {
+                const wasmBuffer = this.o.wasmBuffer;
+                const wasm = this.o.wasm;
+
+                doc.pages.forEach(async function (page, index) {
+                    if (!page.loaded) {
+                        setTimeout(function () {
+                            page.render();
+                            if (index === doc.pages.length - 1) {
+                                Module._free(wasmBuffer);
+
+                                FPDF.CloseDocument(wasm);
+                                FPDF.DestroyLibrary();
+                            }
+                        });
+                    }
+                })
+            }
+
+            setLoading(pageList) {
+                let images = pageList.querySelectorAll(".column img");
+                let width = images[0].offsetWidth + "px";
+                let height = images[0].offsetHeight + "px";
+
+                images.forEach((img) => {
+                    if (!img.getAttribute("src")) {
+                        img.style.width = width;
+                        img.style.height = height;
+                    }
+                })
+            }
+        }
 
         // runtime initialized
         Module.onRuntimeInitialized = async _ => {
@@ -147,111 +254,6 @@
                 console.log('Error while load file from URL: ' + error.message);
             }
         }
-
-        class Page {
-            constructor(index, o) {
-                this.index = index;
-                this.src = null;
-                this.o = o;
-            }
-
-            render() {
-                let canvas = document.createElement('canvas');
-                this.o.render(this.index, canvas, 3.0, 90);
-                let dataUri = canvas.toDataURL();
-                this.updateImage(dataUri);
-            }
-
-            createImage() {
-                let image = document.createElement('img');
-                let pageIndex = this.index;
-                image.id = "pageImage" + (pageIndex + 1);
-                image.src = '';
-                image.className = "page-list-item";
-
-                return image;
-            }
-
-            updateImage(dataUri) {
-                this.src = dataUri;
-
-                // update image in pageList
-                let pageIndex = this.index;
-                let image = document.getElementById("pageImage" + (pageIndex + 1));
-                image.src = dataUri;
-                image.onclick = function () {
-                    openModal();
-                    changeCurrentPageItem(pageIndex + 1);
-                };
-
-                const container = image.closest('.column');
-                const loaderWrapper = container.querySelector('.page-loader-wrapper');
-                if (loaderWrapper) {
-                    container.removeChild(loaderWrapper);
-                }
-            }
-
-            get loaded() {
-                return this.src !== null;
-            }
-        }
-
-        class Doc {
-            constructor(pagesCount, o) {
-                this.pages = Array(pagesCount).fill(null)
-                this.o = o;
-
-                this.onCreate();
-            }
-
-            onCreate() {
-                for (let i = 0; i < this.pages.length; i++) {
-                    this.pages[i] = new Page(i, this.o);
-                }
-            }
-
-            getPage(index) {
-                let page = this.pages[index];
-                if (!page) {
-                    page = new Page(index);
-                    this.pages[index] = page;
-                }
-
-                return page;
-            }
-
-            renderPages() {
-                const wasmBuffer = this.o.wasmBuffer;
-                const wasm = this.o.wasm;
-                doc.pages.forEach(async function (page, index) {
-                    if (!page.loaded) {
-                        setTimeout(function () {
-                            page.render();
-                            if (index === doc.pages.length - 1) {
-                                Module._free(wasmBuffer);
-
-                                FPDF.CloseDocument(wasm);
-                                FPDF.DestroyLibrary();
-                            }
-                        });
-                    }
-                })
-            }
-
-            setLoading(pageList) {
-                let images = pageList.querySelectorAll(".column img");
-                let width = images[0].offsetWidth + "px";
-                let height = images[0].offsetHeight + "px";
-                images.forEach((img) => {
-                    if (!img.getAttribute("src")) {
-                        img.style.width = width;
-                        img.style.height = height;
-                    }
-                })
-            }
-        }
-
-        let doc;
 
         async function processPDF(fileByteArray) {
             try {
