@@ -418,6 +418,7 @@ def run_task_build():
             args.append("ios_enable_code_signing=false")
             args.append("use_xcode_clang=true")
             args.append("pdf_is_complete_lib=true")
+            args.append("use_custom_libcxx=false")
 
             if target["target_cpu"] == "arm":
                 args.append("enable_ios_bitcode=true")

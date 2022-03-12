@@ -23,10 +23,10 @@
         let moduleLoaded = false;
         let debugMode = false;
         let autoOpenMode = true;
-
-        // pdfium initialization
+        let doc;
         let FPDF = {};
 
+        // pdfium initialization
         Object.assign(FPDF, {
             ANNOT: 0x01, // Set if annotations are to be rendered.
             LCD_TEXT: 0x02, // Set if using text rendering optimized for LCD display.
@@ -79,6 +79,204 @@
 
         const F = FPDF.Bitmap_BGRA;
         const C = 4;
+
+        // classes
+        class Page {
+            constructor(index, processor) {
+                this.index = index;
+                this.src = null;
+                this.processor = processor;
+            }
+
+            render() {
+                let canvas = document.createElement('canvas');
+                this.processor.render(this.index, canvas, 3.0, 90);
+
+                let dataUri = canvas.toDataURL();
+                this.updateImage(dataUri);
+            }
+
+            createImage() {
+                let image = document.createElement('img');
+                let pageIndex = this.index;
+
+                image.id = "pageImage" + (pageIndex + 1);
+                image.src = '';
+                image.className = "is-invisible page-list-item";
+
+                return image;
+            }
+
+            updateImage(dataUri) {
+                this.src = dataUri;
+
+                // update image in pageList
+                let pageIndex = this.index;
+                let image = document.getElementById("pageImage" + (pageIndex + 1));
+                image.src = dataUri;
+                image.classList.remove("is-invisible");
+                image.onclick = function () {
+                    openModal();
+                    changeCurrentPageItem(pageIndex + 1);
+                };
+
+                const container = image.closest('.column');
+                const loaderWrapper = container.querySelector('.page-loader-wrapper');
+
+                if (loaderWrapper) {
+                    container.removeChild(loaderWrapper);
+                }
+            }
+
+            get loaded() {
+                return this.src !== null;
+            }
+        }
+
+        class Processor {
+            constructor(wasmData) {
+                this.wasmData = wasmData;
+            }
+
+            getPageSize(i = 0, s = 2) {
+                return H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(this.wasmData.wasm, i, w, h)).map(v => parseInt(v) * s);
+            }
+
+            getRender(i = 0, w, h) {
+                const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
+                const heap = Module._malloc(w * h * C);
+
+                for (let i = 0; i < w * h * C; i++) {
+                    Module.HEAPU8[heap + i] = 0;
+                }
+
+                const bmap = FPDF.Bitmap_CreateEx(w, h, F, heap, w * C);
+                const page = FPDF.LoadPage(this.wasmData.wasm, i);
+
+                FPDF.Bitmap_FillRect(bmap, 0, 0, w, h, 0xFFFFFFFF);
+                FPDF.RenderPageBitmap(bmap, page, 0, 0, w, h, 0, flag);
+                FPDF.Bitmap_Destroy(bmap);
+                FPDF.ClosePage(page);
+
+                return heap;
+            }
+
+            getPageRender(n = 0, w, h) {
+                let pageRenderPtr = this.getRender(n, w, h);
+                let pageRenderData = [];
+
+                for (let v = 0; v < w * h * C; v++) {
+                    pageRenderData.push(Module.HEAPU8[pageRenderPtr + v]);
+                }
+
+                Module._free(pageRenderPtr);
+
+                return pageRenderData;
+            }
+
+            render(n = 0, canvas, scale, rotation) {
+                const [w, h] = this.getPageSize(n, scale, rotation);
+                const data = this.getPageRender(n, w, h, rotation);
+
+                canvas.width = w;
+                canvas.height = h;
+
+                const x = canvas.getContext('2d');
+                const i = x.createImageData(w, h);
+                i.data.set(data);
+                x.putImageData(i, 0, 0);
+            }
+
+            getLastError() {
+                let lastError = FPDF.GetLastError();
+
+                switch (lastError) {
+                    case FPDF.LAST_ERROR.SUCCESS:
+                        return "success";
+                        break;
+                    case FPDF.LAST_ERROR.UNKNOWN:
+                        return "unknown error";
+                        break;
+                    case FPDF.LAST_ERROR.FILE:
+                        return "file not found or could not be opened";
+                        break;
+                    case FPDF.LAST_ERROR.FORMAT:
+                        return "file not in PDF format or corrupted";
+                        break;
+                    case FPDF.LAST_ERROR.PASSWORD:
+                        return "password required or incorrect password";
+                        break;
+                    case FPDF.LAST_ERROR.SECURITY:
+                        return "unsupported security scheme";
+                        break;
+                    case FPDF.LAST_ERROR.PAGE:
+                        return "page not found or content error";
+                        break;
+                    default:
+                        return "unknown error";
+                }
+            }
+        }
+
+        class Doc {
+            constructor(wasmData) {
+                this.processor = new Processor(wasmData);
+            }
+
+            setPages(pagesCount) {
+                this.pages = Array(pagesCount).fill(null);
+            }
+
+            createAllPages() {
+                for (let i = 0; i < this.pages.length; i++) {
+                    this.pages[i] = new Page(i, this.processor);
+                }
+            }
+
+            getPage(index) {
+                let page = this.pages[index];
+
+                if (!page) {
+                    page = new Page(index);
+                    this.pages[index] = page;
+                }
+
+                return page;
+            }
+
+            renderPages() {
+                const wasmBuffer = this.processor.wasmData.wasmBuffer;
+                const wasm = this.processor.wasmData.wasm;
+
+                doc.pages.forEach(async function (page, index) {
+                    if (!page.loaded) {
+                        setTimeout(function () {
+                            page.render();
+
+                            if (index === doc.pages.length - 1) {
+                                Module._free(wasmBuffer);
+
+                                FPDF.CloseDocument(wasm);
+                                FPDF.DestroyLibrary();
+                            }
+                        });
+                    }
+                })
+            }
+
+            setLoading(pageList) {
+                let images = pageList.querySelectorAll(".column img");
+                let width = images[0].offsetWidth + "px";
+                let height = images[0].offsetHeight + "px";
+
+                images.forEach((img) => {
+                    if (!img.getAttribute("src")) {
+                        img.style.width = width;
+                        img.style.height = height;
+                    }
+                })
+            }
+        }
 
         // runtime initialized
         Module.onRuntimeInitialized = async _ => {
@@ -148,111 +346,6 @@
             }
         }
 
-        class Page {
-            constructor(index, o) {
-                this.index = index;
-                this.src = null;
-                this.o = o;
-            }
-
-            render() {
-                let canvas = document.createElement('canvas');
-                this.o.render(this.index, canvas, 3.0, 90);
-                let dataUri = canvas.toDataURL();
-                this.updateImage(dataUri);
-            }
-
-            createImage() {
-                let image = document.createElement('img');
-                let pageIndex = this.index;
-                image.id = "pageImage" + (pageIndex + 1);
-                image.src = '';
-                image.className = "page-list-item";
-
-                return image;
-            }
-
-            updateImage(dataUri) {
-                this.src = dataUri;
-
-                // update image in pageList
-                let pageIndex = this.index;
-                let image = document.getElementById("pageImage" + (pageIndex + 1));
-                image.src = dataUri;
-                image.onclick = function () {
-                    openModal();
-                    changeCurrentPageItem(pageIndex + 1);
-                };
-
-                const container = image.closest('.column');
-                const loaderWrapper = container.querySelector('.page-loader-wrapper');
-                if (loaderWrapper) {
-                    container.removeChild(loaderWrapper);
-                }
-            }
-
-            get loaded() {
-                return this.src !== null;
-            }
-        }
-
-        class Doc {
-            constructor(pagesCount, o) {
-                this.pages = Array(pagesCount).fill(null)
-                this.o = o;
-
-                this.onCreate();
-            }
-
-            onCreate() {
-                for (let i = 0; i < this.pages.length; i++) {
-                    this.pages[i] = new Page(i, this.o);
-                }
-            }
-
-            getPage(index) {
-                let page = this.pages[index];
-                if (!page) {
-                    page = new Page(index);
-                    this.pages[index] = page;
-                }
-
-                return page;
-            }
-
-            renderPages() {
-                const wasmBuffer = this.o.wasmBuffer;
-                const wasm = this.o.wasm;
-                doc.pages.forEach(async function (page, index) {
-                    if (!page.loaded) {
-                        setTimeout(function () {
-                            page.render();
-                            if (index === doc.pages.length - 1) {
-                                Module._free(wasmBuffer);
-
-                                FPDF.CloseDocument(wasm);
-                                FPDF.DestroyLibrary();
-                            }
-                        });
-                    }
-                })
-            }
-
-            setLoading(pageList) {
-                let images = pageList.querySelectorAll(".column img");
-                let width = images[0].offsetWidth + "px";
-                let height = images[0].offsetHeight + "px";
-                images.forEach((img) => {
-                    if (!img.getAttribute("src")) {
-                        img.style.width = width;
-                        img.style.height = height;
-                    }
-                })
-            }
-        }
-
-        let doc;
-
         async function processPDF(fileByteArray) {
             try {
                 // html general
@@ -285,103 +378,27 @@
                 // create document
                 console.log('Loading document...');
 
-                let o = {
+                doc = new Doc({
                     wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
                     wasmBuffer: wasmBuffer,
-                };
-
-                o.getPageSize = (i = 0, s = 2) => H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(o.wasm, i, w, h)).map(v => parseInt(v) * s);
-
-                o.getRender = function (i = 0, w, h) {
-                    const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
-                    const heap = Module._malloc(w * h * C);
-
-                    for (let i = 0; i < w * h * C; i++) {
-                        Module.HEAPU8[heap + i] = 0;
-                    }
-
-                    const bmap = FPDF.Bitmap_CreateEx(w, h, F, heap, w * C);
-                    const page = FPDF.LoadPage(this.wasm, i);
-
-                    FPDF.Bitmap_FillRect(bmap, 0, 0, w, h, 0xFFFFFFFF);
-                    FPDF.RenderPageBitmap(bmap, page, 0, 0, w, h, 0, flag);
-                    FPDF.Bitmap_Destroy(bmap);
-                    FPDF.ClosePage(page);
-
-                    return heap;
-                };
-
-                o.getPageRender = function (n = 0, w, h) {
-                    let pageRenderPtr = this.getRender(n, w, h);
-                    let pageRenderData = [];
-
-                    for (let v = 0; v < w * h * C; v++) {
-                        pageRenderData.push(Module.HEAPU8[pageRenderPtr + v]);
-                    }
-
-                    Module._free(pageRenderPtr);
-
-                    return pageRenderData;
-                };
-
-                o.render = function (n = 0, canvas, scale, rotation) {
-                    const [w, h] = this.getPageSize(n, scale, rotation);
-                    const data = this.getPageRender(n, w, h, rotation);
-
-                    canvas.width = w;
-                    canvas.height = h;
-
-                    const x = canvas.getContext('2d');
-                    const i = x.createImageData(w, h);
-                    i.data.set(data);
-                    x.putImageData(i, 0, 0);
-                };
-
-                o.getLastError = function () {
-                    let lastError = FPDF.GetLastError();
-
-                    switch (lastError) {
-                        case FPDF.LAST_ERROR.SUCCESS:
-                            return "success";
-                            break;
-                        case FPDF.LAST_ERROR.UNKNOWN:
-                            return "unknown error";
-                            break;
-                        case FPDF.LAST_ERROR.FILE:
-                            return "file not found or could not be opened";
-                            break;
-                        case FPDF.LAST_ERROR.FORMAT:
-                            return "file not in PDF format or corrupted";
-                            break;
-                        case FPDF.LAST_ERROR.PASSWORD:
-                            return "password required or incorrect password";
-                            break;
-                        case FPDF.LAST_ERROR.SECURITY:
-                            return "unsupported security scheme";
-                            break;
-                        case FPDF.LAST_ERROR.PAGE:
-                            return "page not found or content error";
-                            break;
-                        default:
-                            return "unknown error";
-                    }
-                }
+                });
 
                 // check last error
-                let lastError = o.getLastError();
+                let lastError = doc.processor.getLastError();
                 console.log("Load document state: " + lastError);
 
                 // count page
                 console.log('Couting pages...');
 
-                let pages = FPDF.GetPageCount(o.wasm);
+                let pages = FPDF.GetPageCount(doc.processor.wasmData.wasm);
                 console.log('Pages: ' + pages);
 
                 // list all pages
                 if (pages > 0) {
                     console.log('Rendering ' + pages + ' PDF pages...');
 
-                    doc = new Doc(pages, o);
+                    doc.setPages(pages);
+                    doc.createAllPages();
 
                     for (let x = 0; x < pages; x++) {
                         console.log('Rendering page ' + (x + 1) + '...');
@@ -1175,7 +1192,7 @@
         <div class="content has-text-centered">
             <p>
                 This application is powered by an open source project called PDF Viewer and can be found <a
-                    target="_blank" href="https://github.com/paulo-coutinho/pdfium-lib">here</a>. No data is stored and
+                    target="_blank" href="https://github.com/paulocoutinhox/pdfium-lib">here</a>. No data is stored and
                 everything run only on client side.
             </p>
             <p>

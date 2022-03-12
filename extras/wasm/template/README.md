@@ -21,6 +21,6 @@ Example:
 
 The main project is hosted here:
 
-[https://github.com/paulo-coutinho/pdfium-lib](https://github.com/paulo-coutinho/pdfium-lib)
+[https://github.com/paulocoutinhox/pdfium-lib](https://github.com/paulocoutinhox/pdfium-lib)
 
 The PDF Viewer use PDFium project from Google to parse PDF data and render final image.
