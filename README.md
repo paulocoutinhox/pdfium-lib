@@ -43,7 +43,7 @@ https://pdfium.googlesource.com/
 
 Since this project generate WASM version, i published a demo that you can test PDFium direct on web browser here:
 
-https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf
+https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://raw.githubusercontent.com/mozilla/pdf.js-sample-files/master/tracemonkey.pdf
 
 ## Requirements
 
