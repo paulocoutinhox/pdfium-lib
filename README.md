@@ -119,4 +119,4 @@ This license informations is about this personal project, not the Google PDFium 
 
 [MIT](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2018-2021, Paulo Coutinho
+Copyright (c) 2018-2022, Paulo Coutinho
