@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://github.com/paulo-coutinho/pdfium-lib" target="_blank" rel="noopener noreferrer">
+    <a href="https://github.com/paulocoutinhox/pdfium-lib" target="_blank" rel="noopener noreferrer">
         <img width="120" src="extras/images/logo.png" alt="PDFium Library Logo">
     </a>
 </p>
@@ -7,10 +7,10 @@
 <h1 align="center">PDFium Library</h1>
 
 <p align="center">
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/ios.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/ios.yml/badge.svg" alt="PDFium - iOS"></a>
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/macos.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/macos.yml/badge.svg" alt="PDFium - macOS"></a>
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/android.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/android.yml/badge.svg" alt="PDFium - Android"></a>
-  <a href="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/wasm.yml"><img src="https://github.com/paulo-coutinho/pdfium-lib/actions/workflows/wasm.yml/badge.svg" alt="PDFium - WASM"></a>
+  <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/ios.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/ios.yml/badge.svg" alt="PDFium - iOS"></a>
+  <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/macos.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/macos.yml/badge.svg" alt="PDFium - macOS"></a>
+  <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/android.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/android.yml/badge.svg" alt="PDFium - Android"></a>
+  <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/wasm.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/wasm.yml/badge.svg" alt="PDFium - WASM"></a>
 </p>
 
 <p align="center">
@@ -43,7 +43,7 @@ https://pdfium.googlesource.com/
 
 Since this project generate WASM version, i published a demo that you can test PDFium direct on web browser here:
 
-https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf
+https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://raw.githubusercontent.com/mozilla/pdf.js-sample-files/master/tracemonkey.pdf
 
 ## Requirements
 
@@ -58,7 +58,7 @@ These are the `general` steps that need be executed `before all` others platform
 1. Get the source:
 
 ```
-git clone https://github.com/paulo-coutinho/pdfium-lib.git
+git clone https://github.com/paulocoutinhox/pdfium-lib.git
 cd pdfium-lib
 ```
 
@@ -101,7 +101,7 @@ Check tutorial here: [Build for WASM](docs/BUILD_WASM.md)
 
 Access releases page to download prebuilt binaries:
 
-https://github.com/paulo-coutinho/pdfium-lib/releases
+https://github.com/paulocoutinhox/pdfium-lib/releases
 
 ## How to include files and extend pdfium
 
@@ -119,4 +119,4 @@ This license informations is about this personal project, not the Google PDFium 
 
 [MIT](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2018-2021, Paulo Coutinho
+Copyright (c) 2018-2022, Paulo Coutinho
