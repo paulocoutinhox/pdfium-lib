@@ -1,5 +1,5 @@
 # Build
-/build
+build
 /sample/build
 /sample-wasm/build
 _bad_scm
