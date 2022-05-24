@@ -20,6 +20,27 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "wasm", "pdfium")
 
+    # compiler warning as error
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "compiler.gni",
+    )
+
+    line_content = "treat_warnings_as_errors = true"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "  treat_warnings_as_errors = false"
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: compiler warning as error", l.GREEN)
+    else:
+        l.bullet("Skipped: compiler warning as error", l.PURPLE)
+
     # build config
     source_file = os.path.join(
         source_dir,
