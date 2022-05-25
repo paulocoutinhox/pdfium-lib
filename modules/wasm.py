@@ -20,6 +20,27 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "wasm", "pdfium")
 
+    # compiler warning as error
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "compiler.gni",
+    )
+
+    line_content = "treat_warnings_as_errors = true"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "  treat_warnings_as_errors = false"
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: compiler warning as error", l.GREEN)
+    else:
+        l.bullet("Skipped: compiler warning as error", l.PURPLE)
+
     # build config
     source_file = os.path.join(
         source_dir,
@@ -77,7 +98,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build thin archive", l.PURPLE)
 
-    # m64
+    # cflags - m64
     source_file = os.path.join(
         source_dir,
         "build",
@@ -93,31 +114,11 @@ def run_task_patch():
 
     if line_number:
         f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: m64", l.GREEN)
+        l.bullet("Applied: cflags - m64", l.GREEN)
     else:
-        l.bullet("Skipped: m64", l.PURPLE)
+        l.bullet("Skipped: cflags - m64", l.PURPLE)
 
-    # x64 arch
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = '"-march=$x64_arch",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: x64 arch", l.GREEN)
-    else:
-        l.bullet("Skipped: x64 arch", l.PURPLE)
-
-    # msse3
+    # cflags - msse3
     source_file = os.path.join(
         source_dir,
         "build",
@@ -134,9 +135,9 @@ def run_task_patch():
     if line_number:
         content = '#"-msse3",'
         f.replace_in_file(source_file, line_content, content)
-        l.bullet("Applied: msse3", l.GREEN)
+        l.bullet("Applied: cflags - msse3", l.GREEN)
     else:
-        l.bullet("Skipped: msse3", l.PURPLE)
+        l.bullet("Skipped: cflags - msse3", l.PURPLE)
 
     # pragma optimize
     source_file = os.path.join(
@@ -320,6 +321,26 @@ def run_task_patch():
         l.bullet("Applied: skia pthread", l.GREEN)
     else:
         l.bullet("Skipped: skia pthread", l.PURPLE)
+
+    # no opaque pointer
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "config",
+        "compiler",
+        "BUILD.gn",
+    )
+
+    line_content = '"-no-opaque-pointers",'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.prepend_to_file_line(source_file, line_number, "#")
+        l.bullet("Applied: no opaque pointer", l.GREEN)
+    else:
+        l.bullet("Skipped: no opaque pointer", l.PURPLE)
 
     # copy files required
     l.colored("Copying required files...", l.YELLOW)
