@@ -136,7 +136,7 @@ def run_task_build():
                 ),
                 "--args='{0}'".format(args_str),
             ]
-            r.run_as_shell(" ".join(command))
+            r.run(" ".join(command), shell=True)
 
             # compiling...
             l.colored(
@@ -201,15 +201,15 @@ def run_task_install():
 
         l.colored("Merging libraries (lipo)...", l.YELLOW)
         command = ["lipo", "-create", files_str, "-o", lib_file_out]
-        r.run_as_shell(" ".join(command))
+        r.run(" ".join(command), shell=True)
 
         l.colored("File data...", l.YELLOW)
         command = ["file", lib_file_out]
-        r.run_as_shell(" ".join(command))
+        r.run(" ".join(command), shell=True)
 
         l.colored("File size...", l.YELLOW)
         command = ["ls", "-lh ", lib_file_out]
-        r.run_as_shell(" ".join(command))
+        r.run(" ".join(command), shell=True)
 
         # include
         include_dir = os.path.join("build", "macos", "pdfium", "public")

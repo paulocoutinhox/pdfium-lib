@@ -7,29 +7,29 @@ Make tool
 Usage:
   make.py <task-name>
   make.py [options]
-  make.py -h | --help  
+  make.py -h | --help
 
 Options:
   -h --help                         Show this screen.
   -d --debug                        Enable debug mode.
   --version                         Show version.
-  
+
 Examples:
-  python make.py -h
+  python3 make.py -h
 
 Tasks:
   - format
 
-  - build-depot-tools  
-  - build-emsdk  
-  
+  - build-depot-tools
+  - build-emsdk
+
   - build-pdfium-ios
   - patch-ios
   - build-ios
-  - install-ios  
+  - install-ios
   - test-ios
   - archive-ios
-  
+
   - build-pdfium-macos
   - patch-macos
   - build-macos
@@ -52,7 +52,7 @@ Tasks:
   - generate-wasm
   - publish-wasm
   - publish-to-web-wasm
-  - archive-wasm  
+  - archive-wasm
 """
 
 from docopt import docopt
@@ -77,7 +77,7 @@ def main(options):
     if c.debug:
         l.bold("You have executed with options:", l.YELLOW)
         l.m(str(options))
-        l.m("")
+        l.nl()
 
     # bind options
     if "<task-name>" in options:
@@ -85,7 +85,7 @@ def main(options):
 
     # validate task
     if not task:
-        l.e("Task is invalid. Use 'python make.py -h' for help.")
+        l.e("Task is invalid. Use 'python3 make.py -h' for help.")
 
     # build depot tools
     if task == "format":

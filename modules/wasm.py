@@ -322,26 +322,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: skia pthread", l.PURPLE)
 
-    # no opaque pointer
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = '"-no-opaque-pointers",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: no opaque pointer", l.GREEN)
-    else:
-        l.bullet("Skipped: no opaque pointer", l.PURPLE)
-
     # copy files required
     l.colored("Copying required files...", l.YELLOW)
 
@@ -431,7 +411,7 @@ def run_task_build():
                 ),
                 "--args='{0}'".format(args_str),
             ]
-            r.run_as_shell(" ".join(command))
+            r.run(" ".join(command), shell=True)
 
             # compiling...
             l.colored(
@@ -498,11 +478,11 @@ def run_task_install():
             # check file
             l.colored("File data...", l.YELLOW)
             command = ["file", target_lib_path]
-            r.run_as_shell(" ".join(command))
+            r.run(" ".join(command), shell=True)
 
             l.colored("File size...", l.YELLOW)
             command = ["ls", "-lh ", target_lib_path]
-            r.run_as_shell(" ".join(command))
+            r.run(" ".join(command), shell=True)
 
             # include
             include_dir = os.path.join("build", "wasm", "pdfium", "public")
@@ -587,10 +567,10 @@ def run_task_test():
                 "--embed-file",
                 "assets/web-assembly.pdf",
             ]
-            r.run_as_shell(" ".join(command), cwd=sample_dir)
+            r.run(" ".join(command), cwd=sample_dir, shell=True)
 
             l.colored(
-                "Test on browser with: python -m http.server --directory {0}".format(
+                "Test on browser with: python3 -m http.server --directory {0}".format(
                     http_dir
                 ),
                 l.YELLOW,
@@ -643,7 +623,7 @@ def run_task_generate():
                 "doxygen",
                 doxygen_file,
             ]
-            r.run_as_shell(" ".join(command), cwd=include_dir)
+            r.run(" ".join(command), cwd=include_dir, shell=True)
 
             # copy xml files
             l.colored("Copying xml files...", l.YELLOW)
@@ -668,7 +648,7 @@ def run_task_generate():
                 "npm",
                 "install",
             ]
-            r.run_as_shell(" ".join(command), cwd=gen_utils_dir)
+            r.run(" ".join(command), cwd=gen_utils_dir, shell=True)
 
             # generate
             l.colored("Compiling with emscripten...", l.YELLOW)
@@ -713,7 +693,7 @@ def run_task_generate():
                 "-Wall",
                 "--no-entry",
             ]
-            r.run_as_shell(" ".join(command), cwd=gen_utils_dir)
+            r.run(" ".join(command), cwd=gen_utils_dir, shell=True)
 
             # copy files
             l.colored("Copying compiled files...", l.YELLOW)
@@ -746,7 +726,7 @@ def run_task_generate():
 
             # test
             l.colored(
-                "Test on browser with: python -m http.server --directory {0}".format(
+                "Test on browser with: python3 -m http.server --directory {0}".format(
                     http_dir
                 ),
                 l.YELLOW,
@@ -799,16 +779,16 @@ def run_task_publish_to_web():
 
     # clone gh-pages branch
     command = "git init ."
-    r.run_as_shell(command, cwd=publish_dir)
+    r.run(command, cwd=publish_dir, shell=True)
 
     command = "git add ."
-    r.run_as_shell(command, cwd=publish_dir)
+    r.run(command, cwd=publish_dir, shell=True)
 
     command = 'git commit -m "new version published"'
-    r.run_as_shell(command, cwd=publish_dir)
+    r.run(command, cwd=publish_dir, shell=True)
 
     command = 'git push "git@github.com:pdfviewer/pdfviewer.github.io.git" master:master --force'
-    r.run_as_shell(command, cwd=publish_dir)
+    r.run(command, cwd=publish_dir, shell=True)
 
     # finish
     l.colored("Test on browser: https://pdfviewer.github.io/", l.YELLOW)
