@@ -28,10 +28,10 @@ jobs:
         run: python3 --version
 
       - name: Display PIP version
-        run: pip3 --version
+        run: python3 -m pip --version
 
       - name: Python requirements
-        run: pip3 install -r requirements.txt --user
+        run: python3 -m pip install -r requirements.txt --user
 
       - name: Docker build
         run: docker build -t pdfium-wasm -f docker/wasm/Dockerfile docker/wasm

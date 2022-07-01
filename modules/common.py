@@ -25,7 +25,7 @@ def run_task_build_depot_tools():
         "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
         "depot-tools",
     ]
-    r.run(command, cwd)
+    r.run(command, cwd=cwd)
 
     l.colored("Execute on your terminal:", l.PURPLE)
     l.m("export PATH=$PATH:$PWD/build/depot-tools")
@@ -49,19 +49,19 @@ def run_task_build_emsdk():
         "clone",
         "https://github.com/emscripten-core/emsdk.git",
     ]
-    r.run(command, cwd)
+    r.run(command, cwd=cwd)
 
     cwd = tools_dir
     command = " ".join(["./emsdk", "install", c.emsdk_version])
-    r.run_as_shell(command, cwd)
+    r.run(command, cwd=cwd, shell=True)
 
     cwd = tools_dir
     command = " ".join(["./emsdk", "activate", c.emsdk_version])
-    r.run_as_shell(command, cwd)
+    r.run(command, cwd=cwd, shell=True)
 
     cwd = tools_dir
     command = " ".join(["source", "emsdk_env.sh"])
-    r.run_as_shell(command, cwd)
+    r.run(command, cwd=cwd, shell=True)
 
     l.ok()
 

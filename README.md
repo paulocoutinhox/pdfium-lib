@@ -43,13 +43,15 @@ https://pdfium.googlesource.com/
 
 Since this project generate WASM version, i published a demo that you can test PDFium direct on web browser here:
 
-https://pdfviewer.github.io/?title=Demo%20PDF&url=https://pdf.ist/r/6365.pdf
+https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://raw.githubusercontent.com/mozilla/pdf.js-sample-files/master/tracemonkey.pdf
 
 ## Requirements
 
 1. Ninja Build
 2. Python 3
 3. PIP
+
+Obs: Generally Python 3 already come with PIP installed. Check it with command `python3 -m pip --version`.
 
 ## How to compile
 
@@ -65,13 +67,13 @@ cd pdfium-lib
 2. Install PIP requirements:
 
 ```
-pip install -r requirements.txt
+python3 -m pip install -r requirements.txt
 ```
 
 3. Get Google Depot Tools:
 
 ```
-python make.py build-depot-tools
+python3 make.py build-depot-tools
 export PATH=$PATH:$PWD/build/depot-tools
 ```
 

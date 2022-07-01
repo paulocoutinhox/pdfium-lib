@@ -3,9 +3,9 @@ debug = False
 task = ""
 
 # pdfium
-pdfium_git_branch = "5082"
-pdfium_git_commit = "3da2ecad3a1402295b3cc020765f6790652f32f1"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/5082
+pdfium_git_branch = "5153"
+pdfium_git_commit = "7e2c12e172e644744fc2828e7000b3689537af12"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/5153
 # OBS 1: don't forget change in android docker file (docker/android/Dockerfile)
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 

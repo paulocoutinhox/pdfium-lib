@@ -32,7 +32,7 @@ jobs:
         run: python3 --version
 
       - name: Display PIP version
-        run: pip3 --version
+        run: python3 -m pip --version
 
       - name: Install Ninja and CMake
         id: cmake_and_ninja
@@ -77,7 +77,7 @@ jobs:
           endif()
 
       - name: Python requirements
-        run: pip3 install -r requirements.txt --user
+        run: python3 -m pip install -r requirements.txt --user
 
       - name: Depot tools
         run: python3 make.py build-depot-tools

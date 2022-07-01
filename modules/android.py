@@ -168,7 +168,7 @@ def run_task_build():
                 ),
                 "--args='{0}'".format(args_str),
             ]
-            r.run_as_shell(" ".join(command))
+            r.run(" ".join(command), shell=True)
 
             # compiling...
             l.colored(
