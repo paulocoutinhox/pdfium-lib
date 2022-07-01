@@ -322,26 +322,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: skia pthread", l.PURPLE)
 
-    # no opaque pointer
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = '"-no-opaque-pointers",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: no opaque pointer", l.GREEN)
-    else:
-        l.bullet("Skipped: no opaque pointer", l.PURPLE)
-
     # copy files required
     l.colored("Copying required files...", l.YELLOW)
 
