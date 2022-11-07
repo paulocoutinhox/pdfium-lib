@@ -19,51 +19,51 @@ def run_task_build_pdfium():
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "macos", "pdfium")
+    # source_dir = os.path.join("build", "macos", "pdfium")
 
-    # zlib
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "zlib",
-        "BUILD.gn",
-    )
+    # # zlib
+    # source_file = os.path.join(
+    #     source_dir,
+    #     "third_party",
+    #     "zlib",
+    #     "BUILD.gn",
+    # )
 
-    line_content = "use_arm_neon_optimizations = false"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    # line_content = "use_arm_neon_optimizations = false"
+    # line_number = f.get_file_line_number_with_content(
+    #     source_file, line_content, strip=True
+    # )
 
-    if line_number:
-        content = 'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")'
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: zlib", l.GREEN)
-    else:
-        l.bullet("Skipped: zlib", l.PURPLE)
+    # if line_number:
+    #     content = 'use_arm_neon_optimizations = (current_cpu == "arm" || current_cpu == "arm64")'
+    #     f.set_file_line_content(source_file, line_number, content, new_line=True)
+    #     l.bullet("Applied: zlib", l.GREEN)
+    # else:
+    #     l.bullet("Skipped: zlib", l.PURPLE)
 
-    # zlib - skia
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "skia",
-        "third_party",
-        "zlib",
-        "BUILD.gn",
-    )
+    # # zlib - skia
+    # source_file = os.path.join(
+    #     source_dir,
+    #     "third_party",
+    #     "skia",
+    #     "third_party",
+    #     "zlib",
+    #     "BUILD.gn",
+    # )
 
-    line_content = (
-        '(current_cpu == "arm" || current_cpu == "arm64") && !(is_win && !is_clang)'
-    )
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    # line_content = (
+    #     '(current_cpu == "arm" || current_cpu == "arm64") && !(is_win && !is_clang)'
+    # )
+    # line_number = f.get_file_line_number_with_content(
+    #     source_file, line_content, strip=True
+    # )
 
-    if line_number:
-        content = '(current_cpu == "arm" || current_cpu == "arm64")'
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: skia - zlib", l.GREEN)
-    else:
-        l.bullet("Skipped: skia - zlib", l.PURPLE)
+    # if line_number:
+    #     content = '(current_cpu == "arm" || current_cpu == "arm64")'
+    #     f.set_file_line_content(source_file, line_number, content, new_line=True)
+    #     l.bullet("Applied: skia - zlib", l.GREEN)
+    # else:
+    #     l.bullet("Skipped: skia - zlib", l.PURPLE)
 
     l.ok()
 

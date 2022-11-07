@@ -397,6 +397,7 @@ def run_task_build():
             args.append("use_system_libjpeg=true")
             args.append("use_system_zlib=true")
             args.append("pdf_is_complete_lib=true")
+            args.append("pdf_use_partition_alloc=false")
 
             if config == "release":
                 args.append("symbol_level=0")

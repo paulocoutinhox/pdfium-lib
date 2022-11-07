@@ -1,9 +1,7 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.20)
 project(sample)
 
-#SET(CMAKE_C_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang)
-#SET(CMAKE_CXX_COMPILER ../../build/macos/pdfium/third_party/llvm-build/Release+Asserts/bin/clang++)
-
+# sources
 file(GLOB S_FILES_PROJECT "src/*.cpp")
 file(GLOB H_FILES_PDFIUM "../build/macos/release/include/*.h")
 
@@ -13,20 +11,21 @@ set(
     ${H_FILES_PDFIUM}
 )
 
-find_library(CORE_GRAPHICS_FWK CoreGraphics)
-get_filename_component(FRAMEWORK_DIR ${CORE_GRAPHICS_FWK} PATH)
+# frameworks
+find_library(FWK_CORE_GRAPHICS CoreGraphics)
+find_library(FWK_FOUNDATION Foundation)
+find_library(FWK_SECURITY Security)
 
-set(LIBS pdfium)
-link_directories("../build/macos/release/lib")
+# target
+add_executable(${PROJECT_NAME} ${PROJ_FILES})
 
-add_executable(sample ${PROJ_FILES})
+# links
+target_link_libraries(${PROJECT_NAME} PRIVATE "pdfium")
 
-set_target_properties(sample PROPERTIES
-    LINK_FLAGS "-F ${FRAMEWORK_DIR}"
-)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_FOUNDATION})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_CORE_GRAPHICS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_SECURITY})
 
-target_link_libraries(sample ${LIBS})
-target_link_libraries(sample "-framework CoreGraphics")
-target_link_libraries(sample "-framework Foundation")
-
-target_include_directories(sample PRIVATE "../build/macos/release/include")
+# paths
+target_link_directories(${PROJECT_NAME} PRIVATE "../build/macos/release/lib")
+target_include_directories(${PROJECT_NAME} PRIVATE "../build/macos/release/include")
