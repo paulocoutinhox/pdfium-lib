@@ -80,27 +80,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build gn flags", l.PURPLE)
 
-    # compiler warning as error
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "compiler.gni",
-    )
-
-    line_content = "treat_warnings_as_errors = true"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "  treat_warnings_as_errors = false"
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: compiler warning as error", l.GREEN)
-    else:
-        l.bullet("Skipped: compiler warning as error", l.PURPLE)
-
     l.ok()
 
 
@@ -147,6 +126,7 @@ def run_task_build():
             args.append('target_cpu="{0}"'.format(target["target_cpu"]))
             args.append("use_goma=false")
             args.append("is_debug={0}".format(arg_is_debug))
+            args.append("treat_warnings_as_errors=false")
             args.append("pdf_use_skia=false")
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
@@ -222,18 +202,30 @@ def run_task_install():
                     if os.path.isfile(pathname):
                         f.copy_file(pathname, os.path.join(target_dir, basename))
 
+            # fix include path
+            source_include_path = os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "public",
+            )
+
+            headers = f.find_files(source_include_path, "*.h", True)
+
+            for header in headers:
+                f.replace_in_file(header, '#include "public/', '#include "../')
+
         # include
         include_dir = os.path.join("build", "android", "pdfium", "public")
+        include_cpp_dir = os.path.join("build", "android", "pdfium", "public", "cpp")
         target_include_dir = os.path.join("build", "android", config, "include")
+        target_include_cpp_dir = os.path.join(
+            "build", "android", config, "include", "cpp"
+        )
 
         f.recreate_dir(target_include_dir)
-
-        for basename in os.listdir(include_dir):
-            if basename.endswith(".h"):
-                pathname = os.path.join(include_dir, basename)
-
-                if os.path.isfile(pathname):
-                    f.copy_file(pathname, os.path.join(target_include_dir, basename))
+        f.copy_files(include_dir, target_include_dir, "*.h")
+        f.copy_files(include_cpp_dir, target_include_cpp_dir, "*.h")
 
     l.ok()
 

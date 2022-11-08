@@ -23,9 +23,24 @@ targets_macos = [
 # ios
 configurations_ios = ["release"]
 targets_ios = [
-    {"target_os": "ios", "target_cpu": "arm", "pdfium_os": "ios"},
-    {"target_os": "ios", "target_cpu": "arm64", "pdfium_os": "ios"},
-    {"target_os": "ios", "target_cpu": "x64", "pdfium_os": "ios"},
+    {
+        "target_os": "ios",
+        "target_cpu": "arm64",
+        "pdfium_os": "ios",
+        "target_environment": "device",
+    },
+    {
+        "target_os": "ios",
+        "target_cpu": "x64",
+        "pdfium_os": "ios",
+        "target_environment": "simulator",
+    },
+    {
+        "target_os": "ios",
+        "target_cpu": "arm64",
+        "pdfium_os": "ios",
+        "target_environment": "simulator",
+    },
 ]
 
 # android

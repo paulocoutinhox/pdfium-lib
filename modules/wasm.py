@@ -221,25 +221,25 @@ def run_task_patch():
         l.bullet("Skipped: gcc toolchain - 2", l.PURPLE)
 
     # partition allocator
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "base",
-        "allocator",
-        "partition_allocator",
-        "spin_lock.cc",
-    )
+    # source_file = os.path.join(
+    #     source_dir,
+    #     "third_party",
+    #     "base",
+    #     "allocator",
+    #     "partition_allocator",
+    #     "spin_lock.cc",
+    # )
 
-    line_content = '#warning "Processor yield not supported on this architecture."'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    # line_content = '#warning "Processor yield not supported on this architecture."'
+    # line_number = f.get_file_line_number_with_content(
+    #     source_file, line_content, strip=True
+    # )
 
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "//")
-        l.bullet("Applied: partition allocator", l.GREEN)
-    else:
-        l.bullet("Skipped: partition allocator", l.PURPLE)
+    # if line_number:
+    #     f.prepend_to_file_line(source_file, line_number, "//")
+    #     l.bullet("Applied: partition allocator", l.GREEN)
+    # else:
+    #     l.bullet("Skipped: partition allocator", l.PURPLE)
 
     # compiler stack protector
     source_file = os.path.join(
@@ -384,6 +384,7 @@ def run_task_build():
             args.append('target_cpu="{0}"'.format(target["target_cpu"]))
             args.append("use_goma=false")
             args.append("is_debug={0}".format(arg_is_debug))
+            args.append("treat_warnings_as_errors=false")
             args.append("pdf_use_skia=false")
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
@@ -476,6 +477,19 @@ def run_task_install():
 
             f.copy_file(source_lib_path, target_lib_path)
 
+            # fix include path
+            source_include_path = os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "public",
+            )
+
+            headers = f.find_files(source_include_path, "*.h", True)
+
+            for header in headers:
+                f.replace_in_file(header, '#include "public/', '#include "../')
+
             # check file
             l.colored("File data...", l.YELLOW)
             command = ["file", target_lib_path]
@@ -487,20 +501,15 @@ def run_task_install():
 
             # include
             include_dir = os.path.join("build", "wasm", "pdfium", "public")
-            target_include_dir = os.path.join(
-                "build", target["target_os"], target["target_cpu"], config, "include"
+            include_cpp_dir = os.path.join("build", "wasm", "pdfium", "public", "cpp")
+            target_include_dir = os.path.join("build", "wasm", config, "include")
+            target_include_cpp_dir = os.path.join(
+                "build", "wasm", config, "include", "cpp"
             )
 
             f.recreate_dir(target_include_dir)
-
-            for basename in os.listdir(include_dir):
-                if basename.endswith(".h"):
-                    pathname = os.path.join(include_dir, basename)
-
-                    if os.path.isfile(pathname):
-                        f.copy_file(
-                            pathname, os.path.join(target_include_dir, basename)
-                        )
+            f.copy_files(include_dir, target_include_dir, "*.h")
+            f.copy_files(include_cpp_dir, target_include_cpp_dir, "*.h")
 
     l.ok()
 
