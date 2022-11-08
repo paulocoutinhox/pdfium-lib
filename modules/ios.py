@@ -21,114 +21,19 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "ios", "pdfium")
 
-    # build gn - tests 1
-    source_file = os.path.join(
-        source_dir,
-        "BUILD.gn",
-    )
+    # rules - test
+    source_file = os.path.join(source_dir, "build", "config", "ios", "rules.gni")
 
-    line_content = 'test("pdfium_unittests") {'
+    line_content = 'data_deps += [ "//testing/iossim" ]'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
     if line_number:
-        line_numbers = f.get_file_line_numbers_with_enclosing_tags(
-            source_file, "{", "}", start_from=line_number
-        )
-
-        if line_numbers:
-            f.prepend_to_file_line_range(
-                source_file, line_numbers[0], line_numbers[1], "#"
-            )
-
-            l.bullet("Applied: build gn - tests 1", l.GREEN)
-        else:
-            l.bullet("Error: build gn - tests 1", l.RED)
+        f.replace_in_file(source_file, 'data_deps += [ "//testing/iossim" ]', "")
+        l.bullet("Applied: rules - test", l.GREEN)
     else:
-        l.bullet("Skipped: build gn - tests 1", l.PURPLE)
-
-    # build gn - tests 2
-    source_file = os.path.join(
-        source_dir,
-        "BUILD.gn",
-    )
-
-    line_content = 'test("pdfium_embeddertests") {'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        line_numbers = f.get_file_line_numbers_with_enclosing_tags(
-            source_file, "{", "}", start_from=line_number
-        )
-
-        if line_numbers:
-            f.prepend_to_file_line_range(
-                source_file, line_numbers[0], line_numbers[1], "#"
-            )
-
-            l.bullet("Applied: build gn - tests 2", l.GREEN)
-        else:
-            l.bullet("Error: build gn - tests 2", l.RED)
-    else:
-        l.bullet("Skipped: build gn - tests 2", l.PURPLE)
-
-    # pdfium - embeddertests
-    source_file = os.path.join(
-        source_dir,
-        "BUILD.gn",
-    )
-
-    line_content = '":pdfium_embeddertests",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: pdfium - embeddertests", l.GREEN)
-    else:
-        l.bullet("Skipped: pdfium - embeddertests", l.PURPLE)
-
-    # pdfium - unittests
-    source_file = os.path.join(
-        source_dir,
-        "BUILD.gn",
-    )
-
-    line_content = '":pdfium_unittests",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: pdfium - unittests", l.GREEN)
-    else:
-        l.bullet("Skipped: pdfium - unittests", l.PURPLE)
-
-    # compiler warning as error
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "compiler.gni",
-    )
-
-    line_content = "treat_warnings_as_errors = true"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "  treat_warnings_as_errors = false"
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: compiler warning as error", l.GREEN)
-    else:
-        l.bullet("Skipped: compiler warning as error", l.PURPLE)
+        l.bullet("Skipped: rules - test", l.PURPLE)
 
     # libjpeg
     source_file = os.path.join(
@@ -151,6 +56,21 @@ def run_task_patch():
     else:
         l.bullet("Skipped: libjpeg", l.PURPLE)
 
+    # core fxge
+    source_file = os.path.join(source_dir, "core", "fxge", "BUILD.gn")
+
+    line_content = "if (is_mac) {"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        content = "  if (is_mac || is_ios) {"
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+        l.bullet("Applied: core fxge", l.GREEN)
+    else:
+        l.bullet("Skipped: core fxge", l.PURPLE)
+
     # ios automatically manage certs
     source_file = os.path.join(
         source_dir,
@@ -172,195 +92,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: ios automatically manage certs", l.PURPLE)
 
-    # carbon
-    source_file = os.path.join(
-        source_dir,
-        "core",
-        "fxge",
-        "apple",
-        "fx_quartz_device.h",
-    )
-
-    line_content = "#include <Carbon/Carbon.h>"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "#include <CoreGraphics/CoreGraphics.h>\n#include <CoreFoundation/CFString.h>"
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: carbon", l.GREEN)
-    else:
-        l.bullet("Skipped: carbon", l.PURPLE)
-
-    # carbon - font
-    source_file = os.path.join(
-        source_dir,
-        "core",
-        "fpdfapi",
-        "font",
-        "cpdf_type1font.cpp",
-    )
-
-    line_content = "#include <Carbon/Carbon.h>"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "#include <CoreGraphics/CoreGraphics.h>"
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: carbon - font", l.GREEN)
-    else:
-        l.bullet("Skipped: carbon - font", l.PURPLE)
-
-    # ios simulator
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "ios",
-        "rules.gni",
-    )
-
-    line_content = 'data_deps += [ "//testing/iossim" ]'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: ios simulator", l.GREEN)
-    else:
-        l.bullet("Skipped: ios simulator", l.PURPLE)
-
-    # 32bits constexpr - 1
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "base",
-        "allocator",
-        "partition_allocator",
-        "address_space_randomization.h",
-    )
-
-    line_content = "constexpr ALWAYS_INLINE uintptr_t ASLRMask() {"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLRMask() {"
-        f.replace_in_file(source_file, line_content, content)
-        l.bullet("Applied: 32bits constexpr - 1", l.GREEN)
-    else:
-        l.bullet("Skipped: 32bits constexpr - 1", l.PURPLE)
-
-    # 32bits constexpr - 2
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "base",
-        "allocator",
-        "partition_allocator",
-        "address_space_randomization.h",
-    )
-
-    line_content = "constexpr ALWAYS_INLINE uintptr_t ASLROffset() {"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "PAGE_ALLOCATOR_CONSTANTS_DECLARE_CONSTEXPR ALWAYS_INLINE uintptr_t ASLROffset() {"
-        f.replace_in_file(source_file, line_content, content)
-        l.bullet("Applied: 32bits constexpr - 2", l.GREEN)
-    else:
-        l.bullet("Skipped: 32bits constexpr - 2", l.PURPLE)
-
-    # arm neon
-    source_file = os.path.join(
-        source_dir,
-        "build_overrides",
-        "build.gni",
-    )
-
-    line_content = 'if (current_cpu == "arm") {'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = 'if (current_cpu == "arm64") {'
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: arm neon", l.GREEN)
-    else:
-        l.bullet("Skipped: arm neon", l.PURPLE)
-
-    # core fxge
-    source_file = os.path.join(source_dir, "core", "fxge", "BUILD.gn")
-
-    line_content = "if (is_mac) {"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "  if (is_mac || is_ios) {"
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: core fxge", l.GREEN)
-    else:
-        l.bullet("Skipped: core fxge", l.PURPLE)
-
-    # mllvm - 1
-    source_file = os.path.join(source_dir, "build", "config", "compiler", "BUILD.gn")
-
-    line_content = '"-mllvm",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line_range(source_file, line_number, line_number + 1, "#")
-        l.bullet("Applied: mllvm - 1", l.GREEN)
-    else:
-        l.bullet("Skipped: mllvm - 1", l.PURPLE)
-
-    # mllvm - 2
-    source_file = os.path.join(source_dir, "build", "config", "compiler", "BUILD.gn")
-
-    line_content = 'ldflags += [ "-Wl,-mllvm,-instcombine-lower-dbg-declare=0" ]'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: mllvm - 2", l.GREEN)
-    else:
-        l.bullet("Skipped: mllvm - 2", l.PURPLE)
-
-    # clang 12
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = 'cflags += [ "-ffile-compilation-dir=." ]'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = '      cflags += ["-Xclang","-fdebug-compilation-dir","-Xclang","."]'
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: clang 12", l.GREEN)
-    else:
-        l.bullet("Skipped: clang 12", l.PURPLE)
-
     l.ok()
 
 
@@ -379,7 +110,12 @@ def run_task_build():
                 target["target_os"],
                 "pdfium",
                 "out",
-                "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
+                "{0}-{1}-{2}-{3}".format(
+                    target["target_os"],
+                    target["target_cpu"],
+                    target["target_environment"],
+                    config,
+                ),
             )
 
             f.recreate_dir(main_dir)
@@ -405,8 +141,10 @@ def run_task_build():
             args = []
             args.append('target_os="{0}"'.format(target["pdfium_os"]))
             args.append('target_cpu="{0}"'.format(target["target_cpu"]))
+            args.append('target_environment="{0}"'.format(target["target_environment"]))
             args.append("use_goma=false")
             args.append("is_debug={0}".format(arg_is_debug))
+            args.append("treat_warnings_as_errors=false")
             args.append("pdf_use_skia=false")
             args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
@@ -414,16 +152,13 @@ def run_task_build():
             args.append("is_component_build=false")
             args.append("clang_use_chrome_plugins=false")
             args.append("pdf_is_standalone=false")
-            args.append('ios_deployment_target="9.0"')
+            args.append('ios_deployment_target="11.0"')
             args.append("ios_enable_code_signing=false")
             args.append("use_xcode_clang=true")
             args.append("pdf_is_complete_lib=true")
             args.append("use_custom_libcxx=false")
 
-            if target["target_cpu"] == "arm":
-                args.append("enable_ios_bitcode=true")
-                args.append("arm_use_neon=false")
-            elif target["target_cpu"] == "arm64":
+            if target["target_cpu"] == "arm64":
                 args.append("enable_ios_bitcode=true")
 
             if config == "release":
@@ -434,8 +169,11 @@ def run_task_build():
             command = [
                 "gn",
                 "gen",
-                "out/{0}-{1}-{2}".format(
-                    target["target_os"], target["target_cpu"], config
+                "out/{0}-{1}-{2}-{3}".format(
+                    target["target_os"],
+                    target["target_cpu"],
+                    target["target_environment"],
+                    config,
                 ),
                 "--args='{0}'".format(args_str),
             ]
@@ -452,8 +190,11 @@ def run_task_build():
             command = [
                 "ninja",
                 "-C",
-                "out/{0}-{1}-{2}".format(
-                    target["target_os"], target["target_cpu"], config
+                "out/{0}-{1}-{2}-{3}".format(
+                    target["target_os"],
+                    target["target_cpu"],
+                    target["target_environment"],
+                    config,
                 ),
                 "pdfium",
                 "-v",
@@ -481,7 +222,12 @@ def run_task_install():
                 target["target_os"],
                 "pdfium",
                 "out",
-                "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
+                "{0}-{1}-{2}-{3}".format(
+                    target["target_os"],
+                    target["target_cpu"],
+                    target["target_environment"],
+                    config,
+                ),
                 "obj",
                 "libpdfium.a",
             )
@@ -491,41 +237,77 @@ def run_task_install():
                 target["target_os"],
                 config,
                 "lib",
-                "libpdfium_{0}.a".format(target["target_cpu"]),
+                "libpdfium_{0}-{1}.a".format(
+                    target["target_cpu"], target["target_environment"]
+                ),
             )
 
             f.copy_file(source_lib_path, target_lib_path)
 
+            # fix include path
+            source_include_path = os.path.join(
+                "build",
+                target["target_os"],
+                "pdfium",
+                "public",
+            )
+
+            headers = f.find_files(source_include_path, "*.h", True)
+
+            for header in headers:
+                f.replace_in_file(header, '#include "public/', '#include "../')
+
         # universal
-        folder = os.path.join("build", "ios", config, "lib", "*.a")
-        files = glob.glob(folder)
-        files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "ios", config, "lib", "libpdfium.a")
+        universal_libs = []
+        for env in ["simulator", "device"]:
+            folder = os.path.join("build", "ios", config, "lib", "*-{0}.a".format(env))
+            files = glob.glob(folder)
+            files_str = " ".join(files)
+            f.create_dir(os.path.join("build", "ios", config, "lib", env))
+            lib_file_out = os.path.join(
+                "build", "ios", config, "lib", env, "libpdfium.a"
+            )
 
-        l.colored("Merging libraries (lipo)...", l.YELLOW)
-        command = ["lipo", "-create", files_str, "-o", lib_file_out]
-        r.run(" ".join(command), shell=True)
+            l.colored("Merging {0} libraries (lipo)...".format(env), l.YELLOW)
+            command = ["lipo", "-create", files_str, "-o", lib_file_out]
+            r.run(" ".join(command), shell=True)
 
-        l.colored("File data...", l.YELLOW)
-        command = ["file", lib_file_out]
-        r.run(" ".join(command), shell=True)
+            universal_libs.append(lib_file_out)
 
-        l.colored("File size...", l.YELLOW)
-        command = ["ls", "-lh ", lib_file_out]
-        r.run(" ".join(command), shell=True)
+            l.colored("File data...", l.YELLOW)
+            command = ["file", lib_file_out]
+            r.run(" ".join(command), shell=True)
 
-        # include
+            l.colored("File size...", l.YELLOW)
+            command = ["ls", "-lh ", lib_file_out]
+            r.run(" ".join(command), shell=True)
+
+        # headers
+        l.colored("Copying header files...", l.YELLOW)
+
         include_dir = os.path.join("build", "ios", "pdfium", "public")
+        include_cpp_dir = os.path.join(include_dir, "cpp")
         target_include_dir = os.path.join("build", "ios", config, "include")
+        target_include_cpp_dir = os.path.join(target_include_dir, "cpp")
 
         f.recreate_dir(target_include_dir)
+        f.copy_files(include_dir, target_include_dir, "*.h")
+        f.copy_files(include_cpp_dir, target_include_cpp_dir, "*.h")
 
-        for basename in os.listdir(include_dir):
-            if basename.endswith(".h"):
-                pathname = os.path.join(include_dir, basename)
+        # xcframework
+        xcframework_out = os.path.join("build", "ios", config, "pdfium.xcframework")
+        command = ["xcodebuild", "-create-xcframework"]
 
-                if os.path.isfile(pathname):
-                    f.copy_file(pathname, os.path.join(target_include_dir, basename))
+        for lib in universal_libs:
+            command.append("-library")
+            command.append(lib)
+            command.append("-headers")
+            command.append(target_include_dir)
+
+        command.append("-output")
+        command.append(xcframework_out)
+
+        r.run(" ".join(command), shell=True)
 
     l.ok()
 
@@ -535,9 +317,13 @@ def run_task_test():
     l.colored("Testing...", l.YELLOW)
 
     for config in c.configurations_ios:
-        lib_dir = os.path.join("build", "ios", config, "lib")
+        for env in ["simulator", "device"]:
+            lib_dir = os.path.join("build", "ios", config, "lib", env)
+            command = ["file", os.path.join(lib_dir, "libpdfium.a")]
+            r.run(command)
 
-        command = ["file", os.path.join(lib_dir, "libpdfium.a")]
+        framework_dir = os.path.join("build", "ios", config, "pdfium.xcframework")
+        command = ["ls", "-lah", framework_dir]
         r.run(command)
 
     l.ok()
@@ -557,9 +343,6 @@ def run_task_archive():
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-            filter=lambda x: (
-                None if "_" in x.name and not x.name.endswith(".h") else x
-            ),
         )
 
     tar.close()

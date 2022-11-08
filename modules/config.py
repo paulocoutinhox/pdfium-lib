@@ -3,9 +3,9 @@ debug = False
 task = ""
 
 # pdfium
-pdfium_git_branch = "5153"
-pdfium_git_commit = "7e2c12e172e644744fc2828e7000b3689537af12"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/5153
+pdfium_git_branch = "5407"
+pdfium_git_commit = "7b8416e7991c5919002f6b9be06b64a180e745f9"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/5407
 # OBS 1: don't forget change in android docker file (docker/android/Dockerfile)
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
@@ -23,9 +23,24 @@ targets_macos = [
 # ios
 configurations_ios = ["release"]
 targets_ios = [
-    {"target_os": "ios", "target_cpu": "arm", "pdfium_os": "ios"},
-    {"target_os": "ios", "target_cpu": "arm64", "pdfium_os": "ios"},
-    {"target_os": "ios", "target_cpu": "x64", "pdfium_os": "ios"},
+    {
+        "target_os": "ios",
+        "target_cpu": "arm64",
+        "pdfium_os": "ios",
+        "target_environment": "device",
+    },
+    {
+        "target_os": "ios",
+        "target_cpu": "x64",
+        "pdfium_os": "ios",
+        "target_environment": "simulator",
+    },
+    {
+        "target_os": "ios",
+        "target_cpu": "arm64",
+        "pdfium_os": "ios",
+        "target_environment": "simulator",
+    },
 ]
 
 # android
@@ -60,5 +75,5 @@ targets_android = [
 # wasm
 configurations_wasm = ["release"]
 targets_wasm = [
-    {"target_os": "wasm", "target_cpu": "x64", "pdfium_os": "linux"},
+    {"target_os": "wasm", "target_cpu": "wasm", "pdfium_os": "wasm"},
 ]
