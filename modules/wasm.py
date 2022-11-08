@@ -18,7 +18,7 @@ def run_task_build_pdfium():
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "wasm", "pdfium")
+    source_dir = os.path.join("build", "wasm32", "pdfium")
 
     # build target
     source_file = os.path.join(
@@ -450,7 +450,7 @@ def run_task_install():
             # headers
             l.colored("Copying header files...", l.YELLOW)
 
-            include_dir = os.path.join("build", "wasm", "pdfium", "public")
+            include_dir = os.path.join("build", "wasm32", "pdfium", "public")
             include_cpp_dir = os.path.join(include_dir, "cpp")
             target_include_dir = os.path.join(
                 "build", target["target_os"], target["target_cpu"], config, "include"
