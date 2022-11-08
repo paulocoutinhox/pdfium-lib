@@ -524,7 +524,6 @@ def run_task_test():
                 "ASSERTIONS=1",
                 "-s",
                 "ALLOW_MEMORY_GROWTH=1",
-                "-sMODULARIZE",
                 "--embed-file",
                 "assets/web-assembly.pdf",
             ]
@@ -621,16 +620,16 @@ def run_task_generate():
 
             f.recreate_dir(gen_out_dir)
 
-            html_file = os.path.join(
+            output_file = os.path.join(
                 gen_out_dir,
-                "pdfium.html",
+                "pdfium.js",
             )
 
             command = [
                 "em++",
                 "{0}".format("-g" if config == "debug" else "-O3"),
                 "-o",
-                html_file,
+                output_file,
                 "-s",
                 'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
                 "-s",
@@ -651,6 +650,7 @@ def run_task_generate():
                 "-s",
                 "ALLOW_MEMORY_GROWTH=1",
                 "-sMODULARIZE",
+                "-sEXPORT_NAME=PDFiumModule",
                 "-std=c++11",
                 "-Wall",
                 "--no-entry",
