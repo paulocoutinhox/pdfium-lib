@@ -215,13 +215,13 @@ def run_task_install():
             for header in headers:
                 f.replace_in_file(header, '#include "public/', '#include "../')
 
-        # include
+        # headers
+        l.colored("Copying header files...", l.YELLOW)
+
         include_dir = os.path.join("build", "android", "pdfium", "public")
-        include_cpp_dir = os.path.join("build", "android", "pdfium", "public", "cpp")
+        include_cpp_dir = os.path.join(include_dir, "cpp")
         target_include_dir = os.path.join("build", "android", config, "include")
-        target_include_cpp_dir = os.path.join(
-            "build", "android", config, "include", "cpp"
-        )
+        target_include_cpp_dir = os.path.join(target_include_dir, "cpp")
 
         f.recreate_dir(target_include_dir)
         f.copy_files(include_dir, target_include_dir, "*.h")

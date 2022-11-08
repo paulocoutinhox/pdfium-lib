@@ -181,13 +181,13 @@ def run_task_install():
         command = ["ls", "-lh ", lib_file_out]
         r.run(" ".join(command), shell=True)
 
-        # include
+        # headers
+        l.colored("Copying header files...", l.YELLOW)
+
         include_dir = os.path.join("build", "macos", "pdfium", "public")
-        include_cpp_dir = os.path.join("build", "macos", "pdfium", "public", "cpp")
+        include_cpp_dir = os.path.join(include_dir, "cpp")
         target_include_dir = os.path.join("build", "macos", config, "include")
-        target_include_cpp_dir = os.path.join(
-            "build", "macos", config, "include", "cpp"
-        )
+        target_include_cpp_dir = os.path.join(target_include_dir, "cpp")
 
         f.recreate_dir(target_include_dir)
         f.copy_files(include_dir, target_include_dir, "*.h")
