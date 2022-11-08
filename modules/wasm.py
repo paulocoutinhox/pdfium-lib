@@ -11,14 +11,14 @@ import modules.pdfium as p
 
 # -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    p.get_pdfium_by_target("wasm")
+    p.get_pdfium_by_target("wasm32")
 
 
 # -----------------------------------------------------------------------------
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "wasm", "pdfium")
+    source_dir = os.path.join("build", "wasm32", "pdfium")
 
     # build target
     source_file = os.path.join(
@@ -450,7 +450,7 @@ def run_task_install():
             # headers
             l.colored("Copying header files...", l.YELLOW)
 
-            include_dir = os.path.join("build", "wasm", "pdfium", "public")
+            include_dir = os.path.join("build", "wasm32", "pdfium", "public")
             include_cpp_dir = os.path.join(include_dir, "cpp")
             target_include_dir = os.path.join(
                 "build", target["target_os"], target["target_cpu"], config, "include"
@@ -620,16 +620,16 @@ def run_task_generate():
 
             f.recreate_dir(gen_out_dir)
 
-            html_file = os.path.join(
+            output_file = os.path.join(
                 gen_out_dir,
-                "pdfium.html",
+                "pdfium.js",
             )
 
             command = [
                 "em++",
                 "{0}".format("-g" if config == "debug" else "-O3"),
                 "-o",
-                html_file,
+                output_file,
                 "-s",
                 'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
                 "-s",
@@ -649,6 +649,8 @@ def run_task_generate():
                 "ASSERTIONS=1",
                 "-s",
                 "ALLOW_MEMORY_GROWTH=1",
+                "-sMODULARIZE",
+                "-sEXPORT_NAME=PDFiumModule",
                 "-std=c++11",
                 "-Wall",
                 "--no-entry",
@@ -700,8 +702,8 @@ def run_task_publish():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = f.current_dir()
-    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -723,8 +725,8 @@ def run_task_publish_to_web():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = os.getcwd()
-    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files

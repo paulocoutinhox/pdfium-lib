@@ -157,6 +157,7 @@ def run_task_build():
             args.append("use_xcode_clang=true")
             args.append("pdf_is_complete_lib=true")
             args.append("use_custom_libcxx=false")
+            args.append("pdf_use_partition_alloc=false")
 
             if target["target_cpu"] == "arm64":
                 args.append("enable_ios_bitcode=true")

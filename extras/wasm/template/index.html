@@ -25,6 +25,7 @@
         let autoOpenMode = true;
         let doc;
         let FPDF = {};
+        let Module = null;
 
         // pdfium initialization
         Object.assign(FPDF, {
@@ -279,7 +280,9 @@
         }
 
         // runtime initialized
-        Module.onRuntimeInitialized = async _ => {
+        PDFiumModule().then(function (pdfiumModule) {
+            Module = pdfiumModule;
+
             moduleLoaded = true;
 
             if (pageLoaded) {
@@ -287,7 +290,7 @@
             }
 
             checkIfEverythingWasLoaded();
-        };
+        });
 
         // functions
         async function loadFile() {
