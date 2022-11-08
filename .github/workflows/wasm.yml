@@ -54,8 +54,8 @@ jobs:
       - name: Install
         run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py install-${{ matrix.config.target }}
 
-      # - name: Test
-      #   run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py test-${{ matrix.config.target }}
+      - name: Test
+        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py test-${{ matrix.config.target }}
 
       - name: Generate
         run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py generate-${{ matrix.config.target }}
