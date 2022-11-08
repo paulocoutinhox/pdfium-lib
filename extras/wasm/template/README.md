@@ -15,7 +15,7 @@ You can use some URL parameters to automatically open your PDF file and/or chang
 
 Example:
 
-[https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf&debug=1&open=1](https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://file-examples-com.github.io/uploads/2017/10/file-example_PDF_1MB.pdf&debug=1&open=1)
+[https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://raw.githubusercontent.com/mozilla/pdf.js-sample-files/master/tracemonkey.pdf](https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://raw.githubusercontent.com/mozilla/pdf.js-sample-files/master/tracemonkey.pdf)
 
 ### Project
 
