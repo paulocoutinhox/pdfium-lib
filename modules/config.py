@@ -75,5 +75,5 @@ targets_android = [
 # wasm
 configurations_wasm = ["release"]
 targets_wasm = [
-    {"target_os": "wasm", "target_cpu": "wasm", "pdfium_os": "wasm"},
+    {"target_os": "wasm32", "target_cpu": "wasm", "pdfium_os": "wasm"},
 ]

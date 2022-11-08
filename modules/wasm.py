@@ -524,6 +524,7 @@ def run_task_test():
                 "ASSERTIONS=1",
                 "-s",
                 "ALLOW_MEMORY_GROWTH=1",
+                "-sMODULARIZE",
                 "--embed-file",
                 "assets/web-assembly.pdf",
             ]
@@ -649,6 +650,7 @@ def run_task_generate():
                 "ASSERTIONS=1",
                 "-s",
                 "ALLOW_MEMORY_GROWTH=1",
+                "-sMODULARIZE",
                 "-std=c++11",
                 "-Wall",
                 "--no-entry",
@@ -700,8 +702,8 @@ def run_task_publish():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = f.current_dir()
-    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -723,8 +725,8 @@ def run_task_publish_to_web():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = os.getcwd()
-    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
