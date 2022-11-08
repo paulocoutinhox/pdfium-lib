@@ -1,6 +1,11 @@
 name: iOS
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'extras/images/**'
 
 env:
   CMAKE_VERSION: "3.24.0"

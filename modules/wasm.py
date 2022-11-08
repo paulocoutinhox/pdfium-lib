@@ -11,7 +11,7 @@ import modules.pdfium as p
 
 # -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    p.get_pdfium_by_target("wasm")
+    p.get_pdfium_by_target("wasm32")
 
 
 # -----------------------------------------------------------------------------
