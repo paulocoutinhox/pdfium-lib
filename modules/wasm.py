@@ -20,49 +20,7 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "wasm", "pdfium")
 
-    # compiler warning as error
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "compiler.gni",
-    )
-
-    line_content = "treat_warnings_as_errors = true"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "  treat_warnings_as_errors = false"
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: compiler warning as error", l.GREEN)
-    else:
-        l.bullet("Skipped: compiler warning as error", l.PURPLE)
-
-    # build config
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "build_config.h",
-    )
-
-    line_content = (
-        "#error Please add support for your architecture in build/build_config.h"
-    )
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = "#define ARCH_CPU_X86_FAMILY 1\n#define ARCH_CPU_32_BITS 1\n#define ARCH_CPU_LITTLE_ENDIAN 1"
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: build config", l.GREEN)
-    else:
-        l.bullet("Skipped: build config", l.PURPLE)
-
-    # compiler thin archive
+    # build target
     source_file = os.path.join(
         source_dir,
         "build",
@@ -70,35 +28,51 @@ def run_task_patch():
         "BUILDCONFIG.gn",
     )
 
-    line_content = '"//build/config/compiler:thin_archive",'
+    line_content = '_default_toolchain = "//build/toolchain/wasm:emscripten"'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: compiler thin archive", l.GREEN)
-    else:
-        l.bullet("Skipped: compiler thin archive", l.PURPLE)
+    if not line_number:
+        source = """} else {
+  assert(false, "Unsupported target_os: $target_os")
+}"""
 
-    # build thin archive
+        target = """} else if (target_cpu == "wasm") {
+  _default_toolchain = "//build/toolchain/wasm:emscripten"
+} else {
+ assert(false, "Unsupported target_os: $target_os")
+}"""
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: build target", l.GREEN)
+    else:
+        l.bullet("Skipped: build target", l.PURPLE)
+
+    # build target
     source_file = os.path.join(
         source_dir,
-        "BUILD.gn",
+        "build",
+        "config",
+        "BUILDCONFIG.gn",
     )
 
-    line_content = 'configs -= [ "//build/config/compiler:thin_archive" ]'
+    line_content = 'is_wasm = current_os == "wasm"'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: build thin archive", l.GREEN)
+    if not line_number:
+        f.replace_in_file(
+            source_file,
+            'is_mac = current_os == "mac"',
+            'is_mac = current_os == "mac"\nis_wasm = current_os == "wasm"',
+        )
+        l.bullet("Applied: build os", l.GREEN)
     else:
-        l.bullet("Skipped: build thin archive", l.PURPLE)
+        l.bullet("Skipped: build os", l.PURPLE)
 
-    # cflags - m64
+    # compiler
     source_file = os.path.join(
         source_dir,
         "build",
@@ -107,18 +81,28 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = '"-m64",'
+    line_content = 'configs += [ "//build/config/wasm:compiler" ]'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: cflags - m64", l.GREEN)
-    else:
-        l.bullet("Skipped: cflags - m64", l.PURPLE)
+    if not line_number:
+        source = """} else if (is_mac) {
+    configs += [ "//build/config/mac:compiler" ]
+  }"""
 
-    # cflags - msse3
+        target = """} else if (is_mac) {
+    configs += [ "//build/config/mac:compiler" ]
+  } else if (current_os == "wasm") {
+    configs += [ "//build/config/wasm:compiler" ]
+  }"""
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: build compiler", l.GREEN)
+    else:
+        l.bullet("Skipped: build compiler", l.PURPLE)
+
+    # stack protector
     source_file = os.path.join(
         source_dir,
         "build",
@@ -127,216 +111,180 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = '"-msse3",'
+    line_content = '} else if (current_os != "aix" && current_os != "wasm") {'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
-    if line_number:
-        content = '#"-msse3",'
-        f.replace_in_file(source_file, line_content, content)
-        l.bullet("Applied: cflags - msse3", l.GREEN)
+    if not line_number:
+        f.replace_in_file(
+            source_file,
+            '} else if (current_os != "aix") {',
+            '} else if (current_os != "aix" && current_os != "wasm") {',
+        )
+        l.bullet("Applied: stack protector", l.GREEN)
     else:
-        l.bullet("Skipped: cflags - msse3", l.PURPLE)
+        l.bullet("Skipped: stack protector", l.PURPLE)
 
-    # pragma optimize
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = '"-Wno-ignored-pragma-optimize",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = '          "-Wno-deprecated-register",'
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: pragma optimize", l.GREEN)
-    else:
-        l.bullet("Skipped: pragma optimize", l.PURPLE)
-
-    # pubnames
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = 'cflags += [ "-ggnu-pubnames" ]'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: pubnames", l.GREEN)
-    else:
-        l.bullet("Skipped: pubnames", l.PURPLE)
-
-    # gcc toolchain - 1
+    # lib extension
     source_file = os.path.join(
         source_dir,
         "build",
         "toolchain",
-        "gcc_toolchain.gni",
+        "toolchain.gni",
     )
 
-    line_content = 'cc = "${prefix}/clang"'
+    line_content = "} else if (is_wasm) {"
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
-    if line_number:
-        content = '    cc = "emcc"'
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: gcc toolchain - 1", l.GREEN)
+    if not line_number:
+        source = """} else if (is_win) {
+  shlib_extension = ".dll"
+}"""
+
+        target = """} else if (is_win) {
+  shlib_extension = ".dll"
+} else if (is_wasm) {
+  shlib_extension = ".so"
+}"""
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: lib extension", l.GREEN)
     else:
-        l.bullet("Skipped: gcc toolchain - 1", l.PURPLE)
-
-    # gcc toolchain - 2
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "toolchain",
-        "gcc_toolchain.gni",
-    )
-
-    line_content = 'cxx = "${prefix}/clang++"'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        content = '    cxx = "em++"'
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-        l.bullet("Applied: gcc toolchain - 2", l.GREEN)
-    else:
-        l.bullet("Skipped: gcc toolchain - 2", l.PURPLE)
+        l.bullet("Skipped: lib extension", l.PURPLE)
 
     # partition allocator
-    # source_file = os.path.join(
-    #     source_dir,
-    #     "third_party",
-    #     "base",
-    #     "allocator",
-    #     "partition_allocator",
-    #     "spin_lock.cc",
-    # )
+    source_file = os.path.join(
+        source_dir,
+        "base",
+        "allocator",
+        "partition_allocator",
+        "partition_alloc_base",
+        "threading",
+        "platform_thread_posix.cc",
+    )
 
-    # line_content = '#warning "Processor yield not supported on this architecture."'
-    # line_number = f.get_file_line_number_with_content(
-    #     source_file, line_content, strip=True
-    # )
+    line_content = (
+        "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
+    )
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
 
-    # if line_number:
-    #     f.prepend_to_file_line(source_file, line_number, "//")
-    #     l.bullet("Applied: partition allocator", l.GREEN)
-    # else:
-    #     l.bullet("Skipped: partition allocator", l.PURPLE)
+    if not line_number:
+        source = "#elif BUILDFLAG(IS_POSIX) && BUILDFLAG(IS_AIX)"
+        target = "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
 
-    # compiler stack protector
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: partition allocator", l.GREEN)
+    else:
+        l.bullet("Skipped: partition allocator", l.PURPLE)
+
+    # fxcrt
+    source_file = os.path.join(
+        source_dir,
+        "core",
+        "fxcrt",
+        "BUILD.gn",
+    )
+
+    line_content = "if (is_posix || is_fuchsia || is_wasm) {"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if not line_number:
+        source = "if (is_posix || is_fuchsia) {"
+        target = "if (is_posix || is_fuchsia || is_wasm) {"
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: fxcrt", l.GREEN)
+    else:
+        l.bullet("Skipped: fxcrt", l.PURPLE)
+
+    # fxge
+    source_file = os.path.join(
+        source_dir,
+        "core",
+        "fxge",
+        "BUILD.gn",
+    )
+
+    line_content = "if (is_linux || is_chromeos || is_fuchsia || is_wasm) {"
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if not line_number:
+        source = "if (is_linux || is_chromeos || is_fuchsia) {"
+        target = "if (is_linux || is_chromeos || is_fuchsia || is_wasm) {"
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: fxge", l.GREEN)
+    else:
+        l.bullet("Skipped: fxge", l.PURPLE)
+
+    # build config
     source_file = os.path.join(
         source_dir,
         "build",
         "config",
-        "compiler",
+        "wasm",
         "BUILD.gn",
     )
 
-    line_content = 'cflags += [ "-fstack-protector" ]'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    if not f.file_exists(source_file):
+        content = """config("compiler") {
+  defines = [
+    # Enable fseeko() and ftello() (required by libopenjpeg20)
+    # https://github.com/emscripten-core/emscripten/issues/4932
+    "_POSIX_C_SOURCE=200112",
+  ]
+}"""
 
-    if line_number:
-        content = 'cflags += [ "-fno-stack-protector" ]'
-        f.replace_in_file(source_file, line_content, content)
-        l.bullet("Applied: compiler stack protector", l.GREEN)
+        f.set_file_content(source_file, content)
+
+        l.bullet("Applied: build config", l.GREEN)
     else:
-        l.bullet("Skipped: compiler stack protector", l.PURPLE)
+        l.bullet("Skipped: build config", l.PURPLE)
 
-    # build pthread
+    # toolchain
     source_file = os.path.join(
         source_dir,
         "build",
-        "config",
+        "toolchain",
+        "wasm",
         "BUILD.gn",
     )
 
-    line_content = '"pthread",'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    if not f.file_exists(source_file):
+        content = """import("//build/toolchain/gcc_toolchain.gni")
 
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: build pthread", l.GREEN)
+gcc_toolchain("emscripten") {
+  cc = "emcc"
+  cxx = "em++"
+
+  readelf = "llvm-readobj"
+  ar = "emar"
+  ld = cxx
+  nm = "emnm"
+
+  extra_cflags = "-Wno-unknown-warning-option"
+  extra_cxxflags = "-Wno-unknown-warning-option"
+
+  toolchain_args = {
+    current_cpu = "wasm"
+    current_os = "wasm"
+  }
+}"""
+
+        f.set_file_content(source_file, content)
+
+        l.bullet("Applied: toolchain", l.GREEN)
     else:
-        l.bullet("Skipped: build pthread", l.PURPLE)
-
-    # compiler pthread
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "compiler",
-        "BUILD.gn",
-    )
-
-    line_content = 'cflags += [ "-pthread" ]'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: compiler pthread", l.GREEN)
-    else:
-        l.bullet("Skipped: compiler pthread", l.PURPLE)
-
-    # skia pthread
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "skia",
-        "gn",
-        "skia",
-        "BUILD.gn",
-    )
-
-    line_content = 'libs += [ "pthread" ]'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: skia pthread", l.GREEN)
-    else:
-        l.bullet("Skipped: skia pthread", l.PURPLE)
-
-    # copy files required
-    l.colored("Copying required files...", l.YELLOW)
-
-    pdfium_linux_dir = os.path.join(source_dir, "linux")
-    f.create_dir(pdfium_linux_dir)
-
-    f.copy_file("/usr/include/jpeglib.h", os.path.join(source_dir, "jpeglib.h"))
-    f.copy_file("/usr/include/jmorecfg.h", os.path.join(source_dir, "jmorecfg.h"))
-    f.copy_file("/usr/include/zlib.h", os.path.join(source_dir, "zlib.h"))
-    f.copy_file("/usr/include/zconf.h", os.path.join(source_dir, "zconf.h"))
-    f.copy_file("/usr/include/jerror.h", os.path.join(source_dir, "jerror.h"))
-    f.copy_file("/usr/include/jconfig.h", os.path.join(source_dir, "jconfig.h"))
-    f.copy_file(
-        "/usr/include/linux/limits.h", os.path.join(pdfium_linux_dir, "limits.h")
-    )
+        l.bullet("Skipped: toolchain", l.PURPLE)
 
     l.ok()
 
