@@ -701,7 +701,7 @@ def run_task_publish():
 
     current_dir = f.current_dir()
     publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "x64", "release", "node")
+    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -724,7 +724,7 @@ def run_task_publish_to_web():
 
     current_dir = os.getcwd()
     publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "x64", "release", "node")
+    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -745,6 +745,9 @@ def run_task_publish_to_web():
     r.run(command, cwd=publish_dir, shell=True)
 
     command = 'git commit -m "new version published"'
+    r.run(command, cwd=publish_dir, shell=True)
+
+    command = 'git branch -M master'
     r.run(command, cwd=publish_dir, shell=True)
 
     command = 'git push "git@github.com:pdfviewer/pdfviewer.github.io.git" master:master --force'
