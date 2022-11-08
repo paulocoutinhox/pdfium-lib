@@ -747,7 +747,7 @@ def run_task_publish_to_web():
     command = 'git commit -m "new version published"'
     r.run(command, cwd=publish_dir, shell=True)
 
-    command = 'git branch -M master'
+    command = "git branch -M master"
     r.run(command, cwd=publish_dir, shell=True)
 
     command = 'git push "git@github.com:pdfviewer/pdfviewer.github.io.git" master:master --force'
