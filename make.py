@@ -87,7 +87,11 @@ def main(options):
     if not task:
         l.e("Task is invalid. Use 'python3 make.py -h' for help.")
 
-    # build depot tools
+    #######################
+    # Common
+    #######################
+
+    # format
     if task == "format":
         common.run_task_format()
 
@@ -95,7 +99,7 @@ def main(options):
     elif task == "build-depot-tools":
         common.run_task_build_depot_tools()
 
-    # build depot tools
+    # build emsdk
     elif task == "build-emsdk":
         common.run_task_build_emsdk()
 

@@ -43,9 +43,7 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = (
-        'assert(use_blink, "This is not used on if blink is not enabled, don\'t drag it in unintentionally")'
-    )
+    line_content = 'assert(use_blink, "This is not used on if blink is not enabled, don\'t drag it in unintentionally")'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
