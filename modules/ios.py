@@ -35,25 +35,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: rules - test", l.PURPLE)
 
-    # libjpeg
-    source_file = os.path.join(
-        source_dir,
-        "third_party",
-        "libjpeg_turbo",
-        "BUILD.gn",
-    )
-
-    line_content = 'assert(use_blink, "This is not used on if blink is not enabled, don\'t drag it in unintentionally")'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.prepend_to_file_line(source_file, line_number, "#")
-        l.bullet("Applied: libjpeg", l.GREEN)
-    else:
-        l.bullet("Skipped: libjpeg", l.PURPLE)
-
     # core fxge
     source_file = os.path.join(source_dir, "core", "fxge", "BUILD.gn")
 
@@ -156,6 +137,7 @@ def run_task_build():
             args.append("pdf_is_complete_lib=true")
             args.append("use_custom_libcxx=false")
             args.append("pdf_use_partition_alloc=false")
+            args.append("use_blink=true")
 
             if target["target_cpu"] == "arm64":
                 args.append("enable_ios_bitcode=true")
