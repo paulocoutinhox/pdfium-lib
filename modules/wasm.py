@@ -336,6 +336,25 @@ gcc_toolchain("emscripten") {
     else:
         l.bullet("Skipped: toolchain", l.PURPLE)
 
+    # skia
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+
+    line_content = 'deps += [ "//skia" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.set_file_line_content(
+            source_file, line_number, '    #deps += [ "//skia" ]', new_line=True
+        )
+        l.bullet("Applied: skia", l.GREEN)
+    else:
+        l.bullet("Skipped: skia", l.PURPLE)
+
     l.ok()
 
 
