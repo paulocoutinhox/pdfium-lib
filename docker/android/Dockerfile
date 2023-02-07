@@ -67,7 +67,7 @@ RUN apt-get install -o APT::Immediate-Configure=false -f apt \
     && apt-get -f install \
     && dpkg --configure -a \
     && apt-get -y dist-upgrade \
-    && echo n | ./build/install-build-deps-android.sh \
+    && echo n | ./build/install-build-deps.sh --android \
     && rm -rf /build
 
 # ninja

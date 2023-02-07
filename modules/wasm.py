@@ -38,7 +38,7 @@ def run_task_patch():
   assert(false, "Unsupported target_os: $target_os")
 }"""
 
-        target = """} else if (target_cpu == "wasm") {
+        target = """} else if (target_os == "wasm") {
   _default_toolchain = "//build/toolchain/wasm:emscripten"
 } else {
  assert(false, "Unsupported target_os: $target_os")
