@@ -11,14 +11,14 @@ import modules.pdfium as p
 
 # -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    p.get_pdfium_by_target("wasm")
+    p.get_pdfium_by_target("wasm32")
 
 
 # -----------------------------------------------------------------------------
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "wasm", "pdfium")
+    source_dir = os.path.join("build", "wasm32", "pdfium")
 
     # build target
     source_file = os.path.join(
@@ -49,7 +49,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build target", l.PURPLE)
 
-    # build target
+    # build os
     source_file = os.path.join(
         source_dir,
         "build",
@@ -71,6 +71,56 @@ def run_task_patch():
         l.bullet("Applied: build os", l.GREEN)
     else:
         l.bullet("Skipped: build os", l.PURPLE)
+
+    # build overrides target
+    source_file = os.path.join(
+        source_dir,
+        "build_overrides",
+        "BUILDCONFIG.gn",
+    )
+
+    line_content = '_default_toolchain = "//build/toolchain/wasm:emscripten"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if not line_number:
+        source = """} else {
+  assert(false, "Unsupported target_os: $target_os")
+}"""
+
+        target = """} else if (target_os == "wasm") {
+  _default_toolchain = "//build/toolchain/wasm:emscripten"
+} else {
+  assert(false, "Unsupported target_os: $target_os")
+}"""
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: build overrides target", l.GREEN)
+    else:
+        l.bullet("Skipped: build overrides target", l.PURPLE)
+
+    # build overrides os
+    source_file = os.path.join(
+        source_dir,
+        "build_overrides",
+        "BUILDCONFIG.gn",
+    )
+
+    line_content = 'is_wasm = current_os == "wasm"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if not line_number:
+        f.replace_in_file(
+            source_file,
+            'is_mac = current_os == "mac"',
+            'is_mac = current_os == "mac"\nis_wasm = current_os == "wasm"',
+        )
+        l.bullet("Applied: build overrides os", l.GREEN)
+    else:
+        l.bullet("Skipped: build overrides os", l.PURPLE)
 
     # compiler
     source_file = os.path.join(
@@ -450,7 +500,7 @@ def run_task_install():
             # headers
             l.colored("Copying header files...", l.YELLOW)
 
-            include_dir = os.path.join("build", "wasm", "pdfium", "public")
+            include_dir = os.path.join("build", "wasm32", "pdfium", "public")
             include_cpp_dir = os.path.join(include_dir, "cpp")
             target_include_dir = os.path.join(
                 "build", target["target_os"], target["target_cpu"], config, "include"
@@ -702,8 +752,8 @@ def run_task_publish():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = f.current_dir()
-    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -725,8 +775,8 @@ def run_task_publish_to_web():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = os.getcwd()
-    publish_dir = os.path.join(current_dir, "build", "wasm", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
+    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files

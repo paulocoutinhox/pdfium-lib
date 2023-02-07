@@ -10,7 +10,7 @@ pdfium_git_commit = "4f5038d08ed19c7eb59ec8d8c553c20a742185f0"
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # emsdk
-emsdk_version = "3.1.31"
+emsdk_version = "3.1.24"
 # OBS 1: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # macos
@@ -75,5 +75,5 @@ targets_android = [
 # wasm
 configurations_wasm = ["release"]
 targets_wasm = [
-    {"target_os": "wasm", "target_cpu": "wasm", "pdfium_os": "wasm"},
+    {"target_os": "wasm32", "target_cpu": "wasm", "pdfium_os": "wasm"},
 ]
