@@ -24,16 +24,16 @@ Project to compile PDFium library to multiple platforms.
 
 This project currently compiles to these platforms:
 
-- [x] iOS device (armv7, arm64)
-- [x] iOS simulator (x86_64)
+- [x] iOS device (arm64)
+- [x] iOS simulator (x86_64, arm64)
 - [X] Android (armv7, armv8, x86, x86_64)
 - [x] macOS (x86_64, arm64)
-- [x] WASM (web assembly)
+- [x] WASM (Web Assembly)
 
 Platforms in roadmap:
 
-- [ ] Linux
-- [ ] Windows
+- Linux
+- Windows
 
 Obs: PDFium project is from Google and i only patch it to compile to all platforms above. Check all oficial details and PDFium license here:
 
@@ -42,6 +42,10 @@ https://pdfium.googlesource.com/
 ## Web demo
 
 Since this project generate WASM version, i published a demo that you can test PDFium direct on web browser here:
+
+https://pdfviewer.github.io
+
+Or with a public PDF as parameter:
 
 https://pdfviewer.github.io/?title=Demo%20PDF%20with%201MB&url=https://raw.githubusercontent.com/mozilla/pdf.js-sample-files/master/tracemonkey.pdf
 
@@ -121,4 +125,4 @@ This license informations is about this personal project, not the Google PDFium 
 
 [MIT](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2018-2022, Paulo Coutinho
+Copyright (c) 2018-2023, Paulo Coutinho
