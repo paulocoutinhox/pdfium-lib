@@ -26,25 +26,15 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = "defines = ["
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    original_content = 'include_dirs = [ "." ]\n  defines = []'
+    has_patch = f.file_has_content(source_file, original_content)
 
-    if line_number:
-        line_content = '"FPDFSDK_EXPORTS",'
-        line_number_to_add = f.get_file_line_number_with_content(
-            source_file, line_content, strip=True
-        )
-
-        if line_number_to_add:
-            l.bullet("Skipped: build gn", l.PURPLE)
-        else:
-            content = '  defines = [\n    "FPDFSDK_EXPORTS",'
-            f.set_file_line_content(source_file, line_number, content, new_line=True)
-            l.bullet("Applied: build gn", l.GREEN)
+    if has_patch:
+        new_content = 'include_dirs = [ "." ]\n  defines = ["FPDFSDK_EXPORTS"]'
+        f.replace_in_file(source_file, original_content, new_content)
+        l.bullet("Applied: build gn", l.GREEN)
     else:
-        l.bullet("Error: build gn", l.RED)
+        l.bullet("Skipped: build gn", l.PURPLE)
 
     # build gn flags
     source_file = os.path.join(

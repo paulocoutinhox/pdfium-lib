@@ -38,10 +38,10 @@ def run_task_patch():
   assert(false, "Unsupported target_os: $target_os")
 }"""
 
-        target = """} else if (target_cpu == "wasm") {
+        target = """} else if (target_os == "wasm") {
   _default_toolchain = "//build/toolchain/wasm:emscripten"
 } else {
- assert(false, "Unsupported target_os: $target_os")
+  assert(false, "Unsupported target_os: $target_os")
 }"""
 
         f.replace_in_file(source_file, source, target)
@@ -49,7 +49,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build target", l.PURPLE)
 
-    # build target
+    # build os
     source_file = os.path.join(
         source_dir,
         "build",
@@ -71,6 +71,56 @@ def run_task_patch():
         l.bullet("Applied: build os", l.GREEN)
     else:
         l.bullet("Skipped: build os", l.PURPLE)
+
+    # build overrides target
+    source_file = os.path.join(
+        source_dir,
+        "build_overrides",
+        "BUILDCONFIG.gn",
+    )
+
+    line_content = '_default_toolchain = "//build/toolchain/wasm:emscripten"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if not line_number:
+        source = """} else {
+  assert(false, "Unsupported target_os: $target_os")
+}"""
+
+        target = """} else if (target_os == "wasm") {
+  _default_toolchain = "//build/toolchain/wasm:emscripten"
+} else {
+  assert(false, "Unsupported target_os: $target_os")
+}"""
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: build overrides target", l.GREEN)
+    else:
+        l.bullet("Skipped: build overrides target", l.PURPLE)
+
+    # build overrides os
+    source_file = os.path.join(
+        source_dir,
+        "build_overrides",
+        "BUILDCONFIG.gn",
+    )
+
+    line_content = 'is_wasm = current_os == "wasm"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if not line_number:
+        f.replace_in_file(
+            source_file,
+            'is_mac = current_os == "mac"',
+            'is_mac = current_os == "mac"\nis_wasm = current_os == "wasm"',
+        )
+        l.bullet("Applied: build overrides os", l.GREEN)
+    else:
+        l.bullet("Skipped: build overrides os", l.PURPLE)
 
     # compiler
     source_file = os.path.join(
@@ -285,6 +335,25 @@ gcc_toolchain("emscripten") {
         l.bullet("Applied: toolchain", l.GREEN)
     else:
         l.bullet("Skipped: toolchain", l.PURPLE)
+
+    # skia
+    source_file = os.path.join(
+        source_dir,
+        "BUILD.gn",
+    )
+
+    line_content = 'deps += [ "//skia" ]'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        f.set_file_line_content(
+            source_file, line_number, '    #deps += [ "//skia" ]', new_line=True
+        )
+        l.bullet("Applied: skia", l.GREEN)
+    else:
+        l.bullet("Skipped: skia", l.PURPLE)
 
     l.ok()
 
