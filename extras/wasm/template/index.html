@@ -145,7 +145,7 @@
 
             getRender(i = 0, w, h) {
                 const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
-                const heap = Module._malloc(w * h * C);
+                const heap = Module.asm.malloc(w * h * C);
 
                 for (let i = 0; i < w * h * C; i++) {
                     Module.HEAPU8[heap + i] = 0;
@@ -170,7 +170,7 @@
                     pageRenderData.push(Module.HEAPU8[pageRenderPtr + v]);
                 }
 
-                Module._free(pageRenderPtr);
+                Module.asm.free(pageRenderPtr);
 
                 return pageRenderData;
             }
@@ -255,7 +255,7 @@
                             page.render();
 
                             if (index === doc.pages.length - 1) {
-                                Module._free(wasmBuffer);
+                                Module.asm.free(wasmBuffer);
 
                                 FPDF.CloseDocument(wasm);
                                 FPDF.DestroyLibrary();
@@ -375,7 +375,7 @@
                 // load document to memory
                 console.log('Loading data to buffer...');
 
-                let wasmBuffer = Module._malloc(fileSize);
+                let wasmBuffer = Module.asm.malloc(fileSize);
                 Module.HEAPU8.set(fileByteArray, wasmBuffer);
 
                 // create document
@@ -852,8 +852,8 @@
                     case Float32Array: E = Module.HEAPF32; break;
                     case Float64Array: E = Module.HEAPF64; break;
                 }
-                const Z = J.BYTES_PER_ELEMENT; const m = Module._malloc(s * Z);
-                const a = Array(1 + s); a[0] = ({ s, J, Z, E, m, free: () => Module._free(m) });
+                const Z = J.BYTES_PER_ELEMENT; const m = Module.asm.malloc(s * Z);
+                const a = Array(1 + s); a[0] = ({ s, J, Z, E, m, free: () => Module.asm.free(m) });
                 for (let i = 0; i < s; i++) a[i + 1] = ({ p: m + (i * Z), get v() { return E[m / Z + i]; } });
                 return a;
             };
