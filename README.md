@@ -19,7 +19,6 @@ Project to compile PDFium library to multiple platforms.
 
 <br>
 
-
 ## Platforms
 
 This project currently compiles to these platforms:
@@ -118,6 +117,11 @@ Check tutorial here: [How to include files](docs/HOW_TO_INCLUDE_FILES.md)
 Support the continuous development of this project.
 
 <a href='https://ko-fi.com/paulocoutinho' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+## My other projects
+
+- XPLPC - Cross Platform Lite Procedure Call [https://github.com/xplpc/xplpc](https://github.com/xplpc/xplpc)
+- Nativium - C++ Multiplatform Modular Toolkit Template [https://github.com/nativium/nativium](https://github.com/nativium/nativium)
 
 ## License
 

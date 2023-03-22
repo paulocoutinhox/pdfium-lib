@@ -3,14 +3,14 @@ debug = False
 task = ""
 
 # pdfium
-pdfium_git_branch = "5609"
-pdfium_git_commit = "bad2c6c8f9549ac9bb0ec4e9e18e7cd2fc9f8d53"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/5609
+pdfium_git_branch = "5668"
+pdfium_git_commit = "15b1203da8e9be060d143a184de6473ca7a68b83"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/5668
 # OBS 1: don't forget change in android docker file (docker/android/Dockerfile)
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # emsdk
-emsdk_version = "3.1.32"
+emsdk_version = "3.1.34"
 # OBS 1: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # macos
