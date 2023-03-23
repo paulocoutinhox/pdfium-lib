@@ -77,3 +77,11 @@ configurations_wasm = ["release"]
 targets_wasm = [
     {"target_os": "wasm32", "target_cpu": "wasm", "pdfium_os": "wasm"},
 ]
+
+# windows
+configurations_windows = ["release"]
+targets_windows = [
+    # {"target_os": "windows", "target_cpu": "x86", "pdfium_os": "win"},
+    {"target_os": "windows", "target_cpu": "x64", "pdfium_os": "win"},
+    # {"target_os": "windows", "target_cpu": "arm64", "pdfium_os": "win"},
+]

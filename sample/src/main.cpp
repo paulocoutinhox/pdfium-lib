@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 #include "fpdfview.h"
 
@@ -80,12 +81,12 @@ int main(int argc, char **argv)
         // render page
         FPDF_PAGE page = FPDF_LoadPage(doc, 0);
 
-        uint8_t buffer[(int)pageWidth * (int)pageHeight * 4];
+        std::vector<uint8_t> buffer(static_cast<size_t>(pageWidth * pageHeight * 4));
 
-        FPDF_BITMAP createdpages = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, 4, buffer, (int)pageWidth * 4);
-        uint background = 0xFFFFFFFF;
-        FPDFBitmap_FillRect(createdpages, 0, 0, (int)pageWidth, (int)pageHeight, background);
-        FPDF_RenderPageBitmap(createdpages, page, 0, 0, (int)pageWidth, (int)pageHeight, 0, FPDF_ANNOT);
+        FPDF_BITMAP createdpages = FPDFBitmap_CreateEx(static_cast<int>(pageWidth), static_cast<int>(pageHeight), 4, buffer.data(), static_cast<int>(pageWidth) * 4);
+        uint32_t background = 0xFFFFFFFF;
+        FPDFBitmap_FillRect(createdpages, 0, 0, static_cast<int>(pageWidth), static_cast<int>(pageHeight), background);
+        FPDF_RenderPageBitmap(createdpages, page, 0, 0, static_cast<int>(pageWidth), static_cast<int>(pageHeight), 0, FPDF_ANNOT);
         FPDFBitmap_Destroy(createdpages);
         FPDF_ClosePage(page);
 

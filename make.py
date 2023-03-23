@@ -53,6 +53,13 @@ Tasks:
   - publish-wasm
   - publish-to-web-wasm
   - archive-wasm
+  
+  - build-pdfium-windows
+  - patch-windows
+  - build-windows
+  - install-windows
+  - test-windows
+  - archive-windows
 """
 
 from docopt import docopt
@@ -65,6 +72,7 @@ import modules.config as c
 import modules.ios as ios
 import modules.macos as macos
 import modules.wasm as wasm
+import modules.windows as windows
 
 
 def main(options):
@@ -226,6 +234,34 @@ def main(options):
     # archive - wasm
     elif task == "archive-wasm":
         wasm.run_task_archive()
+
+    #######################
+    # Windows
+    #######################
+
+    # build pdfium - windows
+    elif task == "build-pdfium-windows":
+        windows.run_task_build_pdfium()
+
+    # patch - windows
+    elif task == "patch-windows":
+        windows.run_task_patch()
+
+    # build - windows
+    elif task == "build-windows":
+        windows.run_task_build()
+
+    # install - windows
+    elif task == "install-windows":
+        windows.run_task_install()
+
+    # test - windows
+    elif task == "test-windows":
+        windows.run_task_test()
+
+    # archive - windows
+    elif task == "archive-windows":
+        windows.run_task_archive()
 
     #######################
     # Invalid

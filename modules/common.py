@@ -28,7 +28,10 @@ def run_task_build_depot_tools():
     r.run(command, cwd=cwd)
 
     l.colored("Execute on your terminal:", l.PURPLE)
+
     l.m("export PATH=$PATH:$PWD/build/depot-tools")
+    l.colored("Or on Windows:", l.PURPLE)
+    l.m("set PATH=%PATH%;{0}".format(os.path.abspath(tools_dir)))
 
     l.ok()
 
