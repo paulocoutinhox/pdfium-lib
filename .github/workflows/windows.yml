@@ -88,11 +88,13 @@ jobs:
         run: python3 make.py build-depot-tools
 
       - name: Environment
+        shell: powershell
         run: |
           echo "$PWD/build/depot-tools" >> $GITHUB_PATH
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" >> $GITHUB_ENV
 
       - name: PDFium
+        shell: powershell
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
