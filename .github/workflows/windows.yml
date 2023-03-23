@@ -88,10 +88,10 @@ jobs:
         run: python3 make.py build-depot-tools
 
       - name: Environment
-        shell: powershell
+        shell: cmd
         run: |
-          setx PATH "%PATH%;%cd%build\depot-tools"
-          setx DEPOT_TOOLS_WIN_TOOLCHAIN "0"
+          set PATH=%PATH%;%cd%\build\depot-tools
+          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
       - name: PDFium
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
