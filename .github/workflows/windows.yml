@@ -89,8 +89,8 @@ jobs:
 
       - name: Environment
         run: |
-          $env:PATH += ';' + $PWD.Path + '\build\depot-tools'
-          $env:DEPOT_TOOLS_WIN_TOOLCHAIN = '0'
+          echo "$PWD/build/depot-tools" >> $GITHUB_PATH
+          echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" >> $GITHUB_ENV
 
       - name: PDFium
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
