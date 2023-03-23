@@ -11,10 +11,11 @@
   <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/macos.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/macos.yml/badge.svg" alt="PDFium - macOS"></a>
   <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/android.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/android.yml/badge.svg" alt="PDFium - Android"></a>
   <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/wasm.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/wasm.yml/badge.svg" alt="PDFium - WASM"></a>
+  <a href="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/windows.yml"><img src="https://github.com/paulocoutinhox/pdfium-lib/actions/workflows/windows.yml/badge.svg" alt="PDFium - Windows"></a>
 </p>
 
 <p align="center">
-Project to compile PDFium library to multiple platforms.
+Project to compile cross-platform PDFium library from locally reproducible scripts.
 </p>
 
 <br>
@@ -28,11 +29,11 @@ This project currently compiles to these platforms:
 - [X] Android (armv7, armv8, x86, x86_64)
 - [x] macOS (x86_64, arm64)
 - [x] WASM (Web Assembly)
+- [x] Windows
 
 Platforms in roadmap:
 
 - Linux
-- Windows
 
 Obs: PDFium project is from Google and i only patch it to compile to all platforms above. Check all oficial details and PDFium license here:
 

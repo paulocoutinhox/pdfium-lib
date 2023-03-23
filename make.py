@@ -53,7 +53,7 @@ Tasks:
   - publish-wasm
   - publish-to-web-wasm
   - archive-wasm
-  
+
   - build-pdfium-windows
   - patch-windows
   - build-windows
