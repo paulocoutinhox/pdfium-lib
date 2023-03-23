@@ -89,8 +89,8 @@ jobs:
 
       - name: Environment
         run: |
-          set PATH=%PATH%;%cd%\build\depot-tools
-          set DEPOT_TOOLS_WIN_TOOLCHAIN=0
+          $env:PATH += ';' + $PWD.Path + '\build\depot-tools'
+          $env:DEPOT_TOOLS_WIN_TOOLCHAIN = '0'
 
       - name: PDFium
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
