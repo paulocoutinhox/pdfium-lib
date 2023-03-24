@@ -88,13 +88,11 @@ jobs:
         run: python3 make.py build-depot-tools
 
       - name: Environment
-        shell: cmd
         run: |
-          setx PATH "%PATH%;%cd%\build\depot-tools"
-          setx DEPOT_TOOLS_WIN_TOOLCHAIN "0"
+          echo "%cd%\build\depot-tools" >> %GITHUB_PATH%
+          echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" >> %GITHUB_ENV%
 
       - name: PDFium
-        shell: cmd
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
