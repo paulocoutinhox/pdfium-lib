@@ -86,7 +86,7 @@ jobs:
 
       - name: Python requirements
         shell: pwsh
-        run: python3 -m pip install -r requirements.txt --user
+        run: python3 -m pip install -r requirements.txt
 
       - name: Depot tools
         shell: pwsh
@@ -100,7 +100,7 @@ jobs:
 
       - name: Python requirements for internal Python
         shell: pwsh
-        run: python3 -m pip install -r requirements.txt --user
+        run: python -m pip install -r requirements.txt
 
       - name: PDFium
         shell: pwsh
