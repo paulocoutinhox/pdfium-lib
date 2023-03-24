@@ -98,6 +98,10 @@ jobs:
           echo "${PWD}/build/depot-tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
+      - name: Python requirements for internal Python
+        shell: pwsh
+        run: python3 -m pip install -r requirements.txt --user
+
       - name: PDFium
         shell: pwsh
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
