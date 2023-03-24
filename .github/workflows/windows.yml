@@ -86,7 +86,7 @@ jobs:
 
       - name: Python requirements
         shell: pwsh
-        run: python3 -m pip install -r requirements.txt
+        run: python3 -m pip install -r requirements.txt --user
 
       - name: Depot tools
         shell: pwsh
@@ -97,10 +97,6 @@ jobs:
         run: |
           echo "${PWD}/build/depot-tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-
-      - name: Python requirements for internal Python
-        shell: pwsh
-        run: python -m pip install -r requirements.txt
 
       - name: PDFium
         shell: pwsh
