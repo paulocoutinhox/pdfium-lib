@@ -98,7 +98,9 @@ jobs:
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: python3 make.py patch-${{ matrix.config.target }}
+        run: |
+          python3 -m pip install -r requirements.txt --user
+          python3 make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
         run: python3 make.py patch-${{ matrix.config.target }}
