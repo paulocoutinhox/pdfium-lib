@@ -20,7 +20,7 @@ jobs:
       matrix:
         config:
           - { name: "Windows", os: "windows-latest", target: "windows" }
-        python-version: [3.7]
+        python-version: [3.9]
 
     steps:
       - uses: actions/checkout@v2
@@ -31,15 +31,12 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Upgrade PIP
-        shell: pwsh
         run: python3 -m pip install --upgrade pip setuptools wheel
 
       - name: Display Python version
-        shell: pwsh
         run: python3 --version
 
       - name: Display PIP version
-        shell: pwsh
         run: python3 -m pip --version
 
       - name: Install Ninja and CMake
@@ -84,50 +81,38 @@ jobs:
             )
           endif()
 
-      - name: Python requirements
-        shell: pwsh
-        run: python3 -m pip install -r requirements.txt --user
+      - name: Python Requirements
+        run: |
+          python3 -m pip install -r requirements.txt --user
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Depot tools
-        shell: pwsh
         run: python3 make.py build-depot-tools
 
       - name: Environment
-        shell: pwsh
         run: |
           echo "${PWD}/build/depot-tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
-      - name: Python requirements for PDFium Python
-        shell: pwsh
-        run: python -m pip install -r requirements.txt --user
-
       - name: PDFium
-        shell: pwsh
         run: python make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        shell: pwsh
         run: python make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
-        shell: pwsh
         run: python make.py patch-${{ matrix.config.target }}
 
       - name: Build
-        shell: pwsh
         run: python make.py build-${{ matrix.config.target }}
 
       - name: Install
-        shell: pwsh
         run: python make.py install-${{ matrix.config.target }}
 
       - name: Test
-        shell: pwsh
         run: python make.py test-${{ matrix.config.target }}
 
       - name: Archive
-        shell: pwsh
         run: python make.py archive-${{ matrix.config.target }}
 
       - name: Save

@@ -20,13 +20,13 @@ jobs:
       matrix:
         config:
           - { name: "macOS", os: "macos-latest", target: "macos" }
-        python-version: [3.7]
+        python-version: [3.9]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -81,8 +81,10 @@ jobs:
             )
           endif()
 
-      - name: Python requirements
-        run: python3 -m pip install -r requirements.txt --user
+      - name: Python Requirements
+        run: |
+          python3 -m pip install -r requirements.txt --user
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Depot tools
         run: python3 make.py build-depot-tools
