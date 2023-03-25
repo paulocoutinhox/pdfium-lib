@@ -95,30 +95,25 @@ jobs:
           echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: PDFium
-        run: |
-          python make.py build-pdfium-${{ matrix.config.target }}
-          python --version
-          python3 --version
-          python -m pip install -r requirements.txt --user
-          python3 -m pip install -r requirements.txt --user
+        run: python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: python make.py patch-${{ matrix.config.target }}
+        run: python3 make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
-        run: python make.py patch-${{ matrix.config.target }}
+        run: python3 make.py patch-${{ matrix.config.target }}
 
       - name: Build
-        run: python make.py build-${{ matrix.config.target }}
+        run: python3 make.py build-${{ matrix.config.target }}
 
       - name: Install
-        run: python make.py install-${{ matrix.config.target }}
+        run: python3 make.py install-${{ matrix.config.target }}
 
       - name: Test
-        run: python make.py test-${{ matrix.config.target }}
+        run: python3 make.py test-${{ matrix.config.target }}
 
       - name: Archive
-        run: python make.py archive-${{ matrix.config.target }}
+        run: python3 make.py archive-${{ matrix.config.target }}
 
       - name: Save
         uses: actions/upload-artifact@v2
