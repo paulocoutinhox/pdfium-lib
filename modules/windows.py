@@ -18,23 +18,7 @@ def run_task_build_pdfium():
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "windows", "pdfium")
-
-    # shared library
-    source_file = os.path.join(source_dir, "BUILD.gn")
-
-    line_content = 'component("pdfium") {'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if line_number:
-        f.replace_in_file(
-            source_file, 'component("pdfium") {', 'shared_library("pdfium") {'
-        )
-        l.bullet("Applied: shared library", l.GREEN)
-    else:
-        l.bullet("Skipped: shared library", l.PURPLE)
+    # ignore
 
     l.ok()
 
