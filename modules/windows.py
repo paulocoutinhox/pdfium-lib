@@ -87,6 +87,7 @@ def run_task_build():
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
             args.append("pdf_is_standalone=true")
+            args.append("pdf_is_complete_lib=true")
             args.append("is_component_build=false")
 
             if config == "release":
@@ -164,7 +165,8 @@ def run_task_install():
                 "pdfium.dll",
             )
 
-            f.copy_file(source_lib_path, target_lib_path)
+            if f.file_exists(source_lib_path):
+                f.copy_file(source_lib_path, target_lib_path)
 
             # pdb
             source_lib_path = os.path.join(
@@ -185,7 +187,8 @@ def run_task_install():
                 "pdfium.dll.pdb",
             )
 
-            f.copy_file(source_lib_path, target_lib_path)
+            if f.file_exists(source_lib_path):
+                f.copy_file(source_lib_path, target_lib_path)
 
             # lib
             source_lib_path = os.path.join(
@@ -206,7 +209,8 @@ def run_task_install():
                 "pdfium.dll.lib",
             )
 
-            f.copy_file(source_lib_path, target_lib_path)
+            if f.file_exists(source_lib_path):
+                f.copy_file(source_lib_path, target_lib_path)
 
             # fix include path
             source_include_path = os.path.join(
