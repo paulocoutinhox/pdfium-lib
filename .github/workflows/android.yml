@@ -16,13 +16,13 @@ jobs:
       matrix:
         config:
           - { name: "Ubuntu", os: "ubuntu-20.04", target: "android" }
-        python-version: [3.7]
+        python-version: [3.9]
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
 
@@ -35,8 +35,10 @@ jobs:
       - name: Display PIP version
         run: python3 -m pip --version
 
-      - name: Python requirements
-        run: python3 -m pip install -r requirements.txt --user
+      - name: Python Requirements
+        run: |
+          python3 -m pip install -r requirements.txt --user
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Remove trash
         run: |

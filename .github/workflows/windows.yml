@@ -1,4 +1,4 @@
-name: macOS
+name: Windows
 
 on:
   push:
@@ -19,7 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "macOS", os: "macos-latest", target: "macos" }
+          - { name: "Windows", os: "windows-latest", target: "windows" }
         python-version: [3.9]
 
     steps:
@@ -91,14 +91,16 @@ jobs:
 
       - name: Environment
         run: |
-          echo "$PWD/build/depot-tools" >> $GITHUB_PATH
-          echo "FORCE_MAC_SDK_MIN=10.15" >> $GITHUB_ENV
+          echo "${PWD}/build/depot-tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "DEPOT_TOOLS_WIN_TOOLCHAIN=0" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: PDFium
         run: python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: python3 make.py patch-${{ matrix.config.target }}
+        run: |
+          python3 -m pip install -r requirements.txt --user
+          python3 make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
         run: python3 make.py patch-${{ matrix.config.target }}
@@ -130,7 +132,7 @@ jobs:
       - name: Load
         uses: actions/download-artifact@v2
         with:
-          name: artifact-macos
+          name: artifact-windows
       - name: Get release
         id: get_release
         uses: bruceadams/get-release@v1.2.2
@@ -143,6 +145,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: macos.tgz
-          asset_name: macos.tgz
+          asset_path: windows.tgz
+          asset_name: windows.tgz
           asset_content_type: application/tar+gzip
