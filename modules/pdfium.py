@@ -25,9 +25,7 @@ def get_pdfium_by_target(target, append_target_os=None):
         "gclient",
         "config",
         "--unmanaged",
-        "https://pdfium.googlesource.com/pdfium.git",
-        '--custom-var',
-        '"checkout_configuration=minimal"',
+        '"https://pdfium.googlesource.com/pdfium.git"',
     ]
     r.run(command, cwd=cwd)
 
