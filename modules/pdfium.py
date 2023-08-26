@@ -26,6 +26,8 @@ def get_pdfium_by_target(target, append_target_os=None):
         "config",
         "--unmanaged",
         "https://pdfium.googlesource.com/pdfium.git",
+        '--custom-var',
+        '"checkout_configuration=minimal"',
     ]
     r.run(command, cwd=cwd)
 
@@ -40,7 +42,7 @@ def get_pdfium_by_target(target, append_target_os=None):
     l.colored("Syncing repository with gclient...", l.YELLOW)
 
     cwd = build_dir
-    command = ["gclient", "sync"]
+    command = ["gclient", "sync", "--no-history", "--shallow"]
     r.run(command, cwd=cwd)
 
     l.colored("Checkout to git commit {0}...".format(c.pdfium_git_commit), l.YELLOW)

@@ -79,6 +79,7 @@ def run_task_build():
             args.append("pdf_is_complete_lib=true")
             args.append("use_custom_libcxx=false")
             args.append("use_sysroot=false")
+            args.append('mac_deployment_target="10.13.0"')
 
             if config == "release":
                 args.append("symbol_level=0")

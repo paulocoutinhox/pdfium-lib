@@ -55,8 +55,8 @@ ENV PATH=${PATH}:/opt/depot-tools
 # pdfium - dependencies
 RUN mkdir /build
 WORKDIR /build
-RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
-RUN gclient sync
+RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git --custom-var "checkout_configuration=minimal"
+RUN gclient sync --no-history --shallow
 WORKDIR /build/pdfium
 RUN git checkout 7952b46ddd1db647dc618b5caf890706ec3bd6d7
 
