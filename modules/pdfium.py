@@ -40,7 +40,7 @@ def get_pdfium_by_target(target, append_target_os=None):
     l.colored("Syncing repository with gclient...", l.YELLOW)
 
     cwd = build_dir
-    command = ["gclient", "sync", "--no-history", "--shallow"]
+    command = ["gclient", "sync"]
     r.run(command, cwd=cwd)
 
     l.colored("Checkout to git commit {0}...".format(c.pdfium_git_commit), l.YELLOW)
