@@ -66,6 +66,13 @@ def run_task_patch():
 
         f.set_file_line_content(source_file, line_number, content, new_line=True)
 
+        # more one
+        line_number = f.get_file_line_number_with_content(
+            source_file, line_content, strip=True
+        )
+
+        f.set_file_line_content(source_file, line_number, content, new_line=True)
+
         l.bullet("Applied: build gn flags", l.GREEN)
     else:
         l.bullet("Skipped: build gn flags", l.PURPLE)
