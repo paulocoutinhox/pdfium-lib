@@ -20,7 +20,7 @@ jobs:
       matrix:
         config:
           - { name: "macOS", os: "macos-latest", target: "ios" }
-        python-version: [3.7]
+          python-version: [3.10]
 
     steps:
       - uses: actions/checkout@v2
