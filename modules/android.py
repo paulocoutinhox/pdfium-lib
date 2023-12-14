@@ -50,23 +50,24 @@ def run_task_patch():
     if line_number:
         content = '  cflags = [ "-fvisibility=default" ]'
 
+        # cflags #1
         f.set_file_line_content(source_file, line_number, content, new_line=True)
 
-        # more one
+        # cflags #2
         line_number = f.get_file_line_number_with_content(
             source_file, line_content, strip=True
         )
 
         f.set_file_line_content(source_file, line_number, content, new_line=True)
 
-        # more one
+        # cflags #3
         line_number = f.get_file_line_number_with_content(
             source_file, line_content, strip=True
         )
 
         f.set_file_line_content(source_file, line_number, content, new_line=True)
 
-        # more one
+        # cflags #4
         line_number = f.get_file_line_number_with_content(
             source_file, line_content, strip=True
         )

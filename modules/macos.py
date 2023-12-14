@@ -81,6 +81,7 @@ def run_task_build():
             args.append("use_sysroot=false")
             args.append('mac_deployment_target="10.13.0"')
             args.append("pdf_use_partition_alloc=false")
+            args.append("use_allocator_shim=false")
 
             if config == "release":
                 args.append("symbol_level=0")

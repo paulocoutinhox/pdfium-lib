@@ -416,6 +416,7 @@ def run_task_build():
             args.append("use_system_zlib=true")
             args.append("pdf_is_complete_lib=true")
             args.append("pdf_use_partition_alloc=false")
+            args.append("is_clang=false")
 
             if config == "release":
                 args.append("symbol_level=0")
@@ -749,12 +750,6 @@ def run_task_generate():
                 c.pdfium_git_branch,
             )
 
-            f.replace_in_file(
-                os.path.join(node_dir, "index.html"),
-                "{pdfium-commit}",
-                c.pdfium_git_commit,
-            )
-
             # test
             l.colored(
                 "Test on browser with: python3 -m http.server --directory {0}".format(
@@ -815,7 +810,7 @@ def run_task_publish_to_web():
     command = "git add ."
     r.run(command, cwd=publish_dir, shell=True)
 
-    command = 'git commit -m "new version published"'
+    command = f'git commit -m "version {c.pdfium_git_branch} published"'
     r.run(command, cwd=publish_dir, shell=True)
 
     command = "git branch -M master"
