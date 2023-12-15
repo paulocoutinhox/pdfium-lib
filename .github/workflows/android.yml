@@ -78,7 +78,7 @@ jobs:
         run: python3 make.py patch-${{ matrix.config.target }}
 
       - name: Install Build Dependencies
-        run: ./build/android/pdfium/install-build-deps.sh
+        run: /home/runner/work/pdfium-lib/pdfium-lib/build/android/pdfium/install-build-deps.sh
 
       - name: Build
         run: python3 make.py build-${{ matrix.config.target }}
