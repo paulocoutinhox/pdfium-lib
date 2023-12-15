@@ -75,7 +75,8 @@ def run_task_patch():
     # build overrides target
     source_file = os.path.join(
         source_dir,
-        "build_overrides",
+        "build",
+        "config",
         "BUILDCONFIG.gn",
     )
 
@@ -103,7 +104,8 @@ def run_task_patch():
     # build overrides os
     source_file = os.path.join(
         source_dir,
-        "build_overrides",
+        "build",
+        "config",
         "BUILDCONFIG.gn",
     )
 
@@ -205,32 +207,32 @@ def run_task_patch():
     else:
         l.bullet("Skipped: lib extension", l.PURPLE)
 
-    # partition allocator
-    source_file = os.path.join(
-        source_dir,
-        "base",
-        "allocator",
-        "partition_allocator",
-        "partition_alloc_base",
-        "threading",
-        "platform_thread_posix.cc",
-    )
+    # # partition allocator
+    # source_file = os.path.join(
+    #     source_dir,
+    #     "base",
+    #     "allocator",
+    #     "partition_allocator",
+    #     "partition_alloc_base",
+    #     "threading",
+    #     "platform_thread_posix.cc",
+    # )
 
-    line_content = (
-        "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
-    )
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    # line_content = (
+    #     "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
+    # )
+    # line_number = f.get_file_line_number_with_content(
+    #     source_file, line_content, strip=True
+    # )
 
-    if not line_number:
-        source = "#elif BUILDFLAG(IS_POSIX) && BUILDFLAG(IS_AIX)"
-        target = "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
+    # if not line_number:
+    #     source = "#elif BUILDFLAG(IS_POSIX) && BUILDFLAG(IS_AIX)"
+    #     target = "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
 
-        f.replace_in_file(source_file, source, target)
-        l.bullet("Applied: partition allocator", l.GREEN)
-    else:
-        l.bullet("Skipped: partition allocator", l.PURPLE)
+    #     f.replace_in_file(source_file, source, target)
+    #     l.bullet("Applied: partition allocator", l.GREEN)
+    # else:
+    #     l.bullet("Skipped: partition allocator", l.PURPLE)
 
     # fxcrt
     source_file = os.path.join(
@@ -403,7 +405,6 @@ def run_task_build():
             args.append("is_debug={0}".format(arg_is_debug))
             args.append("treat_warnings_as_errors=false")
             args.append("pdf_use_skia=false")
-            args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
             args.append("is_component_build=false")
@@ -703,7 +704,7 @@ def run_task_generate():
                 "-s",
                 'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
                 "-s",
-                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap"]\'',
+                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports"]\'',
                 "custom.cpp",
                 lib_file_out,
                 "-I{0}".format(include_dir),

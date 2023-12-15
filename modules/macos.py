@@ -69,7 +69,6 @@ def run_task_build():
             args.append("is_debug={0}".format(arg_is_debug))
             args.append("treat_warnings_as_errors=false")
             args.append("pdf_use_skia=false")
-            args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
             args.append("is_component_build=false")
