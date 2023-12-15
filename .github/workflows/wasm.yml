@@ -20,6 +20,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Install System Packages
+        run: |
+          apt-get install doxygen
+          doxygen --version
+
       - name: Set up Python
         uses: actions/setup-python@v1
         with:
