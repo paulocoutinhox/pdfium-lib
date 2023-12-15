@@ -22,7 +22,7 @@ jobs:
 
       - name: Install System Packages
         run: |
-          apt-get install doxygen
+          sudo apt-get install -y doxygen
           doxygen --version
 
       - name: Set up Python
