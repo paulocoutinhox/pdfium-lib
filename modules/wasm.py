@@ -413,8 +413,6 @@ def run_task_build():
             args.append("use_debug_fission=false")
             args.append("use_custom_libcxx=false")
             args.append("use_sysroot=false")
-            args.append("use_system_libjpeg=true")
-            args.append("use_system_zlib=true")
             args.append("pdf_is_complete_lib=true")
             args.append("pdf_use_partition_alloc=false")
             args.append("is_clang=false")
