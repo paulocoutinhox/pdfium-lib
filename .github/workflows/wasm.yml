@@ -28,44 +28,68 @@ jobs:
       - name: Upgrade PIP
         run: python3 -m pip install --upgrade pip setuptools wheel
 
-      - name: Display Python version
-        run: python3 --version
+      - name: Install CMake
+        uses: jwlawson/actions-setup-cmake@v1.8
+        with:
+          cmake-version: "3.24.0"
 
-      - name: Display PIP version
-        run: python3 -m pip --version
+      - name: Install Ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
+        with:
+          version: "1.10.0"
+
+      - name: Install EMSDK
+        uses: mymindstorm/setup-emsdk@v11
+        with:
+          version: "3.1.50"
+
+      - name: Install Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '19'
+          architecture: 'x64'
+
+      - name: Verify
+        run: |
+          python3 --version
+          cmake --version
+          ninja --version
+          node --version
+          npm --version
+          emcc -v
 
       - name: Python requirements
         run: python3 -m pip install -r requirements.txt --user
 
-      - name: Docker build
-        run: docker build -t pdfium-wasm -f docker/wasm/Dockerfile docker/wasm
+      - name: Depot tools
+        run: python3 make.py build-depot-tools
 
-      - name: Docker test
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm echo "test"
+      - name: Environment
+        run: echo "$PWD/build/depot-tools" >> $GITHUB_PATH
 
       - name: PDFium
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py build-pdfium-${{ matrix.config.target }}
+        run: python3 make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py patch-${{ matrix.config.target }}
+        run: python3 make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py patch-${{ matrix.config.target }}
+        run: python3 make.py patch-${{ matrix.config.target }}
 
       - name: Build
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py build-${{ matrix.config.target }}
+        run: python3 make.py build-${{ matrix.config.target }}
 
       - name: Install
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py install-${{ matrix.config.target }}
+        run: python3 make.py install-${{ matrix.config.target }}
 
       - name: Test
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py test-${{ matrix.config.target }}
+        run: python3 make.py test-${{ matrix.config.target }}
 
       - name: Generate
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py generate-${{ matrix.config.target }}
+        run: python3 make.py generate-${{ matrix.config.target }}
 
       - name: Archive
-        run: docker run -v ${PWD}:/app -i -t=false pdfium-wasm python3 make.py archive-${{ matrix.config.target }}
+        run: python3 make.py archive-${{ matrix.config.target }}
 
       - name: Save
         uses: actions/upload-artifact@v2
