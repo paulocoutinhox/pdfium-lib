@@ -696,7 +696,7 @@ def run_task_generate():
 
             command = [
                 "em++",
-                "{0}".format("-g" if config == "debug" else "-O3"),
+                "{0}".format("-g" if config == "debug" else "-O2"),
                 "-o",
                 output_file,
                 "-s",
