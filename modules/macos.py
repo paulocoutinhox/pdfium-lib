@@ -69,7 +69,6 @@ def run_task_build():
             args.append("is_debug={0}".format(arg_is_debug))
             args.append("treat_warnings_as_errors=false")
             args.append("pdf_use_skia=false")
-            args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
             args.append("is_component_build=false")
@@ -79,8 +78,9 @@ def run_task_build():
             args.append("pdf_is_complete_lib=true")
             args.append("use_custom_libcxx=false")
             args.append("use_sysroot=false")
-            args.append('mac_deployment_target="10.13.0"')
+            args.append('mac_deployment_target="11.0.0"')
             args.append("pdf_use_partition_alloc=false")
+            args.append("use_allocator_shim=false")
 
             if config == "release":
                 args.append("symbol_level=0")

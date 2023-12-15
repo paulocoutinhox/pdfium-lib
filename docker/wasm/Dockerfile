@@ -28,17 +28,36 @@ RUN echo ${JAVA_HOME}
 RUN java -version
 
 # google depot tools
-RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot-tools
+ENV DEPOT_TOOLS_UPDATE=0
+ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
+RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git -b main /opt/depot-tools
 ENV PATH=${PATH}:/opt/depot-tools
 
-# pdfium - dependencies
+# pdfium
 RUN mkdir /build
 WORKDIR /build
-RUN gclient config --unmanaged https://pdfium.googlesource.com/pdfium.git
-RUN gclient sync
-WORKDIR /build/pdfium
-RUN git checkout 9eec95782c4ecdae50cd8c8e9f88d3f8941db1cd
+RUN gclient config --custom-var checkout_configuration=minimal --unmanaged https://pdfium.googlesource.com/pdfium.git
+RUN echo "target_os = [ 'wasm' ]" >> .gclient
+RUN gclient sync -r origin/chromium/6183 --no-history --shallow
 
+# pdfium reset and clean directories
+RUN git -C /build/pdfium reset --hard
+RUN git -C /build/pdfium clean -df
+
+RUN git -C /build/pdfium/build reset --hard
+RUN git -C /build/pdfium/build clean -df
+
+RUN git -C /build/pdfium/third_party/libjpeg_turbo reset --hard
+RUN git -C /build/pdfium/third_party/libjpeg_turbo clean -df
+
+RUN git -C /build/pdfium/base/allocator/partition_allocator reset --hard
+RUN git -C /build/pdfium/base/allocator/partition_allocator clean -df
+
+# pdfium checkout
+WORKDIR /build/pdfium
+RUN git status
+
+# system dependencies
 RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
@@ -60,8 +79,8 @@ RUN pip3 install setuptools docopt pygemstones
 RUN mkdir /emsdk
 WORKDIR /emsdk
 RUN git clone https://github.com/emscripten-core/emsdk.git .
-RUN ./emsdk install 3.1.45
-RUN ./emsdk activate 3.1.45
+RUN ./emsdk install 3.1.50
+RUN ./emsdk activate 3.1.50
 ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
 
 # cache system libraries

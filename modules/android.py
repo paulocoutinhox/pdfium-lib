@@ -20,62 +20,36 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "android", "pdfium")
 
-    # build gn
-    source_file = os.path.join(
-        source_dir,
-        "BUILD.gn",
-    )
+    # shared lib
+    source_file = os.path.join(source_dir, "BUILD.gn")
 
-    original_content = 'include_dirs = [ "." ]\n  defines = []'
-    has_patch = f.file_has_content(source_file, original_content)
+    original_content = 'component("pdfium") {'
+    has_content = f.file_has_content(source_file, original_content)
 
-    if has_patch:
-        new_content = 'include_dirs = [ "." ]\n  defines = ["FPDFSDK_EXPORTS"]'
+    if has_content:
+        new_content = 'shared_library("pdfium") {'
         f.replace_in_file(source_file, original_content, new_content)
-        l.bullet("Applied: build gn", l.GREEN)
+        l.bullet("Applied: shared lib", l.GREEN)
     else:
-        l.bullet("Skipped: build gn", l.PURPLE)
+        l.bullet("Skipped: shared lib", l.PURPLE)
 
-    # build gn flags
+    # build config
     source_file = os.path.join(
         source_dir,
-        "BUILD.gn",
+        "build",
+        "config",
+        "BUILDCONFIG.gn",
     )
 
-    line_content = "cflags = []"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
+    original_content = 'set_defaults("shared_library") {\n  configs = default_shared_library_configs\n}'
+    has_content = f.file_has_content(source_file, original_content)
 
-    if line_number:
-        content = '  cflags = [ "-fvisibility=default" ]'
-
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-
-        # more one
-        line_number = f.get_file_line_number_with_content(
-            source_file, line_content, strip=True
-        )
-
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-
-        # more one
-        line_number = f.get_file_line_number_with_content(
-            source_file, line_content, strip=True
-        )
-
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-
-        # more one
-        line_number = f.get_file_line_number_with_content(
-            source_file, line_content, strip=True
-        )
-
-        f.set_file_line_content(source_file, line_number, content, new_line=True)
-
-        l.bullet("Applied: build gn flags", l.GREEN)
+    if has_content:
+        new_content = 'set_defaults("shared_library") {\n  configs = default_shared_library_configs\n\n  if (is_android) {\n    configs -= [ "//build/config/android:hide_all_but_jni_onload" ]\n  }\n}'
+        f.replace_in_file(source_file, original_content, new_content)
+        l.bullet("Applied: build config", l.GREEN)
     else:
-        l.bullet("Skipped: build gn flags", l.PURPLE)
+        l.bullet("Skipped: build config", l.PURPLE)
 
     l.ok()
 
@@ -125,10 +99,9 @@ def run_task_build():
             args.append("is_debug={0}".format(arg_is_debug))
             args.append("treat_warnings_as_errors=false")
             args.append("pdf_use_skia=false")
-            args.append("pdf_use_skia_paths=false")
             args.append("pdf_enable_xfa=false")
             args.append("pdf_enable_v8=false")
-            args.append("is_component_build=true")
+            args.append("is_component_build=false")
             args.append("pdf_is_standalone=true")
             args.append("pdf_bundle_freetype=true")
 

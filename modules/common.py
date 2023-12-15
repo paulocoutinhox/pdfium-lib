@@ -30,6 +30,9 @@ def run_task_build_depot_tools():
     l.colored("Execute on your terminal:", l.PURPLE)
     l.m("export PATH=$PATH:$PWD/build/depot-tools")
 
+    os.environ["DEPOT_TOOLS_UPDATE"] = "0"
+    os.environ["DEPOT_TOOLS_WIN_TOOLCHAIN"] = "0"
+
     l.ok()
 
 
