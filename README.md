@@ -84,7 +84,7 @@ Obs:
 
 - The file `make.py` need be executed with Python version 3.
 - These steps you only need make `one` time.
-- If you change `pdfium` git commit revision, edit file `modules/config.py` and execute `step 4`.
+- If you want change `pdfium` git branch, edit file `modules/config.py` and others places with same branch name.
 
 ## How to compile for iOS
 
