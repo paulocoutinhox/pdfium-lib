@@ -20,6 +20,19 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "android", "pdfium")
 
+    # shared lib
+    source_file = os.path.join(source_dir, "BUILD.gn")
+
+    original_content = 'component("pdfium") {'
+    has_content = f.file_has_content(source_file, original_content)
+
+    if has_content:
+        new_content = 'shared_library("pdfium") {'
+        f.replace_in_file(source_file, original_content, new_content)
+        l.bullet("Applied: shared lib", l.GREEN)
+    else:
+        l.bullet("Skipped: shared lib", l.PURPLE)
+
     # build config
     source_file = os.path.join(
         source_dir,
