@@ -1,4 +1,5 @@
 import os
+import subprocess
 import tarfile
 
 from pygemstones.io import file as f
@@ -615,13 +616,35 @@ def run_task_generate():
                 "pdfium.js",
             )
 
+            try:
+                result = subprocess.run(
+                    ["node", "function-names", "../xml/index.xml"],
+                    cwd=gen_utils_dir,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    check=True,
+                    text=True,
+                )
+
+                exported_functions = result.stdout.strip()
+            except subprocess.CalledProcessError as e:
+                l.e(f"Error when execute node: {e.stderr}")
+                exported_functions = ""
+
+            if exported_functions:
+                function_list = exported_functions.strip("[]").replace(" ", "").split(',')
+                function_list.extend(['_malloc', '_free'])
+                complete_functions_list = '["' + '","'.join(function_list) + '"]'
+            else:
+                complete_functions_list = '["_malloc", "_free"]'
+
             command = [
                 "em++",
                 "{0}".format("-g" if config == "debug" else "-O2"),
                 "-o",
                 output_file,
                 "-s",
-                'EXPORTED_FUNCTIONS="$(node function-names ../xml/index.xml)"',
+                f"EXPORTED_FUNCTIONS={complete_functions_list}",
                 "-s",
                 'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports"]\'',
                 "custom.cpp",
