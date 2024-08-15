@@ -38,7 +38,7 @@ RUN mkdir /build
 WORKDIR /build
 RUN gclient config --custom-var checkout_configuration=minimal --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN echo "target_os = [ 'wasm' ]" >> .gclient
-RUN gclient sync -r origin/chromium/6276 --no-history --shallow
+RUN gclient sync -r origin/chromium/6658 --no-history --shallow
 
 # pdfium reset and clean directories
 RUN git -C /build/pdfium reset --hard
@@ -79,8 +79,8 @@ RUN pip3 install setuptools docopt pygemstones
 RUN mkdir /emsdk
 WORKDIR /emsdk
 RUN git clone https://github.com/emscripten-core/emsdk.git .
-RUN ./emsdk install 3.1.50
-RUN ./emsdk activate 3.1.50
+RUN ./emsdk install 3.1.64
+RUN ./emsdk activate 3.1.64
 ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
 
 # cache system libraries
