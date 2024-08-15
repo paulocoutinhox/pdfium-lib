@@ -632,8 +632,10 @@ def run_task_generate():
                 exported_functions = ""
 
             if exported_functions:
-                function_list = exported_functions.strip("[]").replace(" ", "").split(',')
-                function_list.extend(['_malloc', '_free'])
+                function_list = (
+                    exported_functions.strip("[]").replace(" ", "").split(",")
+                )
+                function_list.extend(["_malloc", "_free"])
                 complete_functions_list = '["' + '","'.join(function_list) + '"]'
             else:
                 complete_functions_list = '["_malloc", "_free"]'
