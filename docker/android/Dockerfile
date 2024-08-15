@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 # general
 ARG DEBIAN_FRONTEND=noninteractive
@@ -80,7 +80,6 @@ RUN git status
 
 # system dependencies
 RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
 RUN apt-get install -o APT::Immediate-Configure=false -f apt \
     && apt-get -f install \

@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM ubuntu:22.04
 
 # general
 ARG DEBIAN_FRONTEND=noninteractive
@@ -59,7 +59,6 @@ RUN git status
 
 # system dependencies
 RUN ln -s /usr/bin/python3 /usr/bin/python
-RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
 RUN apt-get install -o APT::Immediate-Configure=false -f apt \
     && apt-get -f install \
@@ -88,7 +87,7 @@ RUN bash -c 'echo "int main() { return 0; }" > /tmp/main.cc'
 RUN bash -c 'source /emsdk/emsdk_env.sh && em++ -s USE_ZLIB=1 -s USE_LIBJPEG=1 -s USE_PTHREADS=1 -s ASSERTIONS=1 -o /tmp/main.html /tmp/main.cc'
 
 # nodejs and npm
-RUN curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN curl -sL https://deb.nodesource.com/setup_18.x | sudo -E bash -
 RUN apt-get install -y nodejs
 RUN npm install -g npm@latest
 
