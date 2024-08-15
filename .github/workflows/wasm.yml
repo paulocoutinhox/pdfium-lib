@@ -26,7 +26,7 @@ jobs:
           doxygen --version
 
       - name: Set up Python
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
@@ -46,7 +46,7 @@ jobs:
       - name: Install EMSDK
         uses: mymindstorm/setup-emsdk@v11
         with:
-          version: "3.1.50"
+          version: "3.1.64"
 
       - name: Install Node
         uses: actions/setup-node@v3

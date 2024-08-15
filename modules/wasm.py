@@ -72,58 +72,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build os", l.PURPLE)
 
-    # build overrides target
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "BUILDCONFIG.gn",
-    )
-
-    line_content = '_default_toolchain = "//build/toolchain/wasm:emscripten"'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if not line_number:
-        source = """} else {
-  assert(false, "Unsupported target_os: $target_os")
-}"""
-
-        target = """} else if (target_os == "wasm") {
-  _default_toolchain = "//build/toolchain/wasm:emscripten"
-} else {
-  assert(false, "Unsupported target_os: $target_os")
-}"""
-
-        f.replace_in_file(source_file, source, target)
-        l.bullet("Applied: build overrides target", l.GREEN)
-    else:
-        l.bullet("Skipped: build overrides target", l.PURPLE)
-
-    # build overrides os
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "BUILDCONFIG.gn",
-    )
-
-    line_content = 'is_wasm = current_os == "wasm"'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if not line_number:
-        f.replace_in_file(
-            source_file,
-            'is_mac = current_os == "mac"',
-            'is_mac = current_os == "mac"\nis_wasm = current_os == "wasm"',
-        )
-        l.bullet("Applied: build overrides os", l.GREEN)
-    else:
-        l.bullet("Skipped: build overrides os", l.PURPLE)
-
     # compiler
     source_file = os.path.join(
         source_dir,
@@ -163,7 +111,7 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = '} else if (current_os != "aix" && current_os != "wasm") {'
+    line_content = '} else if (current_os != "aix" && current_os != "zos" && current_os != "wasm") {'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
@@ -171,8 +119,8 @@ def run_task_patch():
     if not line_number:
         f.replace_in_file(
             source_file,
-            '} else if (current_os != "aix") {',
-            '} else if (current_os != "aix" && current_os != "wasm") {',
+            '} else if (current_os != "aix" && current_os != "zos") {',
+            '} else if (current_os != "aix" && current_os != "zos" && current_os != "wasm") {',
         )
         l.bullet("Applied: stack protector", l.GREEN)
     else:
@@ -207,33 +155,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: lib extension", l.PURPLE)
 
-    # # partition allocator
-    # source_file = os.path.join(
-    #     source_dir,
-    #     "base",
-    #     "allocator",
-    #     "partition_allocator",
-    #     "partition_alloc_base",
-    #     "threading",
-    #     "platform_thread_posix.cc",
-    # )
-
-    # line_content = (
-    #     "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
-    # )
-    # line_number = f.get_file_line_number_with_content(
-    #     source_file, line_content, strip=True
-    # )
-
-    # if not line_number:
-    #     source = "#elif BUILDFLAG(IS_POSIX) && BUILDFLAG(IS_AIX)"
-    #     target = "#elif BUILDFLAG(IS_POSIX) && (BUILDFLAG(IS_AIX) || defined(OS_ASMJS))"
-
-    #     f.replace_in_file(source_file, source, target)
-    #     l.bullet("Applied: partition allocator", l.GREEN)
-    # else:
-    #     l.bullet("Skipped: partition allocator", l.PURPLE)
-
     # fxcrt
     source_file = os.path.join(
         source_dir,
@@ -242,14 +163,14 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = "if (is_posix || is_fuchsia || is_wasm) {"
+    line_content = "if (is_posix || is_wasm) {"
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
     if not line_number:
-        source = "if (is_posix || is_fuchsia) {"
-        target = "if (is_posix || is_fuchsia || is_wasm) {"
+        source = "if (is_posix) {"
+        target = "if (is_posix || is_wasm) {"
 
         f.replace_in_file(source_file, source, target)
         l.bullet("Applied: fxcrt", l.GREEN)
@@ -264,14 +185,14 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = "if (is_linux || is_chromeos || is_fuchsia || is_wasm) {"
+    line_content = "if (is_linux || is_chromeos || is_wasm) {"
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
     if not line_number:
-        source = "if (is_linux || is_chromeos || is_fuchsia) {"
-        target = "if (is_linux || is_chromeos || is_fuchsia || is_wasm) {"
+        source = "if (is_linux || is_chromeos) {"
+        target = "if (is_linux || is_chromeos || is_wasm) {"
 
         f.replace_in_file(source_file, source, target)
         l.bullet("Applied: fxge", l.GREEN)
