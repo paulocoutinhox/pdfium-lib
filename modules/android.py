@@ -27,7 +27,8 @@ def run_task_patch():
         patch.apply_shared_library("android")
 
     # public headers
-    patch.apply_public_headers("android")
+    if c.shared_lib_android:
+        patch.apply_public_headers("android")
 
     # build config
     source_file = os.path.join(

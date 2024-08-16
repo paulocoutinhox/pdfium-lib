@@ -28,7 +28,8 @@ def run_task_patch():
         patch.apply_shared_library("wasm32")
 
     # public headers
-    patch.apply_public_headers("wasm32")
+    if c.shared_lib_wasm:
+        patch.apply_public_headers("wasm32")
 
     # build target
     source_file = os.path.join(

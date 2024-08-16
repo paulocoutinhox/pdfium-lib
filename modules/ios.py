@@ -28,7 +28,8 @@ def run_task_patch():
         patch.apply_shared_library("ios")
 
     # public headers
-    patch.apply_public_headers("ios")
+    if c.shared_lib_ios:
+        patch.apply_public_headers("ios")
 
     # rules - test
     source_file = os.path.join(source_dir, "build", "config", "ios", "rules.gni")

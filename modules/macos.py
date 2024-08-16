@@ -26,7 +26,8 @@ def run_task_patch():
         patch.apply_shared_library("macos")
 
     # public headers
-    patch.apply_public_headers("macos")
+    if c.shared_lib_macos:
+        patch.apply_public_headers("macos")
 
     l.ok()
 
