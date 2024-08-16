@@ -66,6 +66,13 @@ def run_task_build_emsdk():
     command = " ".join(["source", "emsdk_env.sh"])
     r.run(command, cwd=cwd, shell=True)
 
+    l.colored(
+        "Execute on your terminal the following file according to your system:",
+        l.PURPLE,
+    )
+    l.m("File: emsdk_env")
+    l.m("Directory: " + cwd)
+
     l.ok()
 
 
