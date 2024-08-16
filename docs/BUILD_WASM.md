@@ -5,25 +5,27 @@
 2. Get Emscripten SDK:
 ```python3 make.py build-emsdk```
 
-3. Get PDFium:
+3. Execute EMSDK environment file "emsdk_env" according to your system.
+
+4. Get PDFium:
 ```python3 make.py build-pdfium-wasm```
 
-4. Patch:
+5. Patch:
 ```python3 make.py patch-wasm```
 
-5. PDFium Linux dependencies
+6. PDFium Linux dependencies
 ```./build/wasm32/pdfium/build/install-build-deps.sh```
 
-6. Compile:
+7. Compile:
 ```python3 make.py build-wasm```
 
-7. Install libraries:
+8. Install libraries:
 ```python3 make.py install-wasm```
 
-8. Test:
+9. Test:
 ```python3 make.py test-wasm```
 
-9. Generate javascript libraries:
+10. Generate javascript libraries:
 ```python3 make.py generate-wasm```
 
 Obs:
