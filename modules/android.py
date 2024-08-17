@@ -5,7 +5,9 @@ from pygemstones.io import file as f
 from pygemstones.system import runner as r
 from pygemstones.util import log as l
 
+import modules.common as cm
 import modules.config as c
+import modules.patch as patch
 import modules.pdfium as p
 
 
@@ -21,17 +23,12 @@ def run_task_patch():
     source_dir = os.path.join("build", "android", "pdfium")
 
     # shared lib
-    source_file = os.path.join(source_dir, "BUILD.gn")
+    if c.shared_lib_android:
+        patch.apply_shared_library("android")
 
-    original_content = 'component("pdfium") {'
-    has_content = f.file_has_content(source_file, original_content)
-
-    if has_content:
-        new_content = 'shared_library("pdfium") {'
-        f.replace_in_file(source_file, original_content, new_content)
-        l.bullet("Applied: shared lib", l.GREEN)
-    else:
-        l.bullet("Skipped: shared lib", l.PURPLE)
+    # public headers
+    if c.shared_lib_android:
+        patch.apply_public_headers("android")
 
     # build config
     source_file = os.path.join(
@@ -90,23 +87,12 @@ def run_task_build():
                 l.YELLOW,
             )
 
-            arg_is_debug = "true" if config == "debug" else "false"
-
-            args = []
-            args.append('target_os="{0}"'.format(target["pdfium_os"]))
-            args.append('target_cpu="{0}"'.format(target["target_cpu"]))
-            args.append("use_goma=false")
-            args.append("is_debug={0}".format(arg_is_debug))
-            args.append("treat_warnings_as_errors=false")
-            args.append("pdf_use_skia=false")
-            args.append("pdf_enable_xfa=false")
-            args.append("pdf_enable_v8=false")
-            args.append("is_component_build=false")
-            args.append("pdf_is_standalone=true")
-            args.append("pdf_bundle_freetype=true")
-
-            if config == "release":
-                args.append("symbol_level=0")
+            args = cm.get_build_args(
+                config,
+                c.shared_lib_android,
+                target["pdfium_os"],
+                target["target_cpu"],
+            )
 
             args_str = " ".join(args)
 

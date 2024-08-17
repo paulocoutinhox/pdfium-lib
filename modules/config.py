@@ -14,6 +14,7 @@ emsdk_version = "3.1.64"
 
 # macos
 configurations_macos = ["release"]
+shared_lib_macos = False
 targets_macos = [
     {"target_os": "macos", "target_cpu": "x64", "pdfium_os": "mac"},
     {"target_os": "macos", "target_cpu": "arm64", "pdfium_os": "mac"},
@@ -21,6 +22,7 @@ targets_macos = [
 
 # ios
 configurations_ios = ["release"]
+shared_lib_ios = False
 targets_ios = [
     {
         "target_os": "ios",
@@ -44,6 +46,7 @@ targets_ios = [
 
 # android
 configurations_android = ["release"]
+shared_lib_android = True
 targets_android = [
     {
         "target_os": "android",
@@ -73,6 +76,7 @@ targets_android = [
 
 # wasm
 configurations_wasm = ["release"]
+shared_lib_wasm = False
 targets_wasm = [
     {"target_os": "wasm32", "target_cpu": "wasm", "pdfium_os": "wasm"},
 ]

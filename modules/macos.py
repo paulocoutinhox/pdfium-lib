@@ -6,7 +6,9 @@ from pygemstones.io import file as f
 from pygemstones.system import runner as r
 from pygemstones.util import log as l
 
+import modules.common as cm
 import modules.config as c
+import modules.patch as patch
 import modules.pdfium as p
 
 
@@ -19,7 +21,13 @@ def run_task_build_pdfium():
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    # none
+    # shared lib
+    if c.shared_lib_macos:
+        patch.apply_shared_library("macos")
+
+    # public headers
+    if c.shared_lib_macos:
+        patch.apply_public_headers("macos")
 
     l.ok()
 
@@ -60,30 +68,12 @@ def run_task_build():
                 l.YELLOW,
             )
 
-            arg_is_debug = "true" if config == "debug" else "false"
-
-            args = []
-            args.append('target_os="{0}"'.format(target["pdfium_os"]))
-            args.append('target_cpu="{0}"'.format(target["target_cpu"]))
-            args.append("use_goma=false")
-            args.append("is_debug={0}".format(arg_is_debug))
-            args.append("treat_warnings_as_errors=false")
-            args.append("pdf_use_skia=false")
-            args.append("pdf_enable_xfa=false")
-            args.append("pdf_enable_v8=false")
-            args.append("is_component_build=false")
-            args.append("clang_use_chrome_plugins=false")
-            args.append("pdf_is_standalone=true")
-            args.append("use_xcode_clang=false")
-            args.append("pdf_is_complete_lib=true")
-            args.append("use_custom_libcxx=false")
-            args.append("use_sysroot=false")
-            args.append('mac_deployment_target="11.0.0"')
-            args.append("pdf_use_partition_alloc=false")
-            args.append("use_allocator_shim=false")
-
-            if config == "release":
-                args.append("symbol_level=0")
+            args = cm.get_build_args(
+                config,
+                c.shared_lib_macos,
+                target["pdfium_os"],
+                target["target_cpu"],
+            )
 
             args_str = " ".join(args)
 

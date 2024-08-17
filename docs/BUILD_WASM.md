@@ -56,6 +56,10 @@ If you are in a macOS with arm64 processors (M*), build with command:
 
 ```docker build --platform linux/amd64 -t pdfium-wasm -f docker/wasm/Dockerfile docker/wasm```
 
+and
+
+```docker run --platform linux/amd64 -v ${PWD}:/app -it pdfium-wasm echo "test"```
+
 ## Run on browser
 
 You can test the sample using commands:

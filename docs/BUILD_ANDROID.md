@@ -47,3 +47,7 @@ Now you can execute any command with pattern:
 If you are in a macOS with arm64 processors (M*), build with command:
 
 ```docker build --platform linux/amd64 -t pdfium-android -f docker/android/Dockerfile docker/android```
+
+and
+
+```docker run --platform linux/amd64 -v ${PWD}:/app -it pdfium-android echo "test"```
