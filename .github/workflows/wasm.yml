@@ -18,7 +18,7 @@ jobs:
           - { name: "Ubuntu", os: "ubuntu-20.04", target: "wasm" }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install System Packages
         run: |
@@ -34,7 +34,7 @@ jobs:
         run: python3 -m pip install --upgrade pip setuptools wheel
 
       - name: Install CMake
-        uses: jwlawson/actions-setup-cmake@v1.8
+        uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: "3.24.0"
 
@@ -44,12 +44,12 @@ jobs:
           version: "1.10.0"
 
       - name: Install EMSDK
-        uses: mymindstorm/setup-emsdk@v11
+        uses: mymindstorm/setup-emsdk@v14
         with:
           version: "3.1.64"
 
       - name: Install Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '19'
           architecture: 'x64'

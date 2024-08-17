@@ -18,7 +18,7 @@ jobs:
           - { name: "Ubuntu", os: "ubuntu-20.04", target: "android" }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Install System Packages
         run: |
@@ -36,7 +36,7 @@ jobs:
         run: python3 -m pip install --upgrade pip setuptools wheel
 
       - name: Install CMake
-        uses: jwlawson/actions-setup-cmake@v1.8
+        uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: "3.24.0"
 
