@@ -90,7 +90,7 @@ jobs:
         run: python3 make.py archive-${{ matrix.config.target }}
 
       - name: Save
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.config.target }}
           path: ${{ matrix.config.target }}.tgz
