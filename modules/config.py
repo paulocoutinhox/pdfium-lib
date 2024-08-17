@@ -14,7 +14,7 @@ emsdk_version = "3.1.64"
 
 # macos
 configurations_macos = ["release"]
-shared_lib_macos = False
+shared_lib_macos = True
 targets_macos = [
     {"target_os": "macos", "target_cpu": "x64", "pdfium_os": "mac"},
     {"target_os": "macos", "target_cpu": "arm64", "pdfium_os": "mac"},

@@ -130,15 +130,18 @@ def get_build_args(config, target_os, target_cpu, libc=None, enable_v8=False):
     elif target_os == "ios":
         args.append("ios_enable_code_signing=false")
         args.append("use_blink=true")
+        args.append("pdf_is_complete_lib=true")
+
         if enable_v8 and target_cpu == "arm64":
             args.append('arm_control_flow_integrity="none"')
         args.append("clang_use_chrome_plugins=false")
     elif target_os == "linux":
         args.append("clang_use_chrome_plugins=false")
-    elif target_os == "mac":
+    elif target_os.startswith("mac"):
         args.append('mac_deployment_target="10.13.0"')
         args.append("clang_use_chrome_plugins=false")
-    elif target_os == "wasm":
+        args.append("pdf_is_complete_lib=true")
+    elif target_os.startswith("wasm"):
         args.append("pdf_is_complete_lib=true")
         args.append("is_clang=false")
 
