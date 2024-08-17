@@ -190,7 +190,6 @@ def run_task_install():
                     target["target_environment"],
                     config,
                 ),
-                "obj",
                 "libpdfium.dylib",
             )
 
