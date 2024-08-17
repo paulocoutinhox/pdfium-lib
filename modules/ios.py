@@ -191,7 +191,7 @@ def run_task_install():
                     config,
                 ),
                 "obj",
-                "libpdfium.a",
+                "libpdfium.dylib",
             )
 
             target_lib_path = os.path.join(
@@ -199,7 +199,7 @@ def run_task_install():
                 target["target_os"],
                 config,
                 "lib",
-                "libpdfium_{0}-{1}.a".format(
+                "libpdfium_{0}-{1}.dylib".format(
                     target["target_cpu"], target["target_environment"]
                 ),
             )
@@ -222,12 +222,14 @@ def run_task_install():
         # universal
         universal_libs = []
         for env in ["simulator", "device"]:
-            folder = os.path.join("build", "ios", config, "lib", "*-{0}.a".format(env))
+            folder = os.path.join(
+                "build", "ios", config, "lib", "*-{0}.dylib".format(env)
+            )
             files = glob.glob(folder)
             files_str = " ".join(files)
             f.create_dir(os.path.join("build", "ios", config, "lib", env))
             lib_file_out = os.path.join(
-                "build", "ios", config, "lib", env, "libpdfium.a"
+                "build", "ios", config, "lib", env, "libpdfium.dylib"
             )
 
             l.colored("Merging {0} libraries (lipo)...".format(env), l.YELLOW)
@@ -281,7 +283,7 @@ def run_task_test():
     for config in c.configurations_ios:
         for env in ["simulator", "device"]:
             lib_dir = os.path.join("build", "ios", config, "lib", env)
-            command = ["file", os.path.join(lib_dir, "libpdfium.a")]
+            command = ["file", os.path.join(lib_dir, "libpdfium.dylib")]
             r.run(command)
 
         framework_dir = os.path.join("build", "ios", config, "pdfium.xcframework")

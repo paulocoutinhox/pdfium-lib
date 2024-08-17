@@ -120,6 +120,9 @@ def get_build_args(config, target_os, target_cpu, libc=None, enable_v8=False):
     args.append("treat_warnings_as_errors=false")
     args.append("is_component_build=false")
 
+    # static lib
+    # args.append("pdf_is_complete_lib=true")
+
     if enable_v8:
         args.append("v8_use_external_startup_data=false")
         args.append("v8_enable_i18n_support=false")
@@ -130,7 +133,6 @@ def get_build_args(config, target_os, target_cpu, libc=None, enable_v8=False):
     elif target_os == "ios":
         args.append("ios_enable_code_signing=false")
         args.append("use_blink=true")
-        args.append("pdf_is_complete_lib=true")
 
         if enable_v8 and target_cpu == "arm64":
             args.append('arm_control_flow_integrity="none"')
@@ -140,7 +142,6 @@ def get_build_args(config, target_os, target_cpu, libc=None, enable_v8=False):
     elif target_os.startswith("mac"):
         args.append('mac_deployment_target="10.13.0"')
         args.append("clang_use_chrome_plugins=false")
-        args.append("pdf_is_complete_lib=true")
     elif target_os.startswith("wasm"):
         args.append("pdf_is_complete_lib=true")
         args.append("is_clang=false")
