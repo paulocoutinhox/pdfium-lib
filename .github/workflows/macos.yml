@@ -18,7 +18,7 @@ jobs:
           - { name: "macOS", os: "macos-latest", target: "macos" }
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -29,7 +29,7 @@ jobs:
         run: python3 -m pip install --upgrade pip setuptools wheel
 
       - name: Install CMake
-        uses: jwlawson/actions-setup-cmake@v1.8
+        uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: "3.24.0"
 
@@ -75,7 +75,7 @@ jobs:
         run: python3 make.py archive-${{ matrix.config.target }}
 
       - name: Save
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.config.target }}
           path: ${{ matrix.config.target }}.tgz
