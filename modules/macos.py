@@ -68,7 +68,13 @@ def run_task_build():
                 l.YELLOW,
             )
 
-            args = cm.get_build_args(config, target["pdfium_os"], target["target_cpu"])
+            args = cm.get_build_args(
+                config,
+                c.shared_lib_macos,
+                target["pdfium_os"],
+                target["target_cpu"],
+            )
+
             args_str = " ".join(args)
 
             command = [
@@ -122,7 +128,8 @@ def run_task_install():
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
-                "libpdfium.dylib",
+                "obj",
+                "libpdfium.a",
             )
 
             target_lib_path = os.path.join(
@@ -130,7 +137,7 @@ def run_task_install():
                 target["target_os"],
                 config,
                 "lib",
-                "libpdfium_{0}.dylib".format(target["target_cpu"]),
+                "libpdfium_{0}.a".format(target["target_cpu"]),
             )
 
             f.copy_file(source_lib_path, target_lib_path)
@@ -149,10 +156,10 @@ def run_task_install():
                 f.replace_in_file(header, '#include "public/', '#include "../')
 
         # universal
-        folder = os.path.join("build", "macos", config, "lib", "*.dylib")
+        folder = os.path.join("build", "macos", config, "lib", "*.a")
         files = glob.glob(folder)
         files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "macos", config, "lib", "libpdfium.dylib")
+        lib_file_out = os.path.join("build", "macos", config, "lib", "libpdfium.a")
 
         l.colored("Merging libraries (lipo)...", l.YELLOW)
         command = ["lipo", "-create", files_str, "-o", lib_file_out]

@@ -328,7 +328,13 @@ def run_task_build():
                 l.YELLOW,
             )
 
-            args = cm.get_build_args(config, target["pdfium_os"], target["target_cpu"])
+            args = cm.get_build_args(
+                config,
+                c.shared_lib_wasm,
+                target["pdfium_os"],
+                target["target_cpu"],
+            )
+
             args_str = " ".join(args)
 
             command = [

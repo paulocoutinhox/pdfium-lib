@@ -125,7 +125,14 @@ def run_task_build():
                 l.YELLOW,
             )
 
-            args = cm.get_build_args(config, target["pdfium_os"], target["target_cpu"])
+            args = cm.get_build_args(
+                config,
+                c.shared_lib_ios,
+                target["pdfium_os"],
+                target["target_cpu"],
+                target["target_environment"],
+            )
+
             args_str = " ".join(args)
 
             command = [
@@ -190,7 +197,8 @@ def run_task_install():
                     target["target_environment"],
                     config,
                 ),
-                "libpdfium.dylib",
+                "obj",
+                "libpdfium.a",
             )
 
             target_lib_path = os.path.join(
@@ -198,7 +206,7 @@ def run_task_install():
                 target["target_os"],
                 config,
                 "lib",
-                "libpdfium_{0}-{1}.dylib".format(
+                "libpdfium_{0}-{1}.a".format(
                     target["target_cpu"], target["target_environment"]
                 ),
             )
@@ -221,14 +229,12 @@ def run_task_install():
         # universal
         universal_libs = []
         for env in ["simulator", "device"]:
-            folder = os.path.join(
-                "build", "ios", config, "lib", "*-{0}.dylib".format(env)
-            )
+            folder = os.path.join("build", "ios", config, "lib", "*-{0}.a".format(env))
             files = glob.glob(folder)
             files_str = " ".join(files)
             f.create_dir(os.path.join("build", "ios", config, "lib", env))
             lib_file_out = os.path.join(
-                "build", "ios", config, "lib", env, "libpdfium.dylib"
+                "build", "ios", config, "lib", env, "libpdfium.a"
             )
 
             l.colored("Merging {0} libraries (lipo)...".format(env), l.YELLOW)
@@ -282,7 +288,7 @@ def run_task_test():
     for config in c.configurations_ios:
         for env in ["simulator", "device"]:
             lib_dir = os.path.join("build", "ios", config, "lib", env)
-            command = ["file", os.path.join(lib_dir, "libpdfium.dylib")]
+            command = ["file", os.path.join(lib_dir, "libpdfium.a")]
             r.run(command)
 
         framework_dir = os.path.join("build", "ios", config, "pdfium.xcframework")
