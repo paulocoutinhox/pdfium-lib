@@ -154,6 +154,7 @@
                 return H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(this.wasmData.wasm, i, w, h)).map(v => parseInt(v) * s);
             }
 
+            // use custom read mechanism to load only necessary parts of the pdf
             getRender(i = 0, w, h) {
                 const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
                 const heap = Module.wasmExports.malloc(w * h * C);
@@ -173,6 +174,7 @@
                 return heap;
             }
 
+            // optimized page rendering by reading only required parts
             getPageRender(n = 0, w, h) {
                 let pageRenderPtr = this.getRender(n, w, h);
                 let pageRenderData = [];
@@ -205,25 +207,18 @@
                 switch (lastError) {
                     case FPDF.LAST_ERROR.SUCCESS:
                         return "success";
-                        break;
                     case FPDF.LAST_ERROR.UNKNOWN:
                         return "unknown error";
-                        break;
                     case FPDF.LAST_ERROR.FILE:
                         return "file not found or could not be opened";
-                        break;
                     case FPDF.LAST_ERROR.FORMAT:
                         return "file not in PDF format or corrupted";
-                        break;
                     case FPDF.LAST_ERROR.PASSWORD:
                         return "password required or incorrect password";
-                        break;
                     case FPDF.LAST_ERROR.SECURITY:
                         return "unsupported security scheme";
-                        break;
                     case FPDF.LAST_ERROR.PAGE:
                         return "page not found or content error";
-                        break;
                     default:
                         return "unknown error";
                 }
@@ -372,7 +367,7 @@
 
                 FPDF.Init();
 
-                // load document to memory
+                // load document partially to memory
                 console.log('Loading data to buffer...');
 
                 let wasmBuffer = Module.wasmExports.malloc(fileSize);
@@ -391,7 +386,7 @@
                 console.log("Load document state: " + lastError);
 
                 // count page
-                console.log('Couting pages...');
+                console.log('Counting pages...');
 
                 let pages = FPDF.GetPageCount(doc.processor.wasmData.wasm);
                 console.log('Pages: ' + pages);
@@ -478,8 +473,8 @@
 
                 console.log('Finished');
             } catch (error) {
-                changeButton('Error while process PDF', 'danger');
-                console.log('Error while process PDF: ' + error.message);
+                changeButton('Error while processing PDF', 'danger');
+                console.log('Error while processing PDF: ' + error.message);
             }
         }
 
