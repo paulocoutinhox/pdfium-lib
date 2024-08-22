@@ -865,7 +865,7 @@
             FPDF.LoadPage = Module.cwrap('FPDF_LoadPage', 'number', ['number', 'number']);
             FPDF.ClosePage = Module.cwrap('FPDF_ClosePage', '', ['number']);
 
-            FPDF.LoadMemDocument = Module.cwrap('FPDF_LoadMemDocument', 'number', ['number', 'number', 'string']);
+            FPDF.LoadCustomDocument = Module.cwrap('FPDF_LoadCustomDocument', 'number', ['number', 'string']);
             FPDF.GetPageSizeByIndex = Module.cwrap('FPDF_GetPageSizeByIndex', 'number', ['number', 'number', 'number', 'number']);
             FPDF.GetLastError = Module.cwrap('FPDF_GetLastError', 'number');
             FPDF.GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
