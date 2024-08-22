@@ -344,9 +344,23 @@
             }
         }
 
+        function createPDFCustomLoader(data) {
+            return {
+                getFileSize: () => data.length,
+                readBlock: (offset, buffer, length) => {
+                    const end = Math.min(offset + length, data.length);
+                    const slice = data.subarray(offset, end);
+                    const dest = new Uint8Array(buffer, 0, slice.length);
+                    dest.set(slice);
+                    console.log(`Read ${slice.length} bytes from offset ${offset}`);
+                    return slice.length;
+                }
+            };
+        }
+
         async function processPDF(fileByteArray) {
             try {
-                // html general
+                // update the ui to indicate processing
                 changeButton('Processing file...', 'warning');
 
                 let pageListContainer = document.getElementById('pageListContainer');
@@ -358,43 +372,51 @@
 
                 // check file size
                 console.log('Getting file size...');
-
                 let fileSize = fileByteArray.length;
                 console.log("File size: " + fileSize + " bytes");
 
-                // init library
+                // initialize pdfium library
                 console.log('Initializing library...');
-
                 FPDF.Init();
 
-                // load document partially to memory
-                console.log('Loading data to buffer...');
+                // create a custom loader for progressive loading
+                const loader = createPDFCustomLoader(fileByteArray);
 
-                let wasmBuffer = Module.wasmExports.malloc(fileSize);
-                Module.HEAPU8.set(fileByteArray, wasmBuffer);
+                // register the readBlock function in the wasm table
+                const readBlockPtr = Module.addFunction((offset, buffer, length) => {
+                    return loader.readBlock(offset, buffer, length);
+                }, 'iii');
 
-                // create document
-                console.log('Loading document...');
+                const FPDF_FILEACCESS = {
+                    m_FileLen: loader.getFileSize(),
+                    m_GetBlock: readBlockPtr,
+                    m_Param: null
+                };
 
-                doc = new Doc({
-                    wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
-                    wasmBuffer: wasmBuffer,
-                });
+                console.log('Loading PDF document using custom loader...');
 
-                // check last error
-                let lastError = doc.processor.getLastError();
-                console.log("Load document state: " + lastError);
+                // load the document using the custom loader
+                const docHandle = FPDF.LoadCustomDocument(FPDF_FILEACCESS, null);
 
-                // count page
+                if (!docHandle) {
+                    const lastError = FPDF.GetLastError();
+                    const errorDescription = getPdfiumErrorDescription(lastError);
+                    console.error(`Failed to load PDF document. Error: ${errorDescription}`);
+                    throw new Error(`Failed to load PDF document. Error: ${errorDescription}`);
+                }
+
+                console.log('PDF document loaded successfully.');
+
+                // count pages
                 console.log('Counting pages...');
-
-                let pages = FPDF.GetPageCount(doc.processor.wasmData.wasm);
+                let pages = FPDF.GetPageCount(docHandle);
                 console.log('Pages: ' + pages);
 
-                // list all pages
+                // render and list all pages
                 if (pages > 0) {
                     console.log('Rendering ' + pages + ' PDF pages...');
 
+                    doc = new Doc({ wasm: docHandle, wasmBuffer: fileByteArray });
                     doc.setPages(pages);
                     doc.createAllPages();
 
@@ -402,11 +424,6 @@
                         console.log('Rendering page ' + (x + 1) + '...');
 
                         // render to canvas
-                        console.log("Rendering to canvas...");
-
-                        // add page item
-                        console.log("Adding page item...");
-
                         const image = doc.getPage(x).createImage();
 
                         // add content item
@@ -440,7 +457,6 @@
 
                         pageList.appendChild(cell);
 
-                        // show results
                         console.log('Page ' + (x + 1) + ' rendered');
                     }
 
@@ -448,7 +464,6 @@
                     firstPage.render();
 
                     pageListTitle.innerHTML = "Number of pages: " + pages;
-
                     pageListContainer.style.display = "block";
 
                     if (autoOpenMode) {
@@ -465,16 +480,38 @@
                     console.log('Cannot render PDF pages: PDF is empty');
                 }
 
-                // clean memory
+                // clean up memory
                 console.log('Cleaning objects...');
+                FPDF.CloseDocument(docHandle);
+                Module.removeFunction(readBlockPtr);
 
-                // initial state
+                // reset ui to initial state
                 buttonToInitialState();
-
                 console.log('Finished');
             } catch (error) {
                 changeButton('Error while processing PDF', 'danger');
-                console.log('Error while processing PDF: ' + error.message);
+                console.log('Error while processing PDF: ' + error.message || error);
+            }
+        }
+
+        function getPdfiumErrorDescription(errorCode) {
+            switch (errorCode) {
+                case 0:
+                    return "Success";
+                case 1:
+                    return "Unknown error";
+                case 2:
+                    return "File not found or could not be opened";
+                case 3:
+                    return "File not in PDF format or corrupted";
+                case 4:
+                    return "Password required or incorrect password";
+                case 5:
+                    return "Unsupported security scheme";
+                case 6:
+                    return "Page not found or content error";
+                default:
+                    return "Unknown error code";
             }
         }
 
