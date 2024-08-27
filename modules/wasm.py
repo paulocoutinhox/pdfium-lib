@@ -604,11 +604,6 @@ def run_task_generate():
 
             f.recreate_dir(gen_out_dir)
 
-            output_file = os.path.join(
-                gen_out_dir,
-                "pdfium.js",
-            )
-
             try:
                 result = subprocess.run(
                     ["node", "function-names", "../xml/index.xml"],
@@ -633,11 +628,9 @@ def run_task_generate():
             else:
                 complete_functions_list = '["_malloc", "_free"]'
 
-            command = [
+            base_command = [
                 "em++",
                 "{0}".format("-g" if config == "debug" else "-O2"),
-                "-o",
-                output_file,
                 "-s",
                 f"EXPORTED_FUNCTIONS={complete_functions_list}",
                 "-s",
@@ -652,8 +645,6 @@ def run_task_generate():
                 "-s",
                 "USE_LIBJPEG=1",
                 "-s",
-                "WASM=1",
-                "-s",
                 "ASSERTIONS=1",
                 "-s",
                 "ALLOW_MEMORY_GROWTH=1",
@@ -663,7 +654,30 @@ def run_task_generate():
                 "-Wall",
                 "--no-entry",
             ]
-            r.run(" ".join(command), cwd=gen_utils_dir, shell=True)
+
+            # Generate UMD (CommonJS + AMD) module and .wasm file
+            umd_command = [
+                *base_command,
+                "-s",
+                "WASM=1",
+                "-o",
+                os.path.join(gen_out_dir, "pdfium.js"),
+ 
+            ]
+            r.run(" ".join(umd_command), cwd=gen_utils_dir, shell=True)
+            
+            # Generate ES6 module, only .js will be generated (no .wasm)
+            l.colored("Compiling ES6 module with emscripten...", l.YELLOW)
+            es6_command = [
+                *base_command,
+                "-s",
+                "WASM=0",
+                "-s"
+                "EXPORT_ES6=1",
+                "-o",
+                os.path.join(gen_out_dir, "pdfium.esm.js"),
+            ]
+            r.run(" ".join(es6_command), cwd=gen_utils_dir, shell=True)
 
             # copy files
             l.colored("Copying compiled files...", l.YELLOW)
