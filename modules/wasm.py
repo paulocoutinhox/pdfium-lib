@@ -658,8 +658,6 @@ def run_task_generate():
             # Generate UMD (CommonJS + AMD) module and .wasm file
             umd_command = [
                 *base_command,
-                "-s",
-                "WASM=1",
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.js"),
  
@@ -670,8 +668,6 @@ def run_task_generate():
             l.colored("Compiling ES6 module with emscripten...", l.YELLOW)
             es6_command = [
                 *base_command,
-                "-s",
-                "WASM=0",
                 "-s"
                 "EXPORT_ES6=1",
                 "-o",
