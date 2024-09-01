@@ -54,7 +54,7 @@ RUN mkdir /build
 WORKDIR /build
 RUN gclient config --custom-var checkout_configuration=minimal --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN echo "target_os = [ 'android' ]" >> .gclient
-RUN gclient sync -r origin/chromium/6684 --no-history --shallow
+RUN gclient sync -r origin/chromium/6689 --no-history --shallow
 
 # pdfium reset and clean directories
 RUN git -C /build/pdfium reset --hard
