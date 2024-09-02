@@ -127,6 +127,9 @@ def get_build_args(
     args.append("treat_warnings_as_errors=false")
     args.append("is_component_build=false")
 
+    if config == "release":
+        args.append("symbol_level=0")
+
     if enable_v8:
         args.append("v8_use_external_startup_data=false")
         args.append("v8_enable_i18n_support=false")
