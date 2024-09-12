@@ -1,6 +1,6 @@
 # Build for iOS
 
-1. Execute all **general** steps
+1. First, execute all steps in the [How to compile](https://github.com/paulocoutinhox/pdfium-lib/tree/master?tab=readme-ov-file#how-to-compile) section
 
 2. Get PDFium:
 ```python3 make.py build-pdfium-ios```
