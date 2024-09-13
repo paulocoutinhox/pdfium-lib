@@ -90,6 +90,9 @@ jobs:
       - name: Test
         run: python3 make.py test-${{ matrix.config.target }}
 
+      - name: Test WasmTime
+        run: python3 make.py test-${{ matrix.config.target }}time
+
       - name: Generate
         run: python3 make.py generate-${{ matrix.config.target }}
 
