@@ -49,6 +49,7 @@ Tasks:
   - build-wasm
   - install-wasm
   - test-wasm
+  - test-wasmtime
   - generate-wasm
   - publish-wasm
   - publish-to-web-wasm
@@ -210,6 +211,10 @@ def main(options):
     # test - wasm
     elif task == "test-wasm":
         wasm.run_task_test()
+
+    # test - wasmtime
+    elif task == "test-wasmtime":
+        wasm.run_task_test_wasmtime()
 
     # generate - wasm
     elif task == "generate-wasm":

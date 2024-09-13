@@ -93,6 +93,9 @@ jobs:
       - name: Generate
         run: python3 make.py generate-${{ matrix.config.target }}
 
+      - name: Test WasmTime
+        run: python3 make.py test-${{ matrix.config.target }}time
+
       - name: Archive
         run: python3 make.py archive-${{ matrix.config.target }}
 

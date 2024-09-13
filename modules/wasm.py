@@ -524,6 +524,70 @@ def run_task_test():
 
 
 # -----------------------------------------------------------------------------
+def run_task_test_wasmtime():
+    import wasmtime
+    from wasmtime import Engine, Func, Instance, Linker, Module, Store
+    from wasmtime.loader import WasiConfig
+
+    l.colored("Testing with wasmtime...", l.YELLOW)
+
+    current_dir = f.current_dir()
+
+    for target in c.targets_wasm:
+        # paths
+        relative_dir = os.path.join(
+            "build",
+            target["target_os"],
+            target["target_cpu"],
+        )
+
+        root_dir = os.path.join(current_dir, relative_dir)
+        gen_dir = os.path.join(root_dir, "gen")
+        gen_out_dir = os.path.join(gen_dir, "out")
+        wasm_file = os.path.join(gen_out_dir, "pdfium.std.wasm")
+
+        # create the engine and store
+        engine = Engine()
+        store = Store(engine)
+
+        # load the WebAssembly module
+        module = Module.from_file(engine, wasm_file)
+
+        # create a linker to provide the necessary imports
+        linker = Linker(engine)
+
+        # WASI support using wasmtime.loader.WasiConfig
+        wasi_config = WasiConfig()
+        wasi_config.inherit_stdin()
+        wasi_config.inherit_stdout()
+        wasi_config.inherit_stderr()
+        store.set_wasi(wasi_config)
+
+        # instantiate the WebAssembly module with linker
+        instance = linker.instantiate(store, module)
+
+        # now we can invoke exported functions from the WebAssembly module
+        try:
+            init_library = instance.exports(store)["FPDF_InitLibrary"]
+            init_library(store)
+            l.i("FPDF_InitLibrary successfully called.")
+        except KeyError:
+            l.e("Function 'FPDF_InitLibrary' not found.")
+
+        # invoke 'FPDF_GetLastError'
+        try:
+            get_last_error = instance.exports(store)["FPDF_GetLastError"]
+            result = get_last_error(store)
+            l.i(f"Result from FPDF_GetLastError: {result}")
+        except KeyError:
+            l.e("Function 'FPDF_GetLastError' not found.")
+
+        l.i(f"Result: {result}")
+
+    l.ok()
+
+
+# -----------------------------------------------------------------------------
 def run_task_generate():
     l.colored("Generating...", l.YELLOW)
 
@@ -660,20 +724,33 @@ def run_task_generate():
                 *base_command,
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.js"),
- 
             ]
             r.run(" ".join(umd_command), cwd=gen_utils_dir, shell=True)
-            
+
             # Generate ES6 module, only .js will be generated (no .wasm)
             l.colored("Compiling ES6 module with emscripten...", l.YELLOW)
             es6_command = [
                 *base_command,
-                "-s"
+                "-s",
                 "EXPORT_ES6=1",
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.esm.js"),
             ]
             r.run(" ".join(es6_command), cwd=gen_utils_dir, shell=True)
+
+            # Generate STANDALONE module, only .js will be generated (no .wasm)
+            l.colored("Compiling STANDALONE module with emscripten...", l.YELLOW)
+            std_command = [
+                *base_command,
+                "-s" "STANDALONE_WASM=1",
+                "-sSTANDALONE_WASM=1",
+                "-sWASM_ASYNC_COMPILATION=0",
+                "-sWARN_ON_UNDEFINED_SYMBOLS=1",
+                "-sERROR_ON_UNDEFINED_SYMBOLS=0",
+                "-o",
+                os.path.join(gen_out_dir, "pdfium.std.js"),
+            ]
+            r.run(" ".join(std_command), cwd=gen_utils_dir, shell=True)
 
             # copy files
             l.colored("Copying compiled files...", l.YELLOW)
