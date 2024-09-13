@@ -731,7 +731,8 @@ def run_task_generate():
             l.colored("Compiling ES6 module with emscripten...", l.YELLOW)
             es6_command = [
                 *base_command,
-                "-s" "EXPORT_ES6=1",
+                "-s",
+                "EXPORT_ES6=1",
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.esm.js"),
             ]
