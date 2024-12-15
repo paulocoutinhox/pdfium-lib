@@ -641,7 +641,7 @@ def run_task_generate():
                 "-s",
                 f"EXPORTED_FUNCTIONS={complete_functions_list}",
                 "-s",
-                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "addFunction", "wasmExports"]\'',
+                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "addFunction", "setValue", "wasmExports"]\'',
                 "custom.cpp",
                 lib_file_out,
                 "-I{0}".format(include_dir),
