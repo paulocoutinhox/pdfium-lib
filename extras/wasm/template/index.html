@@ -7,15 +7,15 @@
     <meta name="viewport"
         content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
 
-    <title>PDFium PDF Viewer</title>
+    <title>PDF Viewer</title>
     <meta name="description"
-        content="Quickly view your PDF files with the PDFium PDF Viewer. Easy, fast, and secure, all within your browser.">
+        content="Quickly view your PDF files with the PDF Viewer. Easy, fast, and secure, all within your browser.">
     <meta name="keywords"
-        content="pdfium, pdf viewer, view pdf, pdf reader, browser, webassembly, fast pdf, secure pdf">
+        content="pdf, pdfium, pdf viewer, view pdf, pdf reader, browser, webassembly, fast pdf, secure pdf">
 
-    <meta property="og:title" content="PDFium PDF Viewer">
+    <meta property="og:title" content="PDF Viewer">
     <meta property="og:description"
-        content="Quickly view your PDF files with the PDFium PDF Viewer. Easy, fast, and secure, all within your browser.">
+        content="Quickly view your PDF files with the PDF Viewer. Easy, fast, and secure, all within your browser.">
     <meta property="og:image" content="https://pdfium-lib.s3.amazonaws.com/others/logo.png">
     <meta property="og:url" content="https://pdfviewer.github.io">
     <meta property="og:type" content="website">
@@ -154,6 +154,7 @@
                 return H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(this.wasmData.wasm, i, w, h)).map(v => parseInt(v) * s);
             }
 
+            // use custom read mechanism to load only necessary parts of the pdf
             getRender(i = 0, w, h) {
                 const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
                 const heap = Module.wasmExports.malloc(w * h * C);
@@ -173,6 +174,7 @@
                 return heap;
             }
 
+            // optimized page rendering by reading only required parts
             getPageRender(n = 0, w, h) {
                 let pageRenderPtr = this.getRender(n, w, h);
                 let pageRenderData = [];
@@ -205,25 +207,18 @@
                 switch (lastError) {
                     case FPDF.LAST_ERROR.SUCCESS:
                         return "success";
-                        break;
                     case FPDF.LAST_ERROR.UNKNOWN:
                         return "unknown error";
-                        break;
                     case FPDF.LAST_ERROR.FILE:
                         return "file not found or could not be opened";
-                        break;
                     case FPDF.LAST_ERROR.FORMAT:
                         return "file not in PDF format or corrupted";
-                        break;
                     case FPDF.LAST_ERROR.PASSWORD:
                         return "password required or incorrect password";
-                        break;
                     case FPDF.LAST_ERROR.SECURITY:
                         return "unsupported security scheme";
-                        break;
                     case FPDF.LAST_ERROR.PAGE:
                         return "page not found or content error";
-                        break;
                     default:
                         return "unknown error";
                 }
@@ -349,9 +344,27 @@
             }
         }
 
+        function createPDFCustomLoader(data) {
+            return {
+                getFileSize: () => data.length,
+                readBlock: (offset, buffer, length) => {
+                    if (offset + length > data.length) {
+                        console.error('Requested chunk is out of bounds');
+                        return 0; // Return zero for error if out of bounds
+                    }
+
+                    for (let i = 0; i < length; i++) {
+                        Module.HEAPU8[buffer + i] = data[offset + i];
+                    }
+
+                    return 1;
+                }
+            };
+        }
+
         async function processPDF(fileByteArray) {
             try {
-                // html general
+                // update the ui to indicate processing
                 changeButton('Processing file...', 'warning');
 
                 let pageListContainer = document.getElementById('pageListContainer');
@@ -363,43 +376,56 @@
 
                 // check file size
                 console.log('Getting file size...');
-
                 let fileSize = fileByteArray.length;
                 console.log("File size: " + fileSize + " bytes");
 
-                // init library
+                // initialize pdfium library
                 console.log('Initializing library...');
-
                 FPDF.Init();
 
-                // load document to memory
-                console.log('Loading data to buffer...');
+                // create a custom loader for progressive loading
+                const loader = createPDFCustomLoader(fileByteArray);
 
-                let wasmBuffer = Module.wasmExports.malloc(fileSize);
-                Module.HEAPU8.set(fileByteArray, wasmBuffer);
+                // register the readBlock function in the wasm table
+                const readBlockPtr = Module.addFunction((param, position, pBuf, size) => {
+                    return loader.readBlock(position, pBuf, size);
+                }, 'iiiii');
 
-                // create document
-                console.log('Loading document...');
+                const structSize = 12;
+                const ptr = Module._malloc(structSize);
+                const FPDF_FILEACCESS = {
+                    m_FileLen: loader.getFileSize(),
+                    m_GetBlock: readBlockPtr,
+                    m_Param: null
+                };
+                Module.setValue(ptr, FPDF_FILEACCESS.m_FileLen, 'i32');
+                Module.setValue(ptr + 4, FPDF_FILEACCESS.m_GetBlock, '*')
+                Module.setValue(ptr + 8, FPDF_FILEACCESS.m_Param ? FPDF_FILEACCESS.m_Param : 0, '*');
 
-                doc = new Doc({
-                    wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
-                    wasmBuffer: wasmBuffer,
-                });
+                console.log('Loading PDF document using custom loader...');
 
-                // check last error
-                let lastError = doc.processor.getLastError();
-                console.log("Load document state: " + lastError);
+                // load the document using the custom loader
+                const docHandle = FPDF.LoadCustomDocument(ptr, null);
 
-                // count page
-                console.log('Couting pages...');
+                if (!docHandle) {
+                    const lastError = FPDF.GetLastError();
+                    const errorDescription = getPdfiumErrorDescription(lastError);
+                    console.error(`Failed to load PDF document. Error: ${errorDescription}`);
+                    throw new Error(`Failed to load PDF document. Error: ${errorDescription}`);
+                }
 
-                let pages = FPDF.GetPageCount(doc.processor.wasmData.wasm);
+                console.log('PDF document loaded successfully.');
+
+                // count pages
+                console.log('Counting pages...');
+                let pages = FPDF.GetPageCount(docHandle);
                 console.log('Pages: ' + pages);
 
-                // list all pages
+                // render and list all pages
                 if (pages > 0) {
                     console.log('Rendering ' + pages + ' PDF pages...');
 
+                    doc = new Doc({ wasm: docHandle, wasmBuffer: fileByteArray });
                     doc.setPages(pages);
                     doc.createAllPages();
 
@@ -407,11 +433,6 @@
                         console.log('Rendering page ' + (x + 1) + '...');
 
                         // render to canvas
-                        console.log("Rendering to canvas...");
-
-                        // add page item
-                        console.log("Adding page item...");
-
                         const image = doc.getPage(x).createImage();
 
                         // add content item
@@ -445,7 +466,6 @@
 
                         pageList.appendChild(cell);
 
-                        // show results
                         console.log('Page ' + (x + 1) + ' rendered');
                     }
 
@@ -453,7 +473,6 @@
                     firstPage.render();
 
                     pageListTitle.innerHTML = "Number of pages: " + pages;
-
                     pageListContainer.style.display = "block";
 
                     if (autoOpenMode) {
@@ -470,16 +489,38 @@
                     console.log('Cannot render PDF pages: PDF is empty');
                 }
 
-                // clean memory
+                // clean up memory
                 console.log('Cleaning objects...');
+                //FPDF.CloseDocument(docHandle);
+                //Module.removeFunction(readBlockPtr);
 
-                // initial state
+                // reset ui to initial state
                 buttonToInitialState();
-
                 console.log('Finished');
             } catch (error) {
-                changeButton('Error while process PDF', 'danger');
-                console.log('Error while process PDF: ' + error.message);
+                changeButton('Error while processing PDF', 'danger');
+                console.log('Error while processing PDF: ' + error.message || error);
+            }
+        }
+
+        function getPdfiumErrorDescription(errorCode) {
+            switch (errorCode) {
+                case 0:
+                    return "Success";
+                case 1:
+                    return "Unknown error";
+                case 2:
+                    return "File not found or could not be opened";
+                case 3:
+                    return "File not in PDF format or corrupted";
+                case 4:
+                    return "Password required or incorrect password";
+                case 5:
+                    return "Unsupported security scheme";
+                case 6:
+                    return "Page not found or content error";
+                default:
+                    return "Unknown error code";
             }
         }
 
@@ -833,7 +874,7 @@
             FPDF.LoadPage = Module.cwrap('FPDF_LoadPage', 'number', ['number', 'number']);
             FPDF.ClosePage = Module.cwrap('FPDF_ClosePage', '', ['number']);
 
-            FPDF.LoadMemDocument = Module.cwrap('FPDF_LoadMemDocument', 'number', ['number', 'number', 'string']);
+            FPDF.LoadCustomDocument = Module.cwrap('FPDF_LoadCustomDocument', 'number', ['number', 'string']);
             FPDF.GetPageSizeByIndex = Module.cwrap('FPDF_GetPageSizeByIndex', 'number', ['number', 'number', 'number', 'number']);
             FPDF.GetLastError = Module.cwrap('FPDF_GetLastError', 'number');
             FPDF.GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
