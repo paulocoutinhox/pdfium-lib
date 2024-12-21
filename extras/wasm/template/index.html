@@ -348,12 +348,16 @@
             return {
                 getFileSize: () => data.length,
                 readBlock: (offset, buffer, length) => {
-                    const end = Math.min(offset + length, data.length);
-                    const slice = data.subarray(offset, end);
-                    const dest = new Uint8Array(buffer, 0, slice.length);
-                    dest.set(slice);
-                    console.log(`Read ${slice.length} bytes from offset ${offset}`);
-                    return slice.length;
+                    if (offset + length > data.length) {
+                        console.error('Requested chunk is out of bounds');
+                        return 0; // Return zero for error if out of bounds
+                    }
+
+                    for (let i = 0; i < length; i++) {
+                        Module.HEAPU8[buffer + i] = data[offset + i];
+                    }
+
+                    return 1;
                 }
             };
         }
@@ -383,20 +387,25 @@
                 const loader = createPDFCustomLoader(fileByteArray);
 
                 // register the readBlock function in the wasm table
-                const readBlockPtr = Module.addFunction((offset, buffer, length) => {
-                    return loader.readBlock(offset, buffer, length);
-                }, 'iii');
+                const readBlockPtr = Module.addFunction((param, position, pBuf, size) => {
+                    return loader.readBlock(position, pBuf, size);
+                }, 'iiiii');
 
+                const structSize = 12;
+                const ptr = Module._malloc(structSize);
                 const FPDF_FILEACCESS = {
                     m_FileLen: loader.getFileSize(),
                     m_GetBlock: readBlockPtr,
                     m_Param: null
                 };
+                Module.setValue(ptr, FPDF_FILEACCESS.m_FileLen, 'i32');
+                Module.setValue(ptr + 4, FPDF_FILEACCESS.m_GetBlock, '*')
+                Module.setValue(ptr + 8, FPDF_FILEACCESS.m_Param ? FPDF_FILEACCESS.m_Param : 0, '*');
 
                 console.log('Loading PDF document using custom loader...');
 
                 // load the document using the custom loader
-                const docHandle = FPDF.LoadCustomDocument(FPDF_FILEACCESS, null);
+                const docHandle = FPDF.LoadCustomDocument(ptr, null);
 
                 if (!docHandle) {
                     const lastError = FPDF.GetLastError();
@@ -482,8 +491,8 @@
 
                 // clean up memory
                 console.log('Cleaning objects...');
-                FPDF.CloseDocument(docHandle);
-                Module.removeFunction(readBlockPtr);
+                //FPDF.CloseDocument(docHandle);
+                //Module.removeFunction(readBlockPtr);
 
                 // reset ui to initial state
                 buttonToInitialState();
