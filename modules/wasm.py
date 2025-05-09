@@ -137,35 +137,6 @@ def run_task_patch():
     else:
         l.bullet("Skipped: stack protector", l.PURPLE)
 
-    # lib extension
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "toolchain",
-        "toolchain.gni",
-    )
-
-    line_content = "} else if (is_wasm) {"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if not line_number:
-        source = """} else if (is_win) {
-  shlib_extension = ".dll"
-}"""
-
-        target = """} else if (is_win) {
-  shlib_extension = ".dll"
-} else if (is_wasm) {
-  shlib_extension = ".so"
-}"""
-
-        f.replace_in_file(source_file, source, target)
-        l.bullet("Applied: lib extension", l.GREEN)
-    else:
-        l.bullet("Skipped: lib extension", l.PURPLE)
-
     # fxcrt
     source_file = os.path.join(
         source_dir,
@@ -243,29 +214,16 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    if not f.file_exists(source_file):
-        content = """import("//build/toolchain/gcc_toolchain.gni")
+    line_content = 'extra_cflags = "-Wno-unknown-warning-option"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
 
-gcc_toolchain("emscripten") {
-  cc = "emcc"
-  cxx = "em++"
+    if not line_number:
+        source = "toolchain_args = {"
+        target = 'extra_cflags = "-Wno-unknown-warning-option"\n  extra_cxxflags = "-Wno-unknown-warning-option"\n\n  toolchain_args = {'
 
-  readelf = "llvm-readobj"
-  ar = "emar"
-  ld = cxx
-  nm = "emnm"
-
-  extra_cflags = "-Wno-unknown-warning-option"
-  extra_cxxflags = "-Wno-unknown-warning-option"
-
-  toolchain_args = {
-    current_cpu = "wasm"
-    current_os = "wasm"
-  }
-}"""
-
-        f.set_file_content(source_file, content)
-
+        f.replace_in_file(source_file, source, target)
         l.bullet("Applied: toolchain", l.GREEN)
     else:
         l.bullet("Skipped: toolchain", l.PURPLE)

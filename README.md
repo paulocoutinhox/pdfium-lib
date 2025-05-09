@@ -116,7 +116,7 @@ Check tutorial here: [How to include files](docs/HOW_TO_INCLUDE_FILES.md)
 
 Support the continuous development of this project.
 
-<a href='https://ko-fi.com/paulocoutinho' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi1.png?v=2' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+<a href='https://ko-fi.com/A0A412XEV' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi2.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 ## My other projects
 
@@ -129,4 +129,4 @@ This license informations is about this personal project, not the Google PDFium 
 
 [MIT](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2018-2024, Paulo Coutinho
+Copyright (c) 2018-2025, Paulo Coutinho
