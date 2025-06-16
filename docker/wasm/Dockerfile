@@ -37,7 +37,7 @@ ENV PATH=${PATH}:/opt/depot-tools
 RUN mkdir /build
 WORKDIR /build
 RUN gclient config --custom-var checkout_configuration=minimal --unmanaged https://pdfium.googlesource.com/pdfium.git
-RUN echo "target_os = [ 'wasm' ]" >> .gclient
+RUN echo "target_os = [ 'emscripten' ]" >> .gclient
 RUN gclient sync -r origin/chromium/7243 --no-history --shallow
 
 # pdfium reset and clean directories
