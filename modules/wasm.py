@@ -39,7 +39,7 @@ def run_task_patch():
         "BUILDCONFIG.gn",
     )
 
-    line_content = '_default_toolchain = "//build/toolchain/wasm:emscripten"'
+    line_content = '_default_toolchain = "//build/toolchain/wasm:$target_cpu"'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
@@ -49,8 +49,8 @@ def run_task_patch():
   assert(false, "Unsupported target_os: $target_os")
 }"""
 
-        target = """} else if (target_os == "wasm") {
-  _default_toolchain = "//build/toolchain/wasm:emscripten"
+        target = """} else if (target_os == "emscripten") {
+  _default_toolchain = "//build/toolchain/wasm:$target_cpu"
 } else {
   assert(false, "Unsupported target_os: $target_os")
 }"""
@@ -59,29 +59,6 @@ def run_task_patch():
         l.bullet("Applied: build target", l.GREEN)
     else:
         l.bullet("Skipped: build target", l.PURPLE)
-
-    # build os
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "BUILDCONFIG.gn",
-    )
-
-    line_content = 'is_wasm = current_os == "wasm"'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if not line_number:
-        f.replace_in_file(
-            source_file,
-            'is_mac = current_os == "mac"',
-            'is_mac = current_os == "mac"\nis_wasm = current_os == "wasm"',
-        )
-        l.bullet("Applied: build os", l.GREEN)
-    else:
-        l.bullet("Skipped: build os", l.PURPLE)
 
     # compiler
     source_file = os.path.join(
@@ -104,7 +81,7 @@ def run_task_patch():
 
         target = """} else if (is_mac) {
     configs += [ "//build/config/mac:compiler" ]
-  } else if (current_os == "wasm") {
+  } else if (current_os == "emscripten") {
     configs += [ "//build/config/wasm:compiler" ]
   }"""
 
@@ -122,7 +99,7 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = '} else if (current_os != "aix" && current_os != "zos" && current_os != "wasm") {'
+    line_content = 'if (current_os != "aix" && current_os != "emscripten") {'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
@@ -130,8 +107,8 @@ def run_task_patch():
     if not line_number:
         f.replace_in_file(
             source_file,
-            '} else if (current_os != "aix" && current_os != "zos") {',
-            '} else if (current_os != "aix" && current_os != "zos" && current_os != "wasm") {',
+            'if (current_os != "aix") {',
+            'if (current_os != "aix" && current_os != "emscripten") {',
         )
         l.bullet("Applied: stack protector", l.GREEN)
     else:
@@ -618,16 +595,14 @@ def run_task_generate():
                 *base_command,
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.js"),
- 
             ]
             r.run(" ".join(umd_command), cwd=gen_utils_dir, shell=True)
-            
+
             # Generate ES6 module, only .js will be generated (no .wasm)
             l.colored("Compiling ES6 module with emscripten...", l.YELLOW)
             es6_command = [
                 *base_command,
-                "-s"
-                "EXPORT_ES6=1",
+                "-s" "EXPORT_ES6=1",
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.esm.js"),
             ]
