@@ -49,7 +49,7 @@ def run_task_patch():
   assert(false, "Unsupported target_os: $target_os")
 }"""
 
-        target = """} else if (is_wasm) {
+        target = """} else if (target_os == "emscripten") {
   _default_toolchain = "//build/toolchain/wasm:$target_cpu"
 } else {
   assert(false, "Unsupported target_os: $target_os")
@@ -81,7 +81,7 @@ def run_task_patch():
 
         target = """} else if (is_mac) {
     configs += [ "//build/config/mac:compiler" ]
-  } else if (is_wasm) {
+  } else if (current_os == "emscripten") {
     configs += [ "//build/config/wasm:compiler" ]
   }"""
 
