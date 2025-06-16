@@ -14,22 +14,22 @@ import modules.pdfium as p
 
 # -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    p.get_pdfium_by_target("wasm32")
+    p.get_pdfium_by_target("emscripten")
 
 
 # -----------------------------------------------------------------------------
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "wasm32", "pdfium")
+    source_dir = os.path.join("build", "emscripten", "pdfium")
 
     # shared lib
     if c.shared_lib_wasm:
-        patch.apply_shared_library("wasm32")
+        patch.apply_shared_library("emscripten")
 
     # public headers
     if c.shared_lib_wasm:
-        patch.apply_public_headers("wasm32")
+        patch.apply_public_headers("emscripten")
 
     # build target
     source_file = os.path.join(
@@ -369,7 +369,7 @@ def run_task_install():
             # headers
             l.colored("Copying header files...", l.YELLOW)
 
-            include_dir = os.path.join("build", "wasm32", "pdfium", "public")
+            include_dir = os.path.join("build", "emscripten", "pdfium", "public")
             include_cpp_dir = os.path.join(include_dir, "cpp")
             target_include_dir = os.path.join(
                 "build", target["target_os"], target["target_cpu"], config, "include"
@@ -647,8 +647,10 @@ def run_task_publish():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = f.current_dir()
-    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "emscripten", "publish")
+    node_dir = os.path.join(
+        current_dir, "build", "emscripten", "wasm", "release", "node"
+    )
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -670,8 +672,10 @@ def run_task_publish_to_web():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = os.getcwd()
-    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "emscripten", "publish")
+    node_dir = os.path.join(
+        current_dir, "build", "emscripten", "wasm", "release", "node"
+    )
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files

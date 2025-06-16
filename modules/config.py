@@ -78,5 +78,5 @@ targets_android = [
 configurations_wasm = ["release"]
 shared_lib_wasm = False
 targets_wasm = [
-    {"target_os": "wasm32", "target_cpu": "wasm", "pdfium_os": "wasm"},
+    {"target_os": "emscripten", "target_cpu": "wasm", "pdfium_os": "emscripten"},
 ]
