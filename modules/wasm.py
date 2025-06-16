@@ -45,15 +45,16 @@ def run_task_patch():
     )
 
     if not line_number:
-        source = """} else {
-  assert(false, "Unsupported target_os: $target_os")
-}"""
+        source = """} else if (target_os == "emscripten") {
+  # Because it's too hard to remove all targets from //BUILD.gn that do not work with it.
+  assert(
+      false,
+      "emscripten is not a supported target_os. It is available only as secondary toolchain.")
+} else {"""
 
         target = """} else if (target_os == "emscripten") {
   _default_toolchain = "//build/toolchain/wasm:$target_cpu"
-} else {
-  assert(false, "Unsupported target_os: $target_os")
-}"""
+} else {"""
 
         f.replace_in_file(source_file, source, target)
         l.bullet("Applied: build target", l.GREEN)
