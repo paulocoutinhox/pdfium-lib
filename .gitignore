@@ -19,3 +19,27 @@ Thumbs.db
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.tox/
+.nox/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+virtualenv/
+
+# Poetry
+dist/
+
+# Claude settings
+.claude/*
