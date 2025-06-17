@@ -145,6 +145,7 @@ def get_build_args(
         args.append("pdf_is_standalone=false")
         args.append("use_custom_libcxx=false")
         args.append('target_environment="{0}"'.format(target_environment))
+        args.append('ios_deployment_target="12.0"')
 
         if enable_v8 and target_cpu == "arm64":
             args.append('arm_control_flow_integrity="none"')
