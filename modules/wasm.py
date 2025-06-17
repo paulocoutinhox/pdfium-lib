@@ -183,7 +183,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build config", l.PURPLE)
 
-    # toolchain
+    # toolchain warn
     source_file = os.path.join(
         source_dir,
         "build",
@@ -202,9 +202,33 @@ def run_task_patch():
         target = 'extra_cflags = "-Wno-unknown-warning-option"\n  extra_cxxflags = "-Wno-unknown-warning-option"\n\n  toolchain_args = {'
 
         f.replace_in_file(source_file, source, target)
-        l.bullet("Applied: toolchain", l.GREEN)
+        l.bullet("Applied: toolchain warn", l.GREEN)
     else:
-        l.bullet("Skipped: toolchain", l.PURPLE)
+        l.bullet("Skipped: toolchain warn", l.PURPLE)
+
+    # toolchain wasm
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "toolchain",
+        "wasm",
+        "BUILD.gn",
+    )
+
+    line_content = 'emscripten_path = "//third_party/emsdk/upstream/emscripten/"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        emsdk_path = os.getenv("EMSDK")
+        source = 'emscripten_path = "//third_party/emsdk/upstream/emscripten/"'
+        target = f'emscripten_path = "{emsdk_path}/upstream/emscripten"'
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: toolchain wasm", l.GREEN)
+    else:
+        l.bullet("Skipped: toolchain wasm", l.PURPLE)
 
     # skia
     source_file = os.path.join(

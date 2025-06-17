@@ -9,7 +9,7 @@ pdfium_git_branch = "chromium/7243"
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # emsdk
-emsdk_version = "4.0.8"
+emsdk_version = "4.0.10"
 # OBS 1: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # macos
