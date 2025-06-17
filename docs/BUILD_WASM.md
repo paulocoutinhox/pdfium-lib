@@ -14,7 +14,7 @@
 ```python3 make.py patch-wasm```
 
 6. PDFium Linux dependencies
-```./build/wasm32/pdfium/build/install-build-deps.sh```
+```./build/emscripten/pdfium/build/install-build-deps.sh```
 
 7. Compile:
 ```python3 make.py build-wasm```

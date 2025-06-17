@@ -36,11 +36,11 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
     # append target os
     if append_target_os:
         l.colored(
-            "Appending target os ({}) to gclient file...".format(append_target_os),
+            "Appending target os ({}) to gclient file...".format(target),
             l.YELLOW,
         )
         gclient_file = os.path.join(build_dir, ".gclient")
-        f.append_to_file(gclient_file, "target_os = [ '{}' ]".format(append_target_os))
+        f.append_to_file(gclient_file, "target_os = [ '{}' ]".format(target))
 
     l.colored(f"Syncing repository with branch {c.pdfium_git_branch}...", l.YELLOW)
     r.run(

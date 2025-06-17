@@ -14,22 +14,22 @@ import modules.pdfium as p
 
 # -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    p.get_pdfium_by_target("wasm32")
+    p.get_pdfium_by_target("emscripten")
 
 
 # -----------------------------------------------------------------------------
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    source_dir = os.path.join("build", "wasm32", "pdfium")
+    source_dir = os.path.join("build", "emscripten", "pdfium")
 
     # shared lib
     if c.shared_lib_wasm:
-        patch.apply_shared_library("wasm32")
+        patch.apply_shared_library("emscripten")
 
     # public headers
     if c.shared_lib_wasm:
-        patch.apply_public_headers("wasm32")
+        patch.apply_public_headers("emscripten")
 
     # build target
     source_file = os.path.join(
@@ -39,49 +39,27 @@ def run_task_patch():
         "BUILDCONFIG.gn",
     )
 
-    line_content = '_default_toolchain = "//build/toolchain/wasm:emscripten"'
+    line_content = '_default_toolchain = "//build/toolchain/wasm:$target_cpu"'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
 
     if not line_number:
-        source = """} else {
-  assert(false, "Unsupported target_os: $target_os")
-}"""
+        source = """} else if (target_os == "emscripten") {
+  # Because it's too hard to remove all targets from //BUILD.gn that do not work with it.
+  assert(
+      false,
+      "emscripten is not a supported target_os. It is available only as secondary toolchain.")
+} else {"""
 
-        target = """} else if (target_os == "wasm") {
-  _default_toolchain = "//build/toolchain/wasm:emscripten"
-} else {
-  assert(false, "Unsupported target_os: $target_os")
-}"""
+        target = """} else if (target_os == "emscripten") {
+  _default_toolchain = "//build/toolchain/wasm:$target_cpu"
+} else {"""
 
         f.replace_in_file(source_file, source, target)
         l.bullet("Applied: build target", l.GREEN)
     else:
         l.bullet("Skipped: build target", l.PURPLE)
-
-    # build os
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "config",
-        "BUILDCONFIG.gn",
-    )
-
-    line_content = 'is_wasm = current_os == "wasm"'
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if not line_number:
-        f.replace_in_file(
-            source_file,
-            'is_mac = current_os == "mac"',
-            'is_mac = current_os == "mac"\nis_wasm = current_os == "wasm"',
-        )
-        l.bullet("Applied: build os", l.GREEN)
-    else:
-        l.bullet("Skipped: build os", l.PURPLE)
 
     # compiler
     source_file = os.path.join(
@@ -104,7 +82,7 @@ def run_task_patch():
 
         target = """} else if (is_mac) {
     configs += [ "//build/config/mac:compiler" ]
-  } else if (current_os == "wasm") {
+  } else if (current_os == "emscripten") {
     configs += [ "//build/config/wasm:compiler" ]
   }"""
 
@@ -122,7 +100,7 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    line_content = '} else if (current_os != "aix" && current_os != "zos" && current_os != "wasm") {'
+    line_content = 'if (current_os != "aix" && current_os != "emscripten") {'
     line_number = f.get_file_line_number_with_content(
         source_file, line_content, strip=True
     )
@@ -130,41 +108,12 @@ def run_task_patch():
     if not line_number:
         f.replace_in_file(
             source_file,
-            '} else if (current_os != "aix" && current_os != "zos") {',
-            '} else if (current_os != "aix" && current_os != "zos" && current_os != "wasm") {',
+            'if (current_os != "aix") {',
+            'if (current_os != "aix" && current_os != "emscripten") {',
         )
         l.bullet("Applied: stack protector", l.GREEN)
     else:
         l.bullet("Skipped: stack protector", l.PURPLE)
-
-    # lib extension
-    source_file = os.path.join(
-        source_dir,
-        "build",
-        "toolchain",
-        "toolchain.gni",
-    )
-
-    line_content = "} else if (is_wasm) {"
-    line_number = f.get_file_line_number_with_content(
-        source_file, line_content, strip=True
-    )
-
-    if not line_number:
-        source = """} else if (is_win) {
-  shlib_extension = ".dll"
-}"""
-
-        target = """} else if (is_win) {
-  shlib_extension = ".dll"
-} else if (is_wasm) {
-  shlib_extension = ".so"
-}"""
-
-        f.replace_in_file(source_file, source, target)
-        l.bullet("Applied: lib extension", l.GREEN)
-    else:
-        l.bullet("Skipped: lib extension", l.PURPLE)
 
     # fxcrt
     source_file = os.path.join(
@@ -234,7 +183,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build config", l.PURPLE)
 
-    # toolchain
+    # toolchain warn
     source_file = os.path.join(
         source_dir,
         "build",
@@ -243,32 +192,43 @@ def run_task_patch():
         "BUILD.gn",
     )
 
-    if not f.file_exists(source_file):
-        content = """import("//build/toolchain/gcc_toolchain.gni")
+    line_content = 'extra_cflags = "-Wno-unknown-warning-option"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
 
-gcc_toolchain("emscripten") {
-  cc = "emcc"
-  cxx = "em++"
+    if not line_number:
+        source = "toolchain_args = {"
+        target = 'extra_cflags = "-Wno-unknown-warning-option"\n  extra_cxxflags = "-Wno-unknown-warning-option"\n\n  toolchain_args = {'
 
-  readelf = "llvm-readobj"
-  ar = "emar"
-  ld = cxx
-  nm = "emnm"
-
-  extra_cflags = "-Wno-unknown-warning-option"
-  extra_cxxflags = "-Wno-unknown-warning-option"
-
-  toolchain_args = {
-    current_cpu = "wasm"
-    current_os = "wasm"
-  }
-}"""
-
-        f.set_file_content(source_file, content)
-
-        l.bullet("Applied: toolchain", l.GREEN)
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: toolchain warn", l.GREEN)
     else:
-        l.bullet("Skipped: toolchain", l.PURPLE)
+        l.bullet("Skipped: toolchain warn", l.PURPLE)
+
+    # toolchain wasm
+    source_file = os.path.join(
+        source_dir,
+        "build",
+        "toolchain",
+        "wasm",
+        "BUILD.gn",
+    )
+
+    line_content = 'emscripten_path = "//third_party/emsdk/upstream/emscripten/"'
+    line_number = f.get_file_line_number_with_content(
+        source_file, line_content, strip=True
+    )
+
+    if line_number:
+        emsdk_path = os.getenv("EMSDK")
+        source = 'emscripten_path = "//third_party/emsdk/upstream/emscripten/"'
+        target = f'emscripten_path = "{emsdk_path}/upstream/emscripten"'
+
+        f.replace_in_file(source_file, source, target)
+        l.bullet("Applied: toolchain wasm", l.GREEN)
+    else:
+        l.bullet("Skipped: toolchain wasm", l.PURPLE)
 
     # skia
     source_file = os.path.join(
@@ -434,7 +394,7 @@ def run_task_install():
             # headers
             l.colored("Copying header files...", l.YELLOW)
 
-            include_dir = os.path.join("build", "wasm32", "pdfium", "public")
+            include_dir = os.path.join("build", "emscripten", "pdfium", "public")
             include_cpp_dir = os.path.join(include_dir, "cpp")
             target_include_dir = os.path.join(
                 "build", target["target_os"], target["target_cpu"], config, "include"
@@ -496,8 +456,6 @@ def run_task_test():
                 "src/main.cpp",
                 lib_file_out,
                 "-I{0}".format(include_dir),
-                "-s",
-                "DEMANGLE_SUPPORT=1",
                 "-s",
                 "USE_ZLIB=1",
                 "-s",
@@ -634,12 +592,10 @@ def run_task_generate():
                 "-s",
                 f"EXPORTED_FUNCTIONS={complete_functions_list}",
                 "-s",
-                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports"]\'',
+                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports", "HEAP8", "HEAP16", "HEAP32", "HEAPU8", "HEAPU16", "HEAPU32", "HEAPF32", "HEAPF64"]\'',
                 "custom.cpp",
                 lib_file_out,
                 "-I{0}".format(include_dir),
-                "-s",
-                "DEMANGLE_SUPPORT=1",
                 "-s",
                 "USE_ZLIB=1",
                 "-s",
@@ -660,16 +616,16 @@ def run_task_generate():
                 *base_command,
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.js"),
- 
             ]
             r.run(" ".join(umd_command), cwd=gen_utils_dir, shell=True)
-            
+
             # Generate ES6 module, only .js will be generated (no .wasm)
             l.colored("Compiling ES6 module with emscripten...", l.YELLOW)
             es6_command = [
                 *base_command,
-                "-s"
-                "EXPORT_ES6=1",
+                "-s" "EXPORT_ES6=1",
+                "-s",
+                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports", "HEAP8", "HEAP16", "HEAP32", "HEAPU8", "HEAPU16", "HEAPU32", "HEAPF32", "HEAPF64"]\'',
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.esm.js"),
             ]
@@ -714,8 +670,10 @@ def run_task_publish():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = f.current_dir()
-    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "emscripten", "publish")
+    node_dir = os.path.join(
+        current_dir, "build", "emscripten", "wasm", "release", "node"
+    )
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files
@@ -737,8 +695,10 @@ def run_task_publish_to_web():
     l.colored("Publishing...", l.YELLOW)
 
     current_dir = os.getcwd()
-    publish_dir = os.path.join(current_dir, "build", "wasm32", "publish")
-    node_dir = os.path.join(current_dir, "build", "wasm32", "wasm", "release", "node")
+    publish_dir = os.path.join(current_dir, "build", "emscripten", "publish")
+    node_dir = os.path.join(
+        current_dir, "build", "emscripten", "wasm", "release", "node"
+    )
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
     # copy generated files

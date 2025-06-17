@@ -3,13 +3,13 @@ debug = False
 task = ""
 
 # pdfium
-pdfium_git_branch = "chromium/6694"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/6694
+pdfium_git_branch = "chromium/7243"
+# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/7243
 # OBS 1: don't forget change in android docker file (docker/android/Dockerfile)
 # OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # emsdk
-emsdk_version = "3.1.64"
+emsdk_version = "4.0.10"
 # OBS 1: don't forget change in wasm docker file (docker/wasm/Dockerfile)
 
 # macos
@@ -78,5 +78,5 @@ targets_android = [
 configurations_wasm = ["release"]
 shared_lib_wasm = False
 targets_wasm = [
-    {"target_os": "wasm32", "target_cpu": "wasm", "pdfium_os": "wasm"},
+    {"target_os": "emscripten", "target_cpu": "wasm", "pdfium_os": "emscripten"},
 ]

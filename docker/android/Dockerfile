@@ -54,7 +54,7 @@ RUN mkdir /build
 WORKDIR /build
 RUN gclient config --custom-var checkout_configuration=minimal --unmanaged https://pdfium.googlesource.com/pdfium.git
 RUN echo "target_os = [ 'android' ]" >> .gclient
-RUN gclient sync -r origin/chromium/6694 --no-history --shallow
+RUN gclient sync -r origin/chromium/7243 --no-history --shallow
 
 # pdfium reset and clean directories
 RUN git -C /build/pdfium reset --hard
@@ -80,7 +80,7 @@ RUN apt-get install -o APT::Immediate-Configure=false -f apt \
     && apt-get -f install \
     && dpkg --configure -a \
     && apt-get -y dist-upgrade \
-    && echo n | ./build/install-build-deps.sh --android \
+    && echo n | ./build/install-build-deps.sh --android || true \
     && rm -rf /build
 
 # ninja

@@ -167,11 +167,10 @@ def get_build_args(
         # static lib
         if not shared:
             args.append("pdf_is_complete_lib=true")
-    elif target_os.startswith("wasm"):
+    elif target_os.startswith("emscripten"):
         args.append("pdf_is_complete_lib=true")
         args.append("is_clang=false")
         args.append("use_custom_libcxx=false")
-        args.append("use_sysroot=false")
 
     if libc == "musl":
         args.append("is_musl=true")

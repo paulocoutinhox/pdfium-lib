@@ -15,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { name: "Ubuntu", os: "ubuntu-20.04", target: "android" }
+          - { name: "Ubuntu", os: "ubuntu-24.04", target: "android" }
 
     steps:
       - uses: actions/checkout@v4
