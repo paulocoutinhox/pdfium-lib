@@ -45,13 +45,13 @@ jobs:
 
       - name: Install EMSDK
         run: |
-          mkdir -p /emsdk
-          cd /emsdk
+          mkdir -p emsdk
+          cd emsdk
           git clone https://github.com/emscripten-core/emsdk.git .
           ./emsdk install 4.0.10
           ./emsdk activate 4.0.10
-          echo "EMSDK=/emsdk" >> $GITHUB_ENV
-          echo "/emsdk:/emsdk/upstream/emscripten" >> $GITHUB_PATH
+          echo "EMSDK=${{ github.workspace }}/emsdk" >> $GITHUB_ENV
+          echo "${{ github.workspace }}/emsdk:${{ github.workspace }}/emsdk/upstream/emscripten" >> $GITHUB_PATH
 
       - name: Install Node
         uses: actions/setup-node@v4
