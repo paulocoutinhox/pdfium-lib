@@ -592,7 +592,7 @@ def run_task_generate():
                 "-s",
                 f"EXPORTED_FUNCTIONS={complete_functions_list}",
                 "-s",
-                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports"]\'',
+                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports", "HEAPU8"]\'',
                 "custom.cpp",
                 lib_file_out,
                 "-I{0}".format(include_dir),
@@ -624,6 +624,8 @@ def run_task_generate():
             es6_command = [
                 *base_command,
                 "-s" "EXPORT_ES6=1",
+                "-s",
+                'EXPORTED_RUNTIME_METHODS=\'["ccall", "cwrap", "wasmExports", "HEAPU8"]\'',
                 "-o",
                 os.path.join(gen_out_dir, "pdfium.esm.js"),
             ]
