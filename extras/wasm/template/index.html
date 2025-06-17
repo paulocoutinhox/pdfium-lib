@@ -187,7 +187,10 @@
             }
 
             render(n = 0, canvas, scale, rotation) {
-                const [w, h] = this.getPageSize(n, scale, rotation);
+                let [w, h] = this.getPageSize(n, scale, rotation);
+                w = Math.ceil(w);
+                h = Math.ceil(h);
+
                 const data = this.getPageRender(n, w, h, rotation);
 
                 canvas.width = w;
