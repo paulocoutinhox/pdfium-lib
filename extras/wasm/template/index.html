@@ -1,1222 +1,1321 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8">
 
-    <meta name="viewport"
-        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"
+    >
 
     <title>PDFium PDF Viewer</title>
-    <meta name="description"
-        content="Quickly view your PDF files with the PDFium PDF Viewer. Easy, fast, and secure, all within your browser.">
-    <meta name="keywords"
-        content="pdfium, pdf viewer, view pdf, pdf reader, browser, webassembly, fast pdf, secure pdf">
+    <meta
+      name="description"
+      content="Quickly view your PDF files with the PDFium PDF Viewer. Easy, fast, and secure, all within your browser."
+    >
+    <meta
+      name="keywords"
+      content="pdfium, pdf viewer, view pdf, pdf reader, browser, webassembly, fast pdf, secure pdf"
+    >
 
     <meta property="og:title" content="PDFium PDF Viewer">
-    <meta property="og:description"
-        content="Quickly view your PDF files with the PDFium PDF Viewer. Easy, fast, and secure, all within your browser.">
-    <meta property="og:image" content="https://pdfium-lib.s3.amazonaws.com/others/logo.png">
+    <meta
+      property="og:description"
+      content="Quickly view your PDF files with the PDFium PDF Viewer. Easy, fast, and secure, all within your browser."
+    >
+    <meta
+      property="og:image"
+      content="https://pdfium-lib.s3.amazonaws.com/others/logo.png"
+    >
     <meta property="og:url" content="https://pdfviewer.github.io">
     <meta property="og:type" content="website">
 
-    <link rel="shortcut icon"
-        href="data:image/x-icon;base64,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" />
+    <link
+      rel="shortcut icon"
+      href="data:image/x-icon;base64,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"
+    >
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"
+    >
 
     <script src="pdfium.js?v={pdfium-branch}"></script>
 
     <script>
-        // variables
-        let currentPageIndex = 1;
-        let pageLoaded = false;
-        let moduleLoaded = false;
-        let debugMode = false;
-        let autoOpenMode = true;
-        let doc;
-        let FPDF = {};
-        let Module = null;
+    "use strict";
+    // variables
+    let currentPageIndex = 1;
+    let pageLoaded = false;
+    let moduleLoaded = false;
+    let debugMode = false;
+    let autoOpenMode = true;
+    let doc;
+    const FPDF = {};
+    let Module = null;
 
-        // pdfium initialization
-        Object.assign(FPDF, {
-            ANNOT: 0x01, // Set if annotations are to be rendered.
-            LCD_TEXT: 0x02, // Set if using text rendering optimized for LCD display.
-            NO_NATIVETEXT: 0x04, // Don't use the native text output available on some platforms
-            GRAYSCALE: 0x08, // Grayscale output.
-            DEBUG_INFO: 0x80, // Set if you want to get some debug info. Please discuss with Foxit first if you need to collect debug info.
-            NO_CATCH: 0x100, // Set if you don't want to catch exception.
-            RENDER_LIMITEDIMAGECACHE: 0x200, // Limit image cache size.
-            RENDER_FORCEHALFTONE: 0x400, // Always use halftone for image stretching.
-            PRINTING: 0x800, // Render for printing.
-            REVERSE_BYTE_ORDER: 0x10, // Set whether render in a reverse Byte order, this flag only.
-            Bitmap_Gray: 1,
-            Bitmap_BGR: 2,
-            Bitmap_BGRx: 3,
-            Bitmap_BGRA: 4,
-            LAST_ERROR: { // Last error types
-                SUCCESS: 0,
-                UNKNOWN: 1,
-                FILE: 2,
-                FORMAT: 3,
-                PASSWORD: 4,
-                SECURITY: 5,
-                PAGE: 6
-            }
-        });
+    // pdfium initialization
+    Object.assign(FPDF, {
+      ANNOT: 0x01, // Set if annotations are to be rendered.
+      LCD_TEXT: 0x02, // Set if using text rendering optimized for LCD display.
+      NO_NATIVETEXT: 0x04, // Don't use the native text output available on some platforms
+      GRAYSCALE: 0x08, // Grayscale output.
+      DEBUG_INFO: 0x80, // Set if you want to get some debug info. Please discuss with Foxit first if you need to collect debug info.
+      NO_CATCH: 0x1_00, // Set if you don't want to catch exception.
+      RENDER_LIMITEDIMAGECACHE: 0x2_00, // Limit image cache size.
+      RENDER_FORCEHALFTONE: 0x4_00, // Always use halftone for image stretching.
+      PRINTING: 0x8_00, // Render for printing.
+      REVERSE_BYTE_ORDER: 0x10, // Set whether render in a reverse Byte order, this flag only.
+      Bitmap_Gray: 1,
+      Bitmap_BGR: 2,
+      Bitmap_BGRx: 3,
+      Bitmap_BGRA: 4,
+      LAST_ERROR: {
+        // Last error types
+        SUCCESS: 0,
+        UNKNOWN: 1,
+        FILE: 2,
+        FORMAT: 3,
+        PASSWORD: 4,
+        SECURITY: 5,
+        PAGE: 6,
+      },
+    });
 
-        const I8 = Int8Array;
-        const I16 = Int16Array;
-        const I32 = Int32Array;
-        const U8 = Uint8Array;
-        const CH = U8;
-        const U16 = Uint16Array;
-        const U32 = Uint32Array;
-        const F32 = Float32Array;
-        const F64 = Float64Array;
+    const I8 = Int8Array;
+    const I16 = Int16Array;
+    const I32 = Int32Array;
+    const U8 = Uint8Array;
+    const CH = U8;
+    const U16 = Uint16Array;
+    const U32 = Uint32Array;
+    const F32 = Float32Array;
+    const F64 = Float64Array;
 
-        const H = (t, s, d) => f => {
-            const [m, ...a] = heap(t, s);
-            const v = f(...a.map(x => x.p));
+    const H = (t, s, d) => (f) => {
+      const [m, ...a] = heap(t, s);
+      const v = f(...a.map((x) => x.p));
 
-            if (!v) {
-                m.free();
-                return d;
-            }
+      if (!v) {
+        m.free();
+        return d;
+      }
 
-            const r = a.map(x => x.v);
-            m.free();
-            return r;
+      const r = a.map((x) => x.v);
+      m.free();
+      return r;
+    };
+
+    const F = FPDF.Bitmap_BGRA;
+    const C = 4;
+
+    // classes
+    class Page {
+      constructor(index, processor) {
+        this.index = index;
+        this.src = null;
+        this.processor = processor;
+      }
+
+      render() {
+        const canvas = document.createElement("canvas");
+        this.processor.render(this.index, canvas, 3.0, 90);
+
+        const dataUri = canvas.toDataURL();
+        this.updateImage(dataUri);
+      }
+
+      createImage() {
+        const image = document.createElement("img");
+        const pageIndex = this.index;
+
+        image.id = "pageImage" + (pageIndex + 1);
+        image.src = "";
+        image.className = "is-hidden page-list-item";
+
+        return image;
+      }
+
+      updateImage(dataUri) {
+        this.src = dataUri;
+
+        // update image in pageList
+        const pageIndex = this.index;
+        const image = document.getElementById("pageImage" + (pageIndex + 1));
+        image.src = dataUri;
+        image.classList.remove("is-hidden");
+        image.onclick = () => {
+          openModal();
+          changeCurrentPageItem(pageIndex + 1);
         };
 
-        const F = FPDF.Bitmap_BGRA;
-        const C = 4;
+        const container = image.closest(".cell");
+        const loaderWrapper = container.querySelector(".page-loader-wrapper");
 
-        // classes
-        class Page {
-            constructor(index, processor) {
-                this.index = index;
-                this.src = null;
-                this.processor = processor;
-            }
+        if (loaderWrapper) {
+          loaderWrapper.remove();
+        }
+      }
 
-            render() {
-                let canvas = document.createElement('canvas');
-                this.processor.render(this.index, canvas, 3.0, 90);
+      get loaded() {
+        return this.src !== null;
+      }
+    }
 
-                let dataUri = canvas.toDataURL();
-                this.updateImage(dataUri);
-            }
+    class Processor {
+      constructor(wasmData) {
+        this.wasmData = wasmData;
+      }
 
-            createImage() {
-                let image = document.createElement('img');
-                let pageIndex = this.index;
+      getPageSize(i = 0, s = 2) {
+        return H(
+          F64,
+          2,
+          [-1, -1]
+        )((w, h) => FPDF.GetPageSizeByIndex(this.wasmData.wasm, i, w, h)).map(
+          (v) => Number.parseInt(v) * s
+        );
+      }
 
-                image.id = "pageImage" + (pageIndex + 1);
-                image.src = '';
-                image.className = "is-hidden page-list-item";
+      getRender(i = 0, w, h) {
+        const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
+        const heap = Module.wasmExports.malloc(w * h * C);
 
-                return image;
-            }
-
-            updateImage(dataUri) {
-                this.src = dataUri;
-
-                // update image in pageList
-                let pageIndex = this.index;
-                let image = document.getElementById("pageImage" + (pageIndex + 1));
-                image.src = dataUri;
-                image.classList.remove("is-hidden");
-                image.onclick = function () {
-                    openModal();
-                    changeCurrentPageItem(pageIndex + 1);
-                };
-
-                const container = image.closest('.cell');
-                const loaderWrapper = container.querySelector('.page-loader-wrapper');
-
-                if (loaderWrapper) {
-                    loaderWrapper.remove();
-                }
-            }
-
-            get loaded() {
-                return this.src !== null;
-            }
+        for (let i = 0; i < w * h * C; i++) {
+          Module.HEAPU8[heap + i] = 0;
         }
 
-        class Processor {
-            constructor(wasmData) {
-                this.wasmData = wasmData;
-            }
+        const bmap = FPDF.Bitmap_CreateEx(w, h, F, heap, w * C);
+        const page = FPDF.LoadPage(this.wasmData.wasm, i);
 
-            getPageSize(i = 0, s = 2) {
-                return H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(this.wasmData.wasm, i, w, h)).map(v => parseInt(v) * s);
-            }
+        FPDF.Bitmap_FillRect(bmap, 0, 0, w, h, 0xff_ff_ff_ff);
+        FPDF.RenderPageBitmap(bmap, page, 0, 0, w, h, 0, flag);
+        FPDF.Bitmap_Destroy(bmap);
+        FPDF.ClosePage(page);
 
-            getRender(i = 0, w, h) {
-                const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
-                const heap = Module.wasmExports.malloc(w * h * C);
+        return heap;
+      }
 
-                for (let i = 0; i < w * h * C; i++) {
-                    Module.HEAPU8[heap + i] = 0;
-                }
+      getPageRender(n = 0, w, h) {
+        const pageRenderPtr = this.getRender(n, w, h);
+        const pageRenderData = [];
 
-                const bmap = FPDF.Bitmap_CreateEx(w, h, F, heap, w * C);
-                const page = FPDF.LoadPage(this.wasmData.wasm, i);
-
-                FPDF.Bitmap_FillRect(bmap, 0, 0, w, h, 0xFFFFFFFF);
-                FPDF.RenderPageBitmap(bmap, page, 0, 0, w, h, 0, flag);
-                FPDF.Bitmap_Destroy(bmap);
-                FPDF.ClosePage(page);
-
-                return heap;
-            }
-
-            getPageRender(n = 0, w, h) {
-                let pageRenderPtr = this.getRender(n, w, h);
-                let pageRenderData = [];
-
-                for (let v = 0; v < w * h * C; v++) {
-                    pageRenderData.push(Module.HEAPU8[pageRenderPtr + v]);
-                }
-
-                Module.wasmExports.free(pageRenderPtr);
-
-                return pageRenderData;
-            }
-
-            render(n = 0, canvas, scale, rotation) {
-                let [w, h] = this.getPageSize(n, scale, rotation);
-                w = Math.ceil(w);
-                h = Math.ceil(h);
-
-                const data = this.getPageRender(n, w, h, rotation);
-
-                canvas.width = w;
-                canvas.height = h;
-
-                const x = canvas.getContext('2d');
-                const i = x.createImageData(w, h);
-                i.data.set(data);
-                x.putImageData(i, 0, 0);
-            }
-
-            getLastError() {
-                let lastError = FPDF.GetLastError();
-
-                switch (lastError) {
-                    case FPDF.LAST_ERROR.SUCCESS:
-                        return "success";
-                        break;
-                    case FPDF.LAST_ERROR.UNKNOWN:
-                        return "unknown error";
-                        break;
-                    case FPDF.LAST_ERROR.FILE:
-                        return "file not found or could not be opened";
-                        break;
-                    case FPDF.LAST_ERROR.FORMAT:
-                        return "file not in PDF format or corrupted";
-                        break;
-                    case FPDF.LAST_ERROR.PASSWORD:
-                        return "password required or incorrect password";
-                        break;
-                    case FPDF.LAST_ERROR.SECURITY:
-                        return "unsupported security scheme";
-                        break;
-                    case FPDF.LAST_ERROR.PAGE:
-                        return "page not found or content error";
-                        break;
-                    default:
-                        return "unknown error";
-                }
-            }
+        for (let v = 0; v < w * h * C; v++) {
+          pageRenderData.push(Module.HEAPU8[pageRenderPtr + v]);
         }
 
-        class Doc {
-            constructor(wasmData) {
-                this.processor = new Processor(wasmData);
-            }
+        Module.wasmExports.free(pageRenderPtr);
 
-            setPages(pagesCount) {
-                this.pages = Array(pagesCount).fill(null);
-            }
+        return pageRenderData;
+      }
 
-            createAllPages() {
-                for (let i = 0; i < this.pages.length; i++) {
-                    this.pages[i] = new Page(i, this.processor);
-                }
-            }
+      render(n = 0, canvas, scale, rotation) {
+        let [w, h] = this.getPageSize(n, scale, rotation);
+        w = Math.ceil(w);
+        h = Math.ceil(h);
 
-            getPage(index) {
-                let page = this.pages[index];
+        const data = this.getPageRender(n, w, h, rotation);
 
-                if (!page) {
-                    page = new Page(index);
-                    this.pages[index] = page;
-                }
+        canvas.width = w;
+        canvas.height = h;
 
-                return page;
-            }
+        const x = canvas.getContext("2d");
+        const i = x.createImageData(w, h);
+        i.data.set(data);
+        x.putImageData(i, 0, 0);
+      }
 
-            async renderPages() {
-                const wasmBuffer = this.processor.wasmData.wasmBuffer;
-                const wasm = this.processor.wasmData.wasm;
+      getLastError() {
+        const lastError = FPDF.GetLastError();
 
-                const renderNextPage = async (index) => {
-                    if (index < doc.pages.length) {
-                        let page = doc.getPage(index);
-                        if (!page.loaded) {
-                            await new Promise(requestAnimationFrame);
-                            page.render();
-                        }
-                        setTimeout(() => renderNextPage(index + 1), 100);
-                    } else {
-                        Module.wasmExports.free(wasmBuffer);
-                        FPDF.CloseDocument(wasm);
-                        FPDF.DestroyLibrary();
-                    }
-                }
+        switch (lastError) {
+          case FPDF.LAST_ERROR.SUCCESS:
+            return "success";
+            break;
+          case FPDF.LAST_ERROR.UNKNOWN:
+            return "unknown error";
+            break;
+          case FPDF.LAST_ERROR.FILE:
+            return "file not found or could not be opened";
+            break;
+          case FPDF.LAST_ERROR.FORMAT:
+            return "file not in PDF format or corrupted";
+            break;
+          case FPDF.LAST_ERROR.PASSWORD:
+            return "password required or incorrect password";
+            break;
+          case FPDF.LAST_ERROR.SECURITY:
+            return "unsupported security scheme";
+            break;
+          case FPDF.LAST_ERROR.PAGE:
+            return "page not found or content error";
+            break;
+          default:
+            return "unknown error";
+        }
+      }
+    }
 
-                await renderNextPage(0);
-            }
+    class Doc {
+      constructor(wasmData) {
+        this.processor = new Processor(wasmData);
+      }
+
+      setPages(pagesCount) {
+        this.pages = Array(pagesCount).fill(null);
+      }
+
+      createAllPages() {
+        for (let i = 0; i < this.pages.length; i++) {
+          this.pages[i] = new Page(i, this.processor);
+        }
+      }
+
+      getPage(index) {
+        let page = this.pages[index];
+
+        if (!page) {
+          page = new Page(index);
+          this.pages[index] = page;
         }
 
-        // runtime initialized
-        PDFiumModule().then(function (pdfiumModule) {
-            Module = pdfiumModule;
+        return page;
+      }
 
-            moduleLoaded = true;
+      async renderPages() {
+        const wasmBuffer = this.processor.wasmData.wasmBuffer;
+        const wasm = this.processor.wasmData.wasm;
 
-            if (pageLoaded) {
-                console.log('The module was loaded!');
+        const renderNextPage = async (index) => {
+          if (index < doc.pages.length) {
+            const page = doc.getPage(index);
+            if (!page.loaded) {
+              await new Promise(requestAnimationFrame);
+              page.render();
             }
+            setTimeout(() => renderNextPage(index + 1), 100);
+          } else {
+            Module.wasmExports.free(wasmBuffer);
+            FPDF.CloseDocument(wasm);
+            FPDF.DestroyLibrary();
+          }
+        };
 
-            checkIfEverythingWasLoaded();
+        await renderNextPage(0);
+      }
+    }
+
+    // runtime initialized
+    PDFiumModule().then((pdfiumModule) => {
+      Module = pdfiumModule;
+
+      moduleLoaded = true;
+
+      if (pageLoaded) {
+        console.log("The module was loaded!");
+      }
+
+      checkIfEverythingWasLoaded();
+    });
+
+    // functions
+    async function loadFile() {
+      try {
+        changeButton("Loading file from input...", "warning");
+
+        resetOnLoad();
+
+        const files = fileInput.files;
+
+        if (files.length <= 0) {
+          throw { message: "Select a PDF file or type a public PDF url" };
+        }
+
+        const file = files[0];
+
+        const fileByteArray = await fileToByteArray(file);
+
+        if (fileByteArray.length <= 0) {
+          throw { message: "The PDF file is invalid" };
+        }
+
+        changeButton("Processing file...", "warning");
+
+        setTimeout(() => {
+          processPDF(fileByteArray);
+        }, 300);
+      } catch (error) {
+        changeButton("Error while load file", "danger");
+        console.log("Error while load file: " + error.message);
+      }
+    }
+
+    async function loadFileFromURL(url) {
+      try {
+        changeButton("Loading file from URL...", "warning");
+
+        resetOnLoad();
+
+        const response = await fetch(url);
+        const fileBuffer = await response.arrayBuffer();
+        const fileByteArray = new Uint8Array(fileBuffer);
+
+        if (fileByteArray.length <= 0) {
+          throw { message: "The PDF file is invalid" };
+        }
+
+        changeButton("Processing file...", "warning");
+
+        setTimeout(() => {
+          processPDF(fileByteArray);
+        }, 300);
+      } catch (error) {
+        changeButton("Error while load file from URL", "danger");
+        console.log("Error while load file from URL: " + error.message);
+      }
+    }
+
+    async function processPDF(fileByteArray) {
+      try {
+        // html general
+        changeButton("Processing file...", "warning");
+
+        const pageListContainer = document.getElementById("pageListContainer");
+        const pageList = document.getElementById("pageList");
+        const pageListTitle = document.getElementById("pageListTitle");
+
+        pageListContainer.style.display = "none";
+        pageList.innerHTML = "";
+
+        // check file size
+        console.log("Getting file size...");
+
+        const fileSize = fileByteArray.length;
+        console.log("File size: " + fileSize + " bytes");
+
+        // init library
+        console.log("Initializing library...");
+
+        FPDF.Init();
+
+        // load document to memory
+        console.log("Loading data to buffer...");
+
+        const wasmBuffer = Module.wasmExports.malloc(fileSize);
+        Module.HEAPU8.set(fileByteArray, wasmBuffer);
+
+        // create document
+        console.log("Loading document...");
+
+        doc = new Doc({
+          wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
+          wasmBuffer,
         });
 
-        // functions
-        async function loadFile() {
-            try {
-                changeButton('Loading file from input...', 'warning');
+        // check last error
+        const lastError = doc.processor.getLastError();
+        console.log("Load document state: " + lastError);
 
-                resetOnLoad();
+        // count page
+        console.log("Couting pages...");
 
-                let files = fileInput.files;
+        const pages = FPDF.GetPageCount(doc.processor.wasmData.wasm);
+        console.log("Pages: " + pages);
 
-                if (files.length <= 0) {
-                    throw { message: "Select a PDF file or type a public PDF url" };
-                }
+        // list all pages
+        if (pages > 0) {
+          console.log("Rendering " + pages + " PDF pages...");
 
-                let file = files[0];
+          doc.setPages(pages);
+          doc.createAllPages();
 
-                let fileByteArray = await fileToByteArray(file);
+          for (let x = 0; x < pages; x++) {
+            console.log("Rendering page " + (x + 1) + "...");
 
-                if (fileByteArray.length <= 0) {
-                    throw { message: "The PDF file is invalid" };
-                }
+            // render to canvas
+            console.log("Rendering to canvas...");
 
-                changeButton('Processing file...', 'warning');
+            // add page item
+            console.log("Adding page item...");
 
-                setTimeout(function () {
-                    processPDF(fileByteArray);
-                }, 300);
-            } catch (error) {
-                changeButton('Error while load file', 'danger');
-                console.log('Error while load file: ' + error.message);
+            const image = doc.getPage(x).createImage();
+
+            // add content item
+            const content = document.createElement("div");
+            content.className = "content";
+            content.appendChild(image);
+
+            // add loader content
+            const loaderContent = document.createElement("span");
+            loaderContent.className = "loader";
+
+            // add loader
+            const loader = document.createElement("div");
+            loader.className = "page-loader-wrapper";
+            loader.appendChild(loaderContent);
+            content.appendChild(loader);
+
+            // add card
+            const cardContent = document.createElement("div");
+            cardContent.className = "card-content";
+            cardContent.appendChild(content);
+
+            const card = document.createElement("div");
+            card.className = "card";
+            card.appendChild(cardContent);
+
+            const cell = document.createElement("div");
+            cell.className = "cell";
+            cell.style.position = "relative";
+            cell.appendChild(card);
+
+            pageList.appendChild(cell);
+
+            // show results
+            console.log("Page " + (x + 1) + " rendered");
+          }
+
+          const firstPage = await doc.getPage(0);
+          firstPage.render();
+
+          pageListTitle.innerHTML = "Number of pages: " + pages;
+
+          pageListContainer.style.display = "block";
+
+          if (autoOpenMode) {
+            showPageItem(currentPageIndex);
+          }
+
+          showFileForm(false);
+
+          setTimeout(() => {
+            console.log("Scrolling to top...");
+            scrollToTop();
+          }, 100);
+        } else {
+          console.log("Cannot render PDF pages: PDF is empty");
+        }
+
+        // clean memory
+        console.log("Cleaning objects...");
+
+        // initial state
+        buttonToInitialState();
+
+        console.log("Finished");
+      } catch (error) {
+        changeButton("Error while process PDF", "danger");
+        console.log("Error while process PDF: " + error.message);
+      }
+    }
+
+    function fileToByteArray(file) {
+      return new Promise((resolve, reject) => {
+        try {
+          const reader = new FileReader();
+          const fileByteArray = [];
+
+          reader.readAsArrayBuffer(file);
+          reader.onloadend = (evt) => {
+            if (evt.target.readyState == FileReader.DONE) {
+              const arrayBuffer = evt.target.result,
+                array = new Uint8Array(arrayBuffer);
+              for (byte of array) {
+                fileByteArray.push(byte);
+              }
             }
+            resolve(fileByteArray);
+          };
+        } catch (e) {
+          reject(e);
         }
+      });
+    }
 
-        async function loadFileFromURL(url) {
-            try {
-                changeButton('Loading file from URL...', 'warning');
+    function changeButton(text, className) {
+      const btRun = document.getElementById("btRun");
+      btRun.firstChild.data = text;
+      btRun.className = "button is-" + className;
+    }
 
-                resetOnLoad();
+    function getUrlParam(param) {
+      const params = getAllUrlParams(window.location.href);
 
-                let response = await fetch(url);
-                let fileBuffer = await response.arrayBuffer();
-                let fileByteArray = new Uint8Array(fileBuffer);
+      if (
+        params != null &&
+        params !== undefined &&
+        Object.hasOwn(params, param)
+      ) {
+        const value = params[param];
 
-                if (fileByteArray.length <= 0) {
-                    throw { message: "The PDF file is invalid" };
-                }
+        if (value != null && value !== undefined) {
+          return value;
+        }
+      }
 
-                changeButton('Processing file...', 'warning');
+      return null;
+    }
 
-                setTimeout(function () {
-                    processPDF(fileByteArray);
-                }, 300);
-            } catch (error) {
-                changeButton('Error while load file from URL', 'danger');
-                console.log('Error while load file from URL: ' + error.message);
+    function getAllUrlParams(url) {
+      // get query string from url (optional) or window
+      var queryString = url
+        ? url.split("?")[1]
+        : window.location.search.slice(1);
+
+      // we'll store the parameters here
+      var obj = {};
+
+      // if query string exists
+      if (queryString) {
+        // stuff after # is not part of query string, so get rid of it
+        queryString = queryString.split("#")[0];
+
+        // split our query string into its component parts
+        var arr = queryString.split("&");
+
+        for (var i = 0; i < arr.length; i++) {
+          // separate the keys and the values
+          var a = arr[i].split("=");
+
+          // in case params look like: list[]=thing1&list[]=thing2
+          var paramNum;
+          var paramName = a[0].replace(/\[\d*\]/, (v) => {
+            paramNum = v.slice(1, -1);
+            return "";
+          });
+
+          // set parameter value (use 'true' if empty)
+          var paramValue = typeof a[1] === "undefined" ? true : a[1];
+
+          // if parameter name already exists
+          if (obj[paramName]) {
+            // convert value to array (if still string)
+            if (typeof obj[paramName] === "string") {
+              obj[paramName] = [obj[paramName]];
             }
-        }
-
-        async function processPDF(fileByteArray) {
-            try {
-                // html general
-                changeButton('Processing file...', 'warning');
-
-                let pageListContainer = document.getElementById('pageListContainer');
-                let pageList = document.getElementById('pageList');
-                let pageListTitle = document.getElementById('pageListTitle');
-
-                pageListContainer.style.display = "none";
-                pageList.innerHTML = "";
-
-                // check file size
-                console.log('Getting file size...');
-
-                let fileSize = fileByteArray.length;
-                console.log("File size: " + fileSize + " bytes");
-
-                // init library
-                console.log('Initializing library...');
-
-                FPDF.Init();
-
-                // load document to memory
-                console.log('Loading data to buffer...');
-
-                let wasmBuffer = Module.wasmExports.malloc(fileSize);
-                Module.HEAPU8.set(fileByteArray, wasmBuffer);
-
-                // create document
-                console.log('Loading document...');
-
-                doc = new Doc({
-                    wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
-                    wasmBuffer: wasmBuffer,
-                });
-
-                // check last error
-                let lastError = doc.processor.getLastError();
-                console.log("Load document state: " + lastError);
-
-                // count page
-                console.log('Couting pages...');
-
-                let pages = FPDF.GetPageCount(doc.processor.wasmData.wasm);
-                console.log('Pages: ' + pages);
-
-                // list all pages
-                if (pages > 0) {
-                    console.log('Rendering ' + pages + ' PDF pages...');
-
-                    doc.setPages(pages);
-                    doc.createAllPages();
-
-                    for (let x = 0; x < pages; x++) {
-                        console.log('Rendering page ' + (x + 1) + '...');
-
-                        // render to canvas
-                        console.log("Rendering to canvas...");
-
-                        // add page item
-                        console.log("Adding page item...");
-
-                        const image = doc.getPage(x).createImage();
-
-                        // add content item
-                        let content = document.createElement('div');
-                        content.className = "content";
-                        content.appendChild(image);
-
-                        // add loader content
-                        let loaderContent = document.createElement('span');
-                        loaderContent.className = "loader";
-
-                        // add loader
-                        let loader = document.createElement('div');
-                        loader.className = "page-loader-wrapper";
-                        loader.appendChild(loaderContent);
-                        content.appendChild(loader);
-
-                        // add card
-                        let cardContent = document.createElement('div');
-                        cardContent.className = "card-content";
-                        cardContent.appendChild(content);
-
-                        let card = document.createElement('div');
-                        card.className = "card";
-                        card.appendChild(cardContent);
-
-                        let cell = document.createElement('div');
-                        cell.className = "cell";
-                        cell.style.position = "relative";
-                        cell.appendChild(card);
-
-                        pageList.appendChild(cell);
-
-                        // show results
-                        console.log('Page ' + (x + 1) + ' rendered');
-                    }
-
-                    let firstPage = await doc.getPage(0);
-                    firstPage.render();
-
-                    pageListTitle.innerHTML = "Number of pages: " + pages;
-
-                    pageListContainer.style.display = "block";
-
-                    if (autoOpenMode) {
-                        showPageItem(currentPageIndex);
-                    }
-
-                    showFileForm(false);
-
-                    setTimeout(function () {
-                        console.log('Scrolling to top...');
-                        scrollToTop();
-                    }, 100);
-                } else {
-                    console.log('Cannot render PDF pages: PDF is empty');
-                }
-
-                // clean memory
-                console.log('Cleaning objects...');
-
-                // initial state
-                buttonToInitialState();
-
-                console.log('Finished');
-            } catch (error) {
-                changeButton('Error while process PDF', 'danger');
-                console.log('Error while process PDF: ' + error.message);
+            // if no array index number specified...
+            if (typeof paramNum === "undefined") {
+              // put the value on the end of the array
+              obj[paramName].push(paramValue);
             }
-        }
-
-        function fileToByteArray(file) {
-            return new Promise((resolve, reject) => {
-                try {
-                    let reader = new FileReader();
-                    let fileByteArray = [];
-
-                    reader.readAsArrayBuffer(file);
-                    reader.onloadend = (evt) => {
-                        if (evt.target.readyState == FileReader.DONE) {
-                            let arrayBuffer = evt.target.result,
-                                array = new Uint8Array(arrayBuffer);
-                            for (byte of array) {
-                                fileByteArray.push(byte);
-                            }
-                        }
-                        resolve(fileByteArray);
-                    }
-                }
-                catch (e) {
-                    reject(e);
-                }
-            })
-        }
-
-        function changeButton(text, className) {
-            let btRun = document.getElementById('btRun');
-            btRun.firstChild.data = text;
-            btRun.className = 'button is-' + className;
-        }
-
-        function getUrlParam(param) {
-            let params = getAllUrlParams(window.location.href);
-
-            if (params != null && params !== undefined) {
-                if (params.hasOwnProperty(param)) {
-                    let value = params[param];
-
-                    if (value != null && value !== undefined) {
-                        return value;
-                    }
-                }
+            // if array index number specified...
+            else {
+              // put the value at that index number
+              obj[paramName][paramNum] = paramValue;
             }
-
-            return null;
+          }
+          // if param name doesn't exist yet, set it
+          else {
+            obj[paramName] = paramValue;
+          }
         }
+      }
 
-        function getAllUrlParams(url) {
-            // get query string from url (optional) or window
-            var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
+      return obj;
+    }
 
-            // we'll store the parameters here
-            var obj = {};
+    function buttonToInitialState() {
+      changeButton("Process file", "success");
+    }
 
-            // if query string exists
-            if (queryString) {
+    function changeFileTitle(title) {
+      const fileTitle = document.getElementById("fileTitle");
+      fileTitle.innerHTML = decodeURI(title);
+    }
 
-                // stuff after # is not part of query string, so get rid of it
-                queryString = queryString.split('#')[0];
+    function changePageTitle(title) {
+      document.title = decodeURI(title) + " - PDF Viewer";
+    }
 
-                // split our query string into its component parts
-                var arr = queryString.split('&');
+    function showDebugConsole(show) {
+      const debugConsole = document.getElementById("debugConsole");
 
-                for (var i = 0; i < arr.length; i++) {
-                    // separate the keys and the values
-                    var a = arr[i].split('=');
+      if (show) {
+        debugConsole.style.display = "block";
+      } else {
+        debugConsole.style.display = "none";
+      }
+    }
 
-                    // in case params look like: list[]=thing1&list[]=thing2
-                    var paramNum = undefined;
-                    var paramName = a[0].replace(/\[\d*\]/, function (v) {
-                        paramNum = v.slice(1, -1);
-                        return '';
-                    });
+    function showFileTitle(show) {
+      const fileTitle = document.getElementById("fileTitle");
 
-                    // set parameter value (use 'true' if empty)
-                    var paramValue = typeof (a[1]) === 'undefined' ? true : a[1];
+      if (show) {
+        fileTitle.style.display = "block";
+      } else {
+        fileTitle.style.display = "none";
+      }
+    }
 
-                    // if parameter name already exists
-                    if (obj[paramName]) {
-                        // convert value to array (if still string)
-                        if (typeof obj[paramName] === 'string') {
-                            obj[paramName] = [obj[paramName]];
-                        }
-                        // if no array index number specified...
-                        if (typeof paramNum === 'undefined') {
-                            // put the value on the end of the array
-                            obj[paramName].push(paramValue);
-                        }
-                        // if array index number specified...
-                        else {
-                            // put the value at that index number
-                            obj[paramName][paramNum] = paramValue;
-                        }
-                    }
-                    // if param name doesn't exist yet, set it
-                    else {
-                        obj[paramName] = paramValue;
-                    }
-                }
-            }
+    function showFileForm(show) {
+      const fileForm = document.getElementById("fileForm");
 
-            return obj;
-        }
+      if (show) {
+        fileForm.style.display = "block";
+      } else {
+        fileForm.style.display = "none";
+      }
+    }
 
-        function buttonToInitialState() {
-            changeButton('Process file', 'success');
-        }
+    function showLoading(show) {
+      const loading = document.getElementById("loadingContainer");
 
-        function changeFileTitle(title) {
-            let fileTitle = document.getElementById('fileTitle');
-            fileTitle.innerHTML = decodeURI(title);
-        }
+      if (show) {
+        loading.className = "loader-wrapper is-active";
+      } else {
+        loading.className = "loader-wrapper";
+      }
 
-        function changePageTitle(title) {
-            document.title = decodeURI(title) + " - PDF Viewer";
-        }
+      return false;
+    }
 
-        function showDebugConsole(show) {
-            let debugConsole = document.getElementById('debugConsole');
+    function showFooter(show) {
+      const footer = document.getElementById("footer");
 
-            if (show) {
-                debugConsole.style.display = "block";
-            } else {
-                debugConsole.style.display = "none";
-            }
-        }
+      if (show) {
+        footer.style.display = "block";
+      } else {
+        footer.style.display = "none";
+      }
+    }
 
-        function showFileTitle(show) {
-            let fileTitle = document.getElementById('fileTitle');
+    function scrollToTop() {
+      window.scrollTo({ top: 0 });
+    }
 
-            if (show) {
-                fileTitle.style.display = "block";
-            } else {
-                fileTitle.style.display = "none";
-            }
-        }
+    function openModal() {
+      const modal = document.getElementById("pageModal");
 
-        function showFileForm(show) {
-            let fileForm = document.getElementById('fileForm');
+      if (typeof modal != "undefined") {
+        modal.className = "modal is-active";
+      }
+    }
 
-            if (show) {
-                fileForm.style.display = "block";
-            } else {
-                fileForm.style.display = "none";
-            }
-        }
+    function closeModal() {
+      const modal = document.getElementById("pageModal");
 
-        function showLoading(show) {
-            let loading = document.getElementById('loadingContainer');
+      if (typeof modal != "undefined") {
+        modal.className = "modal";
+      }
 
-            if (show) {
-                loading.className = "loader-wrapper is-active";
-            } else {
-                loading.className = "loader-wrapper";
-            }
+      setTimeout(() => {
+        doc.renderPages();
+      }, 500);
+    }
 
-            return false;
-        }
+    function modalIsOpened() {
+      const modal = document.getElementById("pageModal");
 
-        function showFooter(show) {
-            let footer = document.getElementById('footer');
+      if (modal.classList.contains("is-active")) {
+        return true;
+      }
 
-            if (show) {
-                footer.style.display = "block";
-            } else {
-                footer.style.display = "none";
-            }
-        }
+      return false;
+    }
 
-        function scrollToTop() {
-            window.scrollTo({ top: 0 })
-        }
+    function changeCurrentPageItemPlus(n) {
+      showPageItem((currentPageIndex += n));
+    }
 
-        function openModal() {
-            let modal = document.getElementById('pageModal');
+    function changeCurrentPageItem(index) {
+      showPageItem(index);
+    }
 
-            if (typeof modal != "undefined") {
-                modal.className = "modal is-active";
-            }
-        }
+    function showPageItem(index) {
+      const pages = document.getElementsByClassName("page-list-item");
+      const pageModalImage = document.getElementById("pageModalImage");
 
-        function closeModal() {
-            let modal = document.getElementById('pageModal');
+      if (index > pages.length) {
+        currentPageIndex = pages.length;
+      } else if (index < 1) {
+        currentPageIndex = 1;
+      } else {
+        currentPageIndex = index;
+      }
 
-            if (typeof modal != "undefined") {
-                modal.className = "modal";
+      const currentPage = doc.getPage(currentPageIndex - 1);
+      if (!currentPage.loaded) {
+        currentPage.render();
+      }
+
+      const page = pages[currentPageIndex - 1];
+
+      if (typeof page != "undefined") {
+        pageModalImage.src = page.src;
+      }
+
+      const prevLink = document.querySelector(".page-prev");
+      const nextLink = document.querySelector(".page-next");
+      if (currentPageIndex === 1) {
+        prevLink.classList.add("disabled");
+      } else {
+        prevLink.classList.remove("disabled");
+      }
+      if (currentPageIndex === pages.length) {
+        nextLink.classList.add("disabled");
+      } else {
+        nextLink.classList.remove("disabled");
+      }
+
+      openModal();
+    }
+
+    function resetOnLoad() {
+      currentPageIndex = 1;
+    }
+
+    function bindKeys() {
+      document.onkeydown = (e) => {
+        switch (e.which) {
+          case 27:
+            // esc
+            if (modalIsOpened()) {
+              closeModal();
+              e.preventDefault();
             }
 
-            setTimeout(function () {
-                doc.renderPages();
-            }, 500)
+            break;
+
+          case 37:
+            // left
+            if (modalIsOpened()) {
+              changeCurrentPageItemPlus(-1);
+              e.preventDefault();
+            }
+
+            break;
+
+          case 39:
+            // right
+            if (modalIsOpened()) {
+              changeCurrentPageItemPlus(1);
+              e.preventDefault();
+            }
+
+            break;
+
+          default:
+            return;
         }
+      };
+    }
 
-        function modalIsOpened() {
-            let modal = document.getElementById('pageModal');
+    function checkIfEverythingWasLoaded() {
+      if (pageLoaded && moduleLoaded) {
+        startApp();
+      }
+    }
 
-            if (modal.classList.contains("is-active")) {
-                return true;
-            }
-
-            return false;
+    function startUI() {
+      // change console methods
+      if (typeof console != "undefined") {
+        if (typeof console.log != "undefined") {
+          console.olog = console.log;
+        } else {
+          console.olog = () => {};
         }
+      }
 
-        function changeCurrentPageItemPlus(n) {
-            showPageItem(currentPageIndex += n);
+      console.log = (message) => {
+        // we will disable it for now
+        // console.olog(message);
+
+        var currentDate = new Date().toLocaleTimeString();
+
+        var e = document.createElement("p");
+        e.innerHTML = "➔ [" + currentDate + "] " + message;
+
+        document.getElementById("debugConsoleContent").prepend(e);
+      };
+
+      console.error = console.debug = console.info = console.log;
+
+      // check for wasm support
+      if (!("WebAssembly" in window)) {
+        console.log("You need a browser with Web Assembly support enabled :(");
+        changeButton("Web Assembly not supported", "danger");
+        return;
+      }
+
+      // file input
+      var fileInput = document.querySelector(
+        "#file-container input[type=file]"
+      );
+      fileInput.onchange = () => {
+        if (fileInput.files.length > 0) {
+          var fileName = document.querySelector("#file-container .file-name");
+          fileName.textContent = fileInput.files[0].name;
         }
+      };
 
-        function changeCurrentPageItem(index) {
-            showPageItem(index);
+      // initial state
+      bindKeys();
+      buttonToInitialState();
+    }
+
+    function initializeFPDF() {
+      FPDF.Init = Module.cwrap("PDFium_Init");
+      FPDF.RenderPageBitmap = Module.cwrap("FPDF_RenderPageBitmap", "", [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+      ]);
+
+      FPDF.Bitmap_FillRect = Module.cwrap("FPDFBitmap_FillRect", "", [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+      ]);
+      FPDF.Bitmap_CreateEx = Module.cwrap("FPDFBitmap_CreateEx", "number", [
+        "number",
+        "number",
+        "number",
+        "number",
+        "number",
+      ]);
+      FPDF.Bitmap_Destroy = Module.cwrap("FPDFBitmap_Destroy", "", ["number"]);
+
+      FPDF.LoadPage = Module.cwrap("FPDF_LoadPage", "number", [
+        "number",
+        "number",
+      ]);
+      FPDF.ClosePage = Module.cwrap("FPDF_ClosePage", "", ["number"]);
+
+      FPDF.LoadMemDocument = Module.cwrap("FPDF_LoadMemDocument", "number", [
+        "number",
+        "number",
+        "string",
+      ]);
+      FPDF.GetPageSizeByIndex = Module.cwrap(
+        "FPDF_GetPageSizeByIndex",
+        "number",
+        ["number", "number", "number", "number"]
+      );
+      FPDF.GetLastError = Module.cwrap("FPDF_GetLastError", "number");
+      FPDF.GetPageCount = Module.cwrap("FPDF_GetPageCount", "number", [
+        "number",
+      ]);
+      FPDF.CloseDocument = Module.cwrap("FPDF_CloseDocument", "", ["number"]);
+      FPDF.DestroyLibrary = Module.cwrap("FPDF_DestroyLibrary");
+
+      window.heap = (J, s) => {
+        let E;
+        switch (J) {
+          case Int8Array:
+            E = Module.HEAP8;
+            break;
+          case Int16Array:
+            E = Module.HEAP16;
+            break;
+          case Int32Array:
+            E = Module.HEAP32;
+            break;
+          case Uint8Array:
+            E = Module.HEAPU8;
+            break;
+          case Uint16Array:
+            E = Module.HEAPU16;
+            break;
+          case Uint32Array:
+            E = Module.HEAPU32;
+            break;
+          case Float32Array:
+            E = Module.HEAPF32;
+            break;
+          case Float64Array:
+            E = Module.HEAPF64;
+            break;
         }
+        const Z = J.BYTES_PER_ELEMENT;
+        const m = Module.wasmExports.malloc(s * Z);
+        const a = Array(1 + s);
+        a[0] = { s, J, Z, E, m, free: () => Module.wasmExports.free(m) };
+        for (let i = 0; i < s; i++)
+          a[i + 1] = {
+            p: m + i * Z,
+            get v() {
+              return E[m / Z + i];
+            },
+          };
+        return a;
+      };
+    }
 
-        function showPageItem(index) {
-            let pages = document.getElementsByClassName("page-list-item");
-            let pageModalImage = document.getElementById("pageModalImage");
+    function startApp() {
+      // initialize FPDF
+      initializeFPDF();
 
-            if (index > pages.length) {
-                currentPageIndex = pages.length;
-            } else if (index < 1) {
-                currentPageIndex = 1;
-            } else {
-                currentPageIndex = index;
-            }
+      // let button start load files
+      const btRun = document.getElementById("btRun");
+      btRun.onclick = () => {
+        const urlInput = document.getElementById("urlInput");
+        const url = urlInput.value;
 
-            let currentPage = doc.getPage(currentPageIndex - 1);
-            if (!currentPage.loaded) {
-                currentPage.render();
-            }
-
-            let page = pages[currentPageIndex - 1];
-
-            if (typeof page != "undefined") {
-                pageModalImage.src = page.src;
-            }
-
-            const prevLink = document.querySelector('.page-prev');
-            const nextLink = document.querySelector('.page-next');
-            if (currentPageIndex === 1) {
-                prevLink.classList.add('disabled')
-            } else {
-                prevLink.classList.remove('disabled')
-            }
-            if (currentPageIndex === pages.length) {
-                nextLink.classList.add('disabled')
-            } else {
-                nextLink.classList.remove('disabled')
-            }
-
-            openModal();
+        if (url.length > 0) {
+          loadFileFromURL(url);
+        } else {
+          loadFile();
         }
+      };
 
-        function resetOnLoad() {
-            currentPageIndex = 1;
-        }
+      // load data from url
+      const urlParamTitle = getUrlParam("title");
+      const urlParamUrl = getUrlParam("url");
+      const urlParamDebug = getUrlParam("debug");
+      const urlParamOpen = getUrlParam("open");
 
-        function bindKeys() {
-            document.onkeydown = function (e) {
-                switch (e.which) {
-                    case 27:
-                        // esc
-                        if (modalIsOpened()) {
-                            closeModal();
-                            e.preventDefault();
-                        }
+      if (urlParamDebug && urlParamDebug === "1") {
+        debugMode = true;
+      } else {
+        debugMode = false;
+      }
 
-                        break;
+      if (urlParamOpen && urlParamOpen === "0") {
+        autoOpenMode = false;
+      } else {
+        autoOpenMode = true;
+      }
 
-                    case 37:
-                        // left
-                        if (modalIsOpened()) {
-                            changeCurrentPageItemPlus(-1)
-                            e.preventDefault();
-                        }
+      if (urlParamTitle) {
+        changeFileTitle(urlParamTitle);
+        changePageTitle(urlParamTitle);
+      }
 
-                        break;
+      if (urlParamUrl) {
+        const urlInput = document.getElementById("urlInput");
+        urlParamUrl.value = urlParamUrl;
 
-                    case 39:
-                        // right
-                        if (modalIsOpened()) {
-                            changeCurrentPageItemPlus(1)
-                            e.preventDefault();
-                        }
+        loadFileFromURL(decodeURI(urlParamUrl));
+      }
 
-                        break;
+      // show inicial things
+      showDebugConsole(debugMode);
+      showFileTitle(true);
+      showFileForm(true);
+      showFooter(true);
 
-                    default: return;
-                }
-            };
-        }
+      setTimeout(() => {
+        showLoading(false);
+      }, 500);
+    }
 
-        function checkIfEverythingWasLoaded() {
-            if (pageLoaded && moduleLoaded) {
-                startApp();
-            }
-        }
+    window.onload = (e) => {
+      pageLoaded = true;
 
-        function startUI() {
-            // change console methods
-            if (typeof console != "undefined") {
-                if (typeof console.log != 'undefined') {
-                    console.olog = console.log;
-                } else {
-                    console.olog = function () { };
-                }
-            }
+      startUI();
 
-            console.log = function (message) {
-                // we will disable it for now
-                // console.olog(message);
+      console.log("The page was loaded!");
 
-                var currentDate = new Date().toLocaleTimeString();
-
-                var e = document.createElement('p');
-                e.innerHTML = "➔ [" + currentDate + "] " + message;
-
-                document.getElementById('debugConsoleContent').prepend(e);
-            };
-
-            console.error = console.debug = console.info = console.log;
-
-            // check for wasm support
-            if (!('WebAssembly' in window)) {
-                console.log('You need a browser with Web Assembly support enabled :(');
-                changeButton('Web Assembly not supported', 'danger');
-                return;
-            }
-
-            // file input
-            var fileInput = document.querySelector('#file-container input[type=file]');
-            fileInput.onchange = () => {
-                if (fileInput.files.length > 0) {
-                    var fileName = document.querySelector('#file-container .file-name');
-                    fileName.textContent = fileInput.files[0].name;
-                }
-            }
-
-            // initial state
-            bindKeys();
-            buttonToInitialState();
-        }
-
-        function initializeFPDF() {
-            FPDF.Init = Module.cwrap('PDFium_Init');
-            FPDF.RenderPageBitmap = Module.cwrap('FPDF_RenderPageBitmap', '', ['number', 'number', 'number', 'number', 'number', 'number', 'number', 'number']);
-
-            FPDF.Bitmap_FillRect = Module.cwrap('FPDFBitmap_FillRect', '', ['number', 'number', 'number', 'number', 'number', 'number']);
-            FPDF.Bitmap_CreateEx = Module.cwrap('FPDFBitmap_CreateEx', 'number', ['number', 'number', 'number', 'number', 'number']);
-            FPDF.Bitmap_Destroy = Module.cwrap('FPDFBitmap_Destroy', '', ['number']);
-
-            FPDF.LoadPage = Module.cwrap('FPDF_LoadPage', 'number', ['number', 'number']);
-            FPDF.ClosePage = Module.cwrap('FPDF_ClosePage', '', ['number']);
-
-            FPDF.LoadMemDocument = Module.cwrap('FPDF_LoadMemDocument', 'number', ['number', 'number', 'string']);
-            FPDF.GetPageSizeByIndex = Module.cwrap('FPDF_GetPageSizeByIndex', 'number', ['number', 'number', 'number', 'number']);
-            FPDF.GetLastError = Module.cwrap('FPDF_GetLastError', 'number');
-            FPDF.GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
-            FPDF.CloseDocument = Module.cwrap('FPDF_CloseDocument', '', ['number']);
-            FPDF.DestroyLibrary = Module.cwrap('FPDF_DestroyLibrary');
-
-            window.heap = (J, s) => {
-                let E;
-                switch (J) {
-                    case Int8Array: E = Module.HEAP8; break;
-                    case Int16Array: E = Module.HEAP16; break;
-                    case Int32Array: E = Module.HEAP32; break;
-                    case Uint8Array: E = Module.HEAPU8; break;
-                    case Uint16Array: E = Module.HEAPU16; break;
-                    case Uint32Array: E = Module.HEAPU32; break;
-                    case Float32Array: E = Module.HEAPF32; break;
-                    case Float64Array: E = Module.HEAPF64; break;
-                }
-                const Z = J.BYTES_PER_ELEMENT; const m = Module.wasmExports.malloc(s * Z);
-                const a = Array(1 + s); a[0] = ({ s, J, Z, E, m, free: () => Module.wasmExports.free(m) });
-                for (let i = 0; i < s; i++) a[i + 1] = ({ p: m + (i * Z), get v() { return E[m / Z + i]; } });
-                return a;
-            };
-        }
-
-        function startApp() {
-            // initialize FPDF
-            initializeFPDF();
-
-            // let button start load files
-            let btRun = document.getElementById('btRun');
-            btRun.onclick = function () {
-                let urlInput = document.getElementById('urlInput');
-                let url = urlInput.value;
-
-                if (url.length > 0) {
-                    loadFileFromURL(url);
-                } else {
-                    loadFile();
-                }
-            }
-
-            // load data from url
-            let urlParamTitle = getUrlParam("title");
-            let urlParamUrl = getUrlParam("url");
-            let urlParamDebug = getUrlParam("debug");
-            let urlParamOpen = getUrlParam("open");
-
-            if (urlParamDebug && urlParamDebug === "1") {
-                debugMode = true;
-            } else {
-                debugMode = false;
-            }
-
-            if (urlParamOpen && urlParamOpen === "0") {
-                autoOpenMode = false;
-            } else {
-                autoOpenMode = true;
-            }
-
-            if (urlParamTitle) {
-                changeFileTitle(urlParamTitle);
-                changePageTitle(urlParamTitle);
-            }
-
-            if (urlParamUrl) {
-                let urlInput = document.getElementById('urlInput');
-                urlParamUrl.value = urlParamUrl;
-
-                loadFileFromURL(decodeURI(urlParamUrl));
-            }
-
-            // show inicial things
-            showDebugConsole(debugMode);
-            showFileTitle(true);
-            showFileForm(true);
-            showFooter(true);
-
-            setTimeout(function () {
-                showLoading(false);
-            }, 500);
-        }
-
-        window.onload = function (e) {
-            pageLoaded = true;
-
-            startUI();
-
-            console.log('The page was loaded!');
-
-            checkIfEverythingWasLoaded();
-        }
+      checkIfEverythingWasLoaded();
+    };
     </script>
 
     <style>
-        /* general */
-        body {
-            touch-action: pan-x pan-y;
-            display: flex;
-            min-height: 100vh;
-            flex-direction: column;
-        }
+    /* general */
+    body {
+      touch-action: pan-x pan-y;
+      display: flex;
+      min-height: 100vh;
+      flex-direction: column;
+    }
 
-        .section {
-            flex: 1;
-        }
+    .section {
+      flex: 1;
+    }
 
-        .footer {
-            padding-bottom: 1.5rem;
-            padding-top: 1.5rem;
-            display: none;
-        }
+    .footer {
+      padding-bottom: 1.5rem;
+      padding-top: 1.5rem;
+      display: none;
+    }
 
-        /* page list item */
-        .page-list-item {
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            padding: 2px;
-            cursor: pointer;
-        }
+    /* page list item */
+    .page-list-item {
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      padding: 2px;
+      cursor: pointer;
+    }
 
-        /* modal */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
+    /* modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
 
-        .modal-content {
-            max-height: none !important;
-            overflow: hidden;
-            width: 78%;
-            text-align: center;
-        }
+    .modal-content {
+      max-height: none !important;
+      overflow: hidden;
+      width: 78%;
+      text-align: center;
+    }
 
-        /* next & previous buttons */
-        .page-prev,
-        .page-next {
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            padding: 16px;
-            margin-top: -34px;
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
-            transition: 0.6s ease;
-            border-radius: 0 3px 3px 0;
-            user-select: none;
-            -webkit-user-select: none;
-        }
+    /* next & previous buttons */
+    .page-prev,
+    .page-next {
+      cursor: pointer;
+      position: absolute;
+      top: 50%;
+      width: auto;
+      padding: 16px;
+      margin-top: -34px;
+      color: white;
+      font-weight: bold;
+      font-size: 20px;
+      transition: 0.6s ease;
+      border-radius: 0 3px 3px 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
 
-        .page-prev.disabled,
-        .page-next.disabled {
-            cursor: not-allowed;
-            color: unset;
-        }
+    .page-prev.disabled,
+    .page-next.disabled {
+      cursor: not-allowed;
+      color: unset;
+    }
 
-        .page-next {
-            right: 0;
-            border-radius: 3px 0 0 3px;
-        }
+    .page-next {
+      right: 0;
+      border-radius: 3px 0 0 3px;
+    }
 
-        .page-prev {
-            left: 0;
-            border-radius: 3px 0 0 3px;
-        }
+    .page-prev {
+      left: 0;
+      border-radius: 3px 0 0 3px;
+    }
 
-        /* page list */
-        #pageList .card-content {
-            padding: 0;
-        }
+    /* page list */
+    #pageList .card-content {
+      padding: 0;
+    }
 
-        .page-loader-wrapper {
-            padding: 30px 10px;
-        }
+    .page-loader-wrapper {
+      padding: 30px 10px;
+    }
 
-        .page-loader-wrapper .loader {
-            -webkit-animation: spinAround .5s infinite linear;
-            animation: spinAround .5s infinite linear;
-            border: 2px solid #dbdbdb;
-            border-radius: 9999px;
-            border-right-color: transparent;
-            border-top-color: transparent;
-            content: "";
-            display: block;
-            height: 2em;
-            width: 2em;
-        }
+    .page-loader-wrapper .loader {
+      -webkit-animation: spinAround 0.5s infinite linear;
+      animation: spinAround 0.5s infinite linear;
+      border: 2px solid #dbdbdb;
+      border-radius: 9999px;
+      border-right-color: transparent;
+      border-top-color: transparent;
+      content: "";
+      display: block;
+      height: 2em;
+      width: 2em;
+    }
 
-        /*  modal */
-        .modal-close {
-            margin-right: -12px;
-        }
+    /*  modal */
+    .modal-close {
+      margin-right: -12px;
+    }
 
-        /* page list container */
-        #pageListContainer {
-            margin-bottom: 30px;
-            display: none;
-        }
+    /* page list container */
+    #pageListContainer {
+      margin-bottom: 30px;
+      display: none;
+    }
 
-        /* page title */
-        #pageListTitle {
-            margin-bottom: 24px;
-            font-weight: bold;
-        }
+    /* page title */
+    #pageListTitle {
+      margin-bottom: 24px;
+      font-weight: bold;
+    }
 
-        /* page modal image */
-        #pageModalImage {
-            max-height: 100%;
-        }
+    /* page modal image */
+    #pageModalImage {
+      max-height: 100%;
+    }
 
-        /* loader */
-        .loader-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background-color: var(--bulma-box-background-color);
-            opacity: 0;
-            z-index: -1;
-            transition: opacity .3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 6px;
-        }
+    /* loader */
+    .loader-wrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+      background-color: var(--bulma-box-background-color);
+      opacity: 0;
+      z-index: -1;
+      transition: opacity 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 6px;
+    }
 
-        .loader {
-            height: 80px;
-            width: 80px;
-            margin: 0 auto;
-        }
+    .loader {
+      height: 80px;
+      width: 80px;
+      margin: 0 auto;
+    }
 
-        .is-active {
-            opacity: 1;
-            z-index: 1;
-        }
+    .is-active {
+      opacity: 1;
+      z-index: 1;
+    }
 
-        /* file title */
-        #fileTitle {
-            display: none;
-        }
+    /* file title */
+    #fileTitle {
+      display: none;
+    }
 
-        /* file form */
-        #fileForm {
-            display: none;
-        }
+    /* file form */
+    #fileForm {
+      display: none;
+    }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <!-- loading -->
     <div id="loadingContainer">
-        <div class="box">
-            <div class="loader-wrapper is-active">
-                <div class="loader is-loading"></div>
-            </div>
+      <div class="box">
+        <div class="loader-wrapper is-active">
+          <div class="loader is-loading"></div>
         </div>
+      </div>
     </div>
 
     <!-- content -->
     <section class="section is-centered">
-        <div class="container">
+      <div class="container">
+        <!-- title -->
+        <h1 id="fileTitle" class="title" style="display: none;">PDF Viewer</h1>
 
-            <!-- title -->
-            <h1 id="fileTitle" class="title" style="display: none;">PDF Viewer</h1>
+        <div id="fileForm" style="display: none;">
+          <br>
+          <p>1 - Select your PDF file:</p>
+          <br>
 
-            <div id="fileForm" style="display: none;">
-                <br>
-                <p>1 - Select your PDF file:</p>
-                <br>
+          <!-- file input -->
+          <div id="file-container" class="file is-info has-name is-boxed">
+            <label class="file-label">
+              <input
+                class="file-input"
+                id="fileInput"
+                type="file"
+                accept="application/pdf"
+              >
+              <span class="file-cta">
+                <span class="file-label"> Choose a file… </span>
+              </span>
+              <span class="file-name"> No file uploaded </span>
+            </label>
+          </div>
+          <br>
+          <br>
 
-                <!-- file input -->
-                <div id="file-container" class="file is-info has-name is-boxed">
-                    <label class="file-label">
-                        <input class="file-input" id="fileInput" type="file" accept="application/pdf">
-                        <span class="file-cta">
-                            <span class="file-label">
-                                Choose a file…
-                            </span>
-                        </span>
-                        <span class="file-name">
-                            No file uploaded
-                        </span>
-                    </label>
-                </div>
-                <br>
-                <br>
+          <!-- url input -->
+          <p>Or type any PDF public url:</p>
+          <br>
+          <input class="input" type="text" placeholder="" id="urlInput">
+          <br>
+          <br>
 
-                <!-- url input -->
-                <p>Or type any PDF public url:</p>
-                <br>
-                <input class="input" type="text" placeholder="" id="urlInput">
-                <br>
-                <br>
-
-                <!-- process button -->
-                <p>2 - Press button to process:</p>
-                <br>
-                <button class="button is-warning" id="btRun">Loading...</button>
-                <br>
-                <br>
-                <br>
-            </div>
-
-            <!-- page list container -->
-            <div id="pageListContainer" style="display: none;">
-                <p style="font-weight: bold;" id="pageListTitle">Number of pages: 0</p>
-
-                <!-- page as a cell -->
-                <div class="fixed-grid has-auto-count">
-                    <div class="grid" id="pageList"></div>
-                </div>
-
-                <div class="modal" id="pageModal">
-                    <div class="modal-background" onclick="closeModal()"></div>
-                    <div class="modal-content">
-                        <img id="pageModalImage" src="">
-                    </div>
-
-                    <!-- modal buttons -->
-                    <a class="page-prev" onclick="changeCurrentPageItemPlus(-1)">&#10094;</a>
-
-                    <a class="page-next" onclick="changeCurrentPageItemPlus(1)">&#10095;</a>
-
-                    <button onclick="closeModal()" class="modal-close is-large" aria-label="close"></button>
-                </div>
-            </div>
-
-            <!-- debug console -->
-            <div class="card" id="debugConsole" style="display: none;">
-                <header class="card-header">
-                    <p class="card-header-title">
-                        Debug console
-                    </p>
-                </header>
-                <div class="card-content">
-                    <div class="content">
-                        <div id="debugConsoleContent">
-                            <p>➔ Debug messages will be showed here</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+          <!-- process button -->
+          <p>2 - Press button to process:</p>
+          <br>
+          <button class="button is-warning" id="btRun">Loading...</button>
+          <br>
+          <br>
+          <br>
         </div>
 
+        <!-- page list container -->
+        <div id="pageListContainer" style="display: none;">
+          <p style="font-weight: bold;" id="pageListTitle">
+            Number of pages: 0
+          </p>
+
+          <!-- page as a cell -->
+          <div class="fixed-grid has-auto-count">
+            <div class="grid" id="pageList"></div>
+          </div>
+
+          <div class="modal" id="pageModal">
+            <div class="modal-background" onclick="closeModal()"></div>
+            <div class="modal-content">
+              <img id="pageModalImage" src="">
+            </div>
+
+            <!-- modal buttons -->
+            <a class="page-prev" onclick="changeCurrentPageItemPlus(-1)"
+              >&#10094;</a
+            >
+
+            <a class="page-next" onclick="changeCurrentPageItemPlus(1)"
+              >&#10095;</a
+            >
+
+            <button
+              onclick="closeModal()"
+              class="modal-close is-large"
+              aria-label="close"
+            ></button>
+          </div>
+        </div>
+
+        <!-- debug console -->
+        <div class="card" id="debugConsole" style="display: none;">
+          <header class="card-header">
+            <p class="card-header-title">Debug console</p>
+          </header>
+          <div class="card-content">
+            <div class="content">
+              <div id="debugConsoleContent">
+                <p>➔ Debug messages will be showed here</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- footer -->
     <footer id="footer" class="footer" style="display: none;">
-        <div class="content has-text-centered is-small">
-            <p>
-                This application is powered by an open source project called PDF Viewer and can be found <a
-                    target="_blank" href="https://github.com/paulocoutinhox/pdfium-lib">here</a>. No data is stored and
-                everything run only on client side.
-            </p>
-            <p>
-                PDFium branch "{pdfium-branch}".
-            </p>
-        </div>
+      <div class="content has-text-centered is-small">
+        <p>
+          This application is powered by an open source project called PDF
+          Viewer and can be found
+          <a target="_blank" href="https://github.com/paulocoutinhox/pdfium-lib"
+            >here</a
+          >. No data is stored and everything run only on client side.
+        </p>
+        <p>PDFium branch " { pdfium-branch}".</p>
+      </div>
     </footer>
 
     <!-- google analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-J2FWK7KZMQ"></script>
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-J2FWK7KZMQ"
+    ></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
+    "use strict";
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+    gtag("js", new Date());
 
-        gtag('config', 'G-J2FWK7KZMQ');
+    gtag("config", "G-J2FWK7KZMQ");
     </script>
-</body>
-
+  </body>
 </html>

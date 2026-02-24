@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   mode: "development",
@@ -9,23 +9,23 @@ module.exports = {
   entry: "./index.js",
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "bundle.js"
+    filename: "bundle.js",
   },
   // This is necessary due to the fact that emscripten puts both Node and web
   // code into one file. The node part uses Node’s `fs` module to load the wasm
   // file.
   // Issue: https://github.com/kripken/emscripten/issues/6542.
   node: {
-    "fs": "empty"
+    fs: "empty",
   },
   module: {
     rules: [
-      // Emscripten JS files define a global. With `exports-loader` we can 
+      // Emscripten JS files define a global. With `exports-loader` we can
       // load these files correctly (provided the global’s name is the same
       // as the file name).
       {
         test: /pdfium\.js$/,
-        loader: "exports-loader"
+        loader: "exports-loader",
       },
       // wasm files should not be processed but just be emitted and we want
       // to have their public URL.
@@ -35,10 +35,10 @@ module.exports = {
         loader: "file-loader",
         options: {
           publicPath: "dist/",
-          name: '[path][name].[ext]',
-        }
-      }
-    ]
+          name: "[path][name].[ext]",
+        },
+      },
+    ],
   },
   plugins: [new HtmlWebpackPlugin()],
 };

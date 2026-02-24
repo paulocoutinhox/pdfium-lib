@@ -1,14 +1,14 @@
 {
-    "name": "pdfium-lib",
-    "version": "{pdfium-branch-version}.0.0",
-    "exports": {
-      ".": {
-        "require": "./node/pdfium.js",
-        "import": "./node/pdfium.esm.js"
-      },
-      "./pdfium.wasm": {
-        "require": "./node/pdfium.wasm",
-        "import": "./node/pdfium.esm.wasm"
-      }
+  "name": "pdfium-lib",
+  "version": "{pdfium-branch-version}.0.0",
+  "exports": {
+    ".": {
+      "require": "./node/pdfium.js",
+      "import": "./node/pdfium.esm.js"
+    },
+    "./pdfium.wasm": {
+      "require": "./node/pdfium.wasm",
+      "import": "./node/pdfium.esm.wasm"
     }
   }
+}
