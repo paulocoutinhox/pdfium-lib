@@ -1,6 +1,9 @@
 import glob
 import os
+import shutil
+import subprocess
 import tarfile
+import tempfile
 
 from pygemstones.io import file as f
 from pygemstones.system import runner as r
@@ -156,19 +159,72 @@ def run_task_build():
                 l.YELLOW,
             )
 
+            out_dir = "out/{0}-{1}-{2}-{3}".format(
+                target["target_os"],
+                target["target_cpu"],
+                target["target_environment"],
+                config,
+            )
+
+            command = ["ninja", "-C", out_dir, "pdfium", "-v"]
+            r.run(command)
+
+            # Build and merge Chromium's custom libc++ into the static archive
+            # so consumers don't get undefined std::__Cr:: symbols at link time.
+            l.colored("Building and merging libc++ / libc++abi...", l.YELLOW)
+
             command = [
                 "ninja",
                 "-C",
-                "out/{0}-{1}-{2}-{3}".format(
-                    target["target_os"],
-                    target["target_cpu"],
-                    target["target_environment"],
-                    config,
-                ),
-                "pdfium",
-                "-v",
+                out_dir,
+                "buildtools/third_party/libc++:libc++",
+                "buildtools/third_party/libc++abi:libc++abi",
             ]
             r.run(command)
+
+            libpdfium = os.path.join(out_dir, "obj", "libpdfium.a")
+            libcxx_obj_dir = os.path.join(
+                out_dir, "obj", "buildtools", "third_party", "libc++", "libc++"
+            )
+            libcxxabi_obj_dir = os.path.join(
+                out_dir, "obj", "buildtools", "third_party", "libc++abi", "libc++abi"
+            )
+
+            objs = glob.glob(os.path.join(libcxx_obj_dir, "*.o"))
+            objs += glob.glob(os.path.join(libcxxabi_obj_dir, "*.o"))
+
+            if objs:
+                # Collect basenames already in the archive so we can detect
+                # collisions (e.g. libc++ thread.o vs openjpeg thread.o).
+                existing = set()
+                try:
+                    result = subprocess.run(
+                        ["ar", "t", libpdfium],
+                        capture_output=True, text=True, check=True,
+                    )
+                    existing = set(result.stdout.strip().splitlines())
+                except Exception:
+                    pass
+
+                # Copy objects to a temp dir, prefixing any that collide.
+                tmp_dir = tempfile.mkdtemp(prefix="libcxx_merge_")
+                try:
+                    staged = []
+                    for obj in objs:
+                        basename = os.path.basename(obj)
+                        if basename in existing:
+                            basename = "libcxx_" + basename
+                        dest = os.path.join(tmp_dir, basename)
+                        shutil.copy2(obj, dest)
+                        staged.append(dest)
+
+                    command = ["ar", "qc", libpdfium] + staged
+                    r.run(command)
+
+                    command = ["ranlib", libpdfium]
+                    r.run(command)
+                finally:
+                    shutil.rmtree(tmp_dir, ignore_errors=True)
 
             os.chdir(current_dir)
 
