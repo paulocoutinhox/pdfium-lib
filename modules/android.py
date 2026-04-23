@@ -48,6 +48,8 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build config", l.PURPLE)
 
+    patch.apply_lumin_custom_patches("android")
+
     l.ok()
 
 

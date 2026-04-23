@@ -84,6 +84,8 @@ def run_task_patch():
     else:
         l.bullet("Skipped: ios automatically manage certs", l.PURPLE)
 
+    patch.apply_lumin_custom_patches("ios")
+
     l.ok()
 
 
