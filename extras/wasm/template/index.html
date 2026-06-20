@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <meta charset="utf-8">
 
-    <meta name="viewport"
-        content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
     <title>PDFium PDF Viewer</title>
     <meta name="description"
@@ -21,1192 +20,1173 @@
     <meta property="og:type" content="website">
 
     <link rel="shortcut icon"
-        href="data:image/x-icon;base64,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" />
+        href="data:image/x-icon;base64,UklGRtASAABXRUJQVlA4TMMSAAAv/8F/EH+HoG3blD/pSG32UxAQFPk/moCg4P/oBAJJavtDbbRtG40NOT0jwgYBAkDAAQFAArDLICAARjA1HRADCqxhf04whCEM6ImQMVZQZtiCTlFLXHTwzajPNiRT6yOoEadHVvdlHLEhZO3/Bn1WkWhFmstFBanIWjp4GADaldJs2641A0NREAULii0ae+8pGsXexd6wlzD2hmLXSGJNQdMsxF4wWC+97JpgwBpFbFhADG3KWfePEGbW2mc4M+tuRPR/ArDc/+X+L/d/uf/L/V/u/3L//2+/trtnjx49e7dY4mzXv587vJ0FSvRvFfe7TdSyt/euAG5XW/xUyrST/fyA1jIpU8K0Y62BMcD6Vrz+6gbMlbcUilZxvD8o2Oa5XN1rA4quKRaqw6GgbPO/RGqTCRQO2i1P2jJQfIM4JYDyicKUBDo8LkpXLXqo8lKQ8uqDLscKUhzoNF2MMvz0EitGg0GvFQuE6Dbo95gQjdeRVYZeBejoMxlKBB2Hy1BLPcF7CcoAXf8tQau4Qhv5s6RJUAeOlhvPvdDw6TiOqwKUDfQRJzQs+UIzuisCtIfhBrr4hu6mAE2mi0dXM+gyBKgRWeX3Lp2jeyY/b4B8Drr8G12B/KTQ3XRtO1lFlN+VZJGaawlk9QVoGNlodH0m2acC9DHZNjeGksXIT5GZ7Kobn5LNk58MoDblu9GQbIv8HCZrgG6Gkh2Vn0Syfm7kA/lf8vMlmdWNh3Tv5Wcw2TY3LpBFoPy2JzvpRjJZWwGqRXbXjUSyYfKj+ZMVuLGAbL785AB1OLo5mmyr/Nwna+5ON7Jj8nOFLNqdhmRp8nOSbJQbWiBZjvwkk81yIxuoAzT52Um2zI0bZI1QfreQrXfjAFkPAdpIttWNr8hiBWgVWZIbM8hWCFA82S9u9Cb7UYCWkO1zoyHZeQFaRJbsmt1CliVAC9V4CNQBTgFaTLbXtRNkjVCAl5L97FoiWV8JSiD7wbVpZFYJWku2xbUvyLZL0Ddk61yrQXZagn4gW+rSWyB/JkF7yWa6dIEsRJOgE2QjXfqOrD1K8EWyni7FkY0ToQyyVi71IFsrQtlkNVzRIsiOipDDTGW2u/AcyP8WIaxGBVkunCQLdspQK7L/uLCBrD3KcB+y3S6MIYsVoilkq1xoSva1EK0mm1BavpnsrBDtJutS2mUgzxGiy2ThpW0ni0IhfkUGr0qZRDZAirQwsrOltCFbLkXYgWxLSYUWskNiNI5sSklXgPyJGK0j61jSZrIITYyOkgU7ShhL1gvF+DEZpJfQiGyJHGmhZD9+kAvkh+QIPyWb9UEq3VNBmk3W/oMEskgU5J1klkJE7E02SJLSyOASojOMbI0k2YPINiJmAPkpScIuZIMQk8hM70QpjixCw1iyZijKe8ggAxuTTZKlx3Q7soH8B1nSapANP0CXIUs4hKz6l2SVncK0iQyCyPqgMF+no18lTfYQ5c5LE/ZSLaBQnNaq1gXF+bJqi+XJHqpYijxhP7XM7wQqUa22KNDpas2TKK2mUsclCieoZM4VqX0qtUeRfmNWaJFMYSeFUoUqQR1LvlDdVKcbCrUWqcwqqcIpylwVq+OqhDnEqrCiIsNQrmMU+V6w9iqSKVh5gUo0QskepEScaO1W4qRovQ9WIKhAtHC4Ar1Rto8qsFW4isP5HgsXzmJrgtJ9g22+eGnNuC6IFyYyhTvk63UAzzgU8OE8+yXsLEvgewnTmnD0QxHfzPGDjL3j+EXGsAJDZ03G6jBAioi9MHO00yRsC7AelLAuPB/b5SsTmJPkaz1XrXzp0ppywWrpugXsodnCZeWDqbJlq6qAOU20joGK3TXJilEC9gtWTqAadfLlagcoGi9X7VQJfChVf4KyfTShmq0OHJSpgjCFovJE6mdQ2SpSnyllviFQGaB2a7s8xSkGG8UpP0y14IfSlATKf6EJUzv14DtZugo6DM0SpbF6gF6aIL0K0AX8IEirgb4/S2imGNlq0YXl9+KA7k4p2gf0cfgwiAM2S1FnhjuIa1iC78rQVaDvhoi2ZhzQ3iZCIxiSEREvmThguQRl+dFF2j7AWSx+lwVoIdCvwBLzojigfp745IXR+T8vCVNYYLz4fA30w7H08SywT3jsdRguuZATyRKWKTv7gL695gIeYYEudsnR2jD8ii6PYYFlknMK6COLXcuJZDGdFpxeDKvQzRMsUCNbbG4BfdBrdzCWBXo6pSaGYQq6/a4uC6wRmnsmhgz38LyJxe+8zMQCfT+knMcCkS8lJsvCcI6kqDkLdHcIzGygb6uR4O1AFlgmLy+DGPYicSIPpIjLAqCvZ6dyRvNUfiwsrysybEPy5xEs0KZQVpYCfUQ+HR7jgVhNUnJCGVYi52we+FZS4oE+JIelsAWP5ZKc5FRimI+8dyqwQORzMYkH+sDnTLiLB7oUC0lOJYYZyK2N5oEpQrIE6P0z2fB9Ix7YLiKvKzJMQAXTgnj8z0nIfKA331UBk3gg/JF8PA9mGIVKauN4oHmeeMwCelOGGvhPUx4Y6BSOTAtDDKp6N4QHFgtHLDCmKYPJTPCLaNwxMwxFha1MARclYxgwpqlk+4wHqj6Si+vAOBSVfhHJA01yxSKawXRbLbzozwPRNqE4BYzDUfVtTDBFEwmtHYP5jnLaRCbYIBLJwDgW1S/swAS/CURxAwa/BzrApzWYgi7JwxZgnIy6/E8AD0Q8kIbcCIaArH1gEhM0eC0MS4AxDvUaxwSd8kUhK4ihYrZu7NFMMMghCWOBMR71m/MxE8zQ5OAmMIa/0xHeC2OCVW8f/XH+RPLObRtXLVswZ/bMGR/Ots5fmrBha9K+4+f+eJTr9I1pn3NsQl2n+jEpaQ5v3DVm9tqfTt0r8GUdBMaoQn3hdv25XLXdsAXfnc5y+qCKPuLYhXqP8ySlBrccviI5w+ZT+goYmzr0lXs5yeqBSra0HLvpTK6P6FUljqOo1/dXkqzRtcDzNxix6WKh72cqMHbVdOC8l7xsYH0oSy0drAdf+3TSzBxXUe28i9umdAqEsrnZrIO5vhqtKzAOR3WzU1YPawBlvLlj/BWnLyYZGAMeqZF9ImFgFBjFarFHC30t+bU55iL7+7Prh0SB0QwZebjIp7IcGCvnsGh3kiY3N4NBrTz1suYzeRzEkYjk+WdX960CBrdJYo6PZAgwNiymeXtkbkd/MMTBkzN8IanAeRjdf7V/VnMw1H0u+DyKG3F009zIPRzXHAx41/M+jnXAaPoDXSw8taidGYx67zRfRlZFjklYsnb7q+ggMPSmSa98F8OAMfTlB2/3TYgEL7DyZqeP4nfgXI/arVVdzOAtfnrfJ1HYkKPG3thI8CqDt2s+iATwrgfm+BzuB3pZUO8PH4MWDV53cLJvYQ8Y2UW7dmxKWDRj7IDPm0V6EoDVmg8hp7qhiUhDF7Xcu+d2b7QObV/VE8A0h+9gKpTFwc0GWTcfT8/D66FcEP6nC67mZxxNnN6jlr4gxuYruAhlq1+DfvO+P5PlxNLPBXFBlVsUpb67snNOdFXdwMBi30BxkzLD0jRmRXJ6Mbp/3J8LKl+nK1F7dmx536q6gEE2n8BKKAvrDVyanGFD8n0mLgi7xFOi9vfumS1NysFopw/gboCHC+k8dcelPOROYoOQ83wl5hyb18akFli9P+fn4Lmj+sUfeOhENRPZIDhVjQ/f7p8cpRJs9vZs/cEz1x265uQrVHoVGwQcVgYRtT8TWqtjTvXq0qzggWsOWpP6FtXXFrOB368KffhwVWNFoEqm1/Z2SxvwtMGfLTiQhXrV4tjAtE0tRO3yxCAloKPNK3OeHhkInjVqxDc3bKhrbSobwEpNLUR8s6a6CrDEC3ux5iPwqM2m73mCHtA5gQ/inKohFm6JVMB8xcty/j7EHzynqY318Bv0lI7RfDCqWDnE/NUhbNDU5k292VAfPGdz65Fc9Kj24XwQnace4vORbLDBe7o6PhA8Zd0pya/Q89qH8UHrFzpAPB7FFfLSOyr6uT14yEqDdjxED20bygd17+gBcycwwSxv6EV8NfCMbZddsKEHtw3hg7CzekBMDuUJeOb1/DHOAp4wZPhP2ejpbUP5wPKTLvBuIxaY6t04T3QHT9h88UU7loW2YXwAS5x6wJyuLGH5Xkzxriagf0v0lsdYZtqGKwBD/tEDFvblgF+8lveJtUD3lYbvzcUy1T5GAWiZqQcsiubo7aXkrqwCeq82JaUYy1zHRAWg6nk9YF4LBss7b+RtfEXQeZT1ggPLZOd0BcB/i6YDfBRGBwe9jzdLQ0Hf9eZf1bDM1uYqADA2Xwe4h2Gmt5EbHwq6rrvghoZlurZCBWhxXwdaX7qW3sU/a8JAz7WsVzUs+zepAKH71cN7fmTmAi/Ctr0G6LjKtPNONIY/mBUAmF2kHE4kg5teg7a/Ieh5iw2N428WFaD1PeXS6XZ7C1e6gK43o6FMragCVNylKYbdyVZ6B1mjQN+fOY0FXotQASAmR7GfyaZ6AwUJwaDvCg/QaN6rqwTUSlUr159qsPHTDtYBvW9G4/m8pRIAM/9RCTtSdTN893uB7rs6DQi+i1YDGlxQaRJVO4NXGB8Aug95hIbUNkENMM1+r85iqpbG7kxD8IDfo0HVEtQAqHNCGStVayOXMxE8YW/NqCD+EqAGQMxTRfpRdTRwB2uAJ6zyDA3sv8MVgZANxSoUh1H1MGxvRoBnTEZD+3cTRQAaHtb4fgPqGKN2rAZ4xlFocN/1UQWg62UurQPZl8YsbxJ4yKhco4OO+coA9L/J8xOQbzJkl+qDhzSdQQO8O0gZgN5nNLpTwXRHDJgjwQ885Tw0xLfqqAPQ8vv3NC+tfkD/yHg9/Rw8ZqsiY4RveioEEDL+pM0de+qYQGAM1wxXSgR4zKAMNMqOZSp9OGTbn7ZSnu6dAMwD0WA7loIH3Y4GOqWKWgAQ2LT36Akxn1cH/i0G63U0qDzw1wo8AzQjhU86q6bwE2N1qw4o3Ot6bkNgrfkajbVtoYf6BA313mBQt/M5dPYHVtMZNNy/V/dIPxkp5zJQt9FBDXEF8C5FA57d1wOFFhmogmGgbMQ2GyIeBt5P7EYMte3BHmcrGufXnUBVy/xcRMT0EJ7KT9Cg3+voYZrYjNOjhqDqgAf44duPgPcIGnb7mgBPYrqAhvl2DVC0YQqWaOsBvFY08ukdPMgCNMxXK4OaQSuLsOSZwNuh2NChY1Owp/jMZpguhYKaPR9iqduAt3ImGv1HvTxD3Ww0ypdCQMmI3RqWmurHdByNv7Yv0gNUv49G+UYlUHLUayw9vRLwLkav8N0cf71VT0ejnBEOKlY7jC6+qAO83R3eAeKd3vqqew+N8tMoUHHYa3TxfVvgrZmN3mNKUx11folGOa8FKFjpFw1dtPcBXssl9CYdSVF6mV6ERtnRDxTs8hhd1SYD81b0Mgu/rq6HiINonBcDv2mJHV1eDszjNW8DMT+xlnIjstE4HwH+qqno+g5gblOA3mhRUhOlmp1CA/04jK/zU3Q92cQUkYleqnayn0mV+jsdaKDtXYB9ejG6nmIBXv9z6MVmxtdRoe1uOxrqVcBt+Q7dvBAMzFvRu3X+e1ZNnqozrqPBvm3hCj+Pbl6vBMxTNC8HEbU/NvaLoKnQbfl/HGi0HR2AueFDdDOtMjB/Vozesfbk6PrJvVrUrPBBQESjrmPi96Tb0YjvAOZOr9HN9KrAXO81etuarciBRj4nnKlPPrqZXhWYQ9NRWq3AO9KGbt6OAGZzCkrrkwCeEQ5082YV4P4GxXUKsE5yopuXwoD7SxTXpxaWCU50M7UicA9wyMt84BziQDd/CwDu9vkorvlhHF2L0M3tJuCu/xLl9SdgbJSDrjsXAXvEfRTYbgxh99D1wuHAXuEqCuwzE8MBdP1FJ2D3O4ESux3oJ6Hr16KA/1cU2b50NXJd2xkI/N+gyNpD6Hahq/mxoGACyuxVIP/Y4UpGM1DQqgnNVrrtWLpzSxAoOEVDoZ1GFpRb2sMvQMWxTpTaHmQDsOSiNUGg4nA7im0Dsm0laAcagJIxdpTbELK/ENF5pD2oOcKOcmsH6jAnvtz0MSg62o6Cm0tWaX03M6ga60DJfU2m8mwniu5b/cVrKLv/6O5rlF7NT1+WvSi/1XUVdgYFuLWeaqejBA/VUeeXKMLx+oktQhk+qBfLdg2F+IVOal9BOW6iiwFvUJAX6iBoq4aSnKZe2wwU5k8Us6y0oTSfUOvTDJRnra9C1XZpKNHPa6himZuLQn0tRAnT6Eco1xfD+Ewxf6Fo32vGFBibgdJduMjCUHdNNkr4gzF+NJXGn3KilGclNHar3rTjRSjrD76L7Vj1A7+ortbdmSj0jtw3eRqW+7/c/+X+L/d/uf/L/V/u/3L/l/v//0P/X+L/r3L/l/u/HIAA" />
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
 
-    <script src="pdfium.js?v={pdfium-branch}"></script>
-
     <script>
-        // variables
-        let currentPageIndex = 1;
-        let pageLoaded = false;
-        let moduleLoaded = false;
-        let debugMode = false;
-        let autoOpenMode = true;
-        let doc;
-        let FPDF = {};
-        let Module = null;
+        // apply the saved theme before paint to avoid a flash of the wrong scheme
+        (function () {
+            const saved = localStorage.getItem('pdfviewer-theme');
 
-        // pdfium initialization
-        Object.assign(FPDF, {
-            ANNOT: 0x01, // Set if annotations are to be rendered.
-            LCD_TEXT: 0x02, // Set if using text rendering optimized for LCD display.
-            NO_NATIVETEXT: 0x04, // Don't use the native text output available on some platforms
-            GRAYSCALE: 0x08, // Grayscale output.
-            DEBUG_INFO: 0x80, // Set if you want to get some debug info. Please discuss with Foxit first if you need to collect debug info.
-            NO_CATCH: 0x100, // Set if you don't want to catch exception.
-            RENDER_LIMITEDIMAGECACHE: 0x200, // Limit image cache size.
-            RENDER_FORCEHALFTONE: 0x400, // Always use halftone for image stretching.
-            PRINTING: 0x800, // Render for printing.
-            REVERSE_BYTE_ORDER: 0x10, // Set whether render in a reverse Byte order, this flag only.
-            Bitmap_Gray: 1,
-            Bitmap_BGR: 2,
-            Bitmap_BGRx: 3,
-            Bitmap_BGRA: 4,
-            LAST_ERROR: { // Last error types
-                SUCCESS: 0,
-                UNKNOWN: 1,
-                FILE: 2,
-                FORMAT: 3,
-                PASSWORD: 4,
-                SECURITY: 5,
-                PAGE: 6
+            if (saved === 'light' || saved === 'dark') {
+                document.documentElement.setAttribute('data-theme', saved);
             }
-        });
-
-        const I8 = Int8Array;
-        const I16 = Int16Array;
-        const I32 = Int32Array;
-        const U8 = Uint8Array;
-        const CH = U8;
-        const U16 = Uint16Array;
-        const U32 = Uint32Array;
-        const F32 = Float32Array;
-        const F64 = Float64Array;
-
-        const H = (t, s, d) => f => {
-            const [m, ...a] = heap(t, s);
-            const v = f(...a.map(x => x.p));
-
-            if (!v) {
-                m.free();
-                return d;
-            }
-
-            const r = a.map(x => x.v);
-            m.free();
-            return r;
-        };
-
-        const F = FPDF.Bitmap_BGRA;
-        const C = 4;
-
-        // classes
-        class Page {
-            constructor(index, processor) {
-                this.index = index;
-                this.src = null;
-                this.processor = processor;
-            }
-
-            render() {
-                let canvas = document.createElement('canvas');
-                this.processor.render(this.index, canvas, 3.0, 90);
-
-                let dataUri = canvas.toDataURL();
-                this.updateImage(dataUri);
-            }
-
-            createImage() {
-                let image = document.createElement('img');
-                let pageIndex = this.index;
-
-                image.id = "pageImage" + (pageIndex + 1);
-                image.src = '';
-                image.className = "is-hidden page-list-item";
-
-                return image;
-            }
-
-            updateImage(dataUri) {
-                this.src = dataUri;
-
-                // update image in pageList
-                let pageIndex = this.index;
-                let image = document.getElementById("pageImage" + (pageIndex + 1));
-                image.src = dataUri;
-                image.classList.remove("is-hidden");
-                image.onclick = function () {
-                    openModal();
-                    changeCurrentPageItem(pageIndex + 1);
-                };
-
-                const container = image.closest('.cell');
-                const loaderWrapper = container.querySelector('.page-loader-wrapper');
-
-                if (loaderWrapper) {
-                    loaderWrapper.remove();
-                }
-            }
-
-            get loaded() {
-                return this.src !== null;
-            }
-        }
-
-        class Processor {
-            constructor(wasmData) {
-                this.wasmData = wasmData;
-            }
-
-            getPageSize(i = 0, s = 2) {
-                return H(F64, 2, [-1, -1])((w, h) => FPDF.GetPageSizeByIndex(this.wasmData.wasm, i, w, h)).map(v => parseInt(v) * s);
-            }
-
-            getRender(i = 0, w, h) {
-                const flag = FPDF.REVERSE_BYTE_ORDER | FPDF.ANNOT;
-                const heap = Module.wasmExports.malloc(w * h * C);
-
-                for (let i = 0; i < w * h * C; i++) {
-                    Module.HEAPU8[heap + i] = 0;
-                }
-
-                const bmap = FPDF.Bitmap_CreateEx(w, h, F, heap, w * C);
-                const page = FPDF.LoadPage(this.wasmData.wasm, i);
-
-                FPDF.Bitmap_FillRect(bmap, 0, 0, w, h, 0xFFFFFFFF);
-                FPDF.RenderPageBitmap(bmap, page, 0, 0, w, h, 0, flag);
-                FPDF.Bitmap_Destroy(bmap);
-                FPDF.ClosePage(page);
-
-                return heap;
-            }
-
-            getPageRender(n = 0, w, h) {
-                let pageRenderPtr = this.getRender(n, w, h);
-                let pageRenderData = [];
-
-                for (let v = 0; v < w * h * C; v++) {
-                    pageRenderData.push(Module.HEAPU8[pageRenderPtr + v]);
-                }
-
-                Module.wasmExports.free(pageRenderPtr);
-
-                return pageRenderData;
-            }
-
-            render(n = 0, canvas, scale, rotation) {
-                let [w, h] = this.getPageSize(n, scale, rotation);
-                w = Math.ceil(w);
-                h = Math.ceil(h);
-
-                const data = this.getPageRender(n, w, h, rotation);
-
-                canvas.width = w;
-                canvas.height = h;
-
-                const x = canvas.getContext('2d');
-                const i = x.createImageData(w, h);
-                i.data.set(data);
-                x.putImageData(i, 0, 0);
-            }
-
-            getLastError() {
-                let lastError = FPDF.GetLastError();
-
-                switch (lastError) {
-                    case FPDF.LAST_ERROR.SUCCESS:
-                        return "success";
-                        break;
-                    case FPDF.LAST_ERROR.UNKNOWN:
-                        return "unknown error";
-                        break;
-                    case FPDF.LAST_ERROR.FILE:
-                        return "file not found or could not be opened";
-                        break;
-                    case FPDF.LAST_ERROR.FORMAT:
-                        return "file not in PDF format or corrupted";
-                        break;
-                    case FPDF.LAST_ERROR.PASSWORD:
-                        return "password required or incorrect password";
-                        break;
-                    case FPDF.LAST_ERROR.SECURITY:
-                        return "unsupported security scheme";
-                        break;
-                    case FPDF.LAST_ERROR.PAGE:
-                        return "page not found or content error";
-                        break;
-                    default:
-                        return "unknown error";
-                }
-            }
-        }
-
-        class Doc {
-            constructor(wasmData) {
-                this.processor = new Processor(wasmData);
-            }
-
-            setPages(pagesCount) {
-                this.pages = Array(pagesCount).fill(null);
-            }
-
-            createAllPages() {
-                for (let i = 0; i < this.pages.length; i++) {
-                    this.pages[i] = new Page(i, this.processor);
-                }
-            }
-
-            getPage(index) {
-                let page = this.pages[index];
-
-                if (!page) {
-                    page = new Page(index);
-                    this.pages[index] = page;
-                }
-
-                return page;
-            }
-
-            async renderPages() {
-                const wasmBuffer = this.processor.wasmData.wasmBuffer;
-                const wasm = this.processor.wasmData.wasm;
-
-                const renderNextPage = async (index) => {
-                    if (index < doc.pages.length) {
-                        let page = doc.getPage(index);
-                        if (!page.loaded) {
-                            await new Promise(requestAnimationFrame);
-                            page.render();
-                        }
-                        setTimeout(() => renderNextPage(index + 1), 100);
-                    } else {
-                        Module.wasmExports.free(wasmBuffer);
-                        FPDF.CloseDocument(wasm);
-                        FPDF.DestroyLibrary();
-                    }
-                }
-
-                await renderNextPage(0);
-            }
-        }
-
-        // runtime initialized
-        PDFiumModule().then(function (pdfiumModule) {
-            Module = pdfiumModule;
-
-            moduleLoaded = true;
-
-            if (pageLoaded) {
-                console.log('The module was loaded!');
-            }
-
-            checkIfEverythingWasLoaded();
-        });
-
-        // functions
-        async function loadFile() {
-            try {
-                changeButton('Loading file from input...', 'warning');
-
-                resetOnLoad();
-
-                let files = fileInput.files;
-
-                if (files.length <= 0) {
-                    throw { message: "Select a PDF file or type a public PDF url" };
-                }
-
-                let file = files[0];
-
-                let fileByteArray = await fileToByteArray(file);
-
-                if (fileByteArray.length <= 0) {
-                    throw { message: "The PDF file is invalid" };
-                }
-
-                changeButton('Processing file...', 'warning');
-
-                setTimeout(function () {
-                    processPDF(fileByteArray);
-                }, 300);
-            } catch (error) {
-                changeButton('Error while load file', 'danger');
-                console.log('Error while load file: ' + error.message);
-            }
-        }
-
-        async function loadFileFromURL(url) {
-            try {
-                changeButton('Loading file from URL...', 'warning');
-
-                resetOnLoad();
-
-                let response = await fetch(url);
-                let fileBuffer = await response.arrayBuffer();
-                let fileByteArray = new Uint8Array(fileBuffer);
-
-                if (fileByteArray.length <= 0) {
-                    throw { message: "The PDF file is invalid" };
-                }
-
-                changeButton('Processing file...', 'warning');
-
-                setTimeout(function () {
-                    processPDF(fileByteArray);
-                }, 300);
-            } catch (error) {
-                changeButton('Error while load file from URL', 'danger');
-                console.log('Error while load file from URL: ' + error.message);
-            }
-        }
-
-        async function processPDF(fileByteArray) {
-            try {
-                // html general
-                changeButton('Processing file...', 'warning');
-
-                let pageListContainer = document.getElementById('pageListContainer');
-                let pageList = document.getElementById('pageList');
-                let pageListTitle = document.getElementById('pageListTitle');
-
-                pageListContainer.style.display = "none";
-                pageList.innerHTML = "";
-
-                // check file size
-                console.log('Getting file size...');
-
-                let fileSize = fileByteArray.length;
-                console.log("File size: " + fileSize + " bytes");
-
-                // init library
-                console.log('Initializing library...');
-
-                FPDF.Init();
-
-                // load document to memory
-                console.log('Loading data to buffer...');
-
-                let wasmBuffer = Module.wasmExports.malloc(fileSize);
-                Module.HEAPU8.set(fileByteArray, wasmBuffer);
-
-                // create document
-                console.log('Loading document...');
-
-                doc = new Doc({
-                    wasm: FPDF.LoadMemDocument(wasmBuffer, fileSize, ""),
-                    wasmBuffer: wasmBuffer,
-                });
-
-                // check last error
-                let lastError = doc.processor.getLastError();
-                console.log("Load document state: " + lastError);
-
-                // count page
-                console.log('Couting pages...');
-
-                let pages = FPDF.GetPageCount(doc.processor.wasmData.wasm);
-                console.log('Pages: ' + pages);
-
-                // list all pages
-                if (pages > 0) {
-                    console.log('Rendering ' + pages + ' PDF pages...');
-
-                    doc.setPages(pages);
-                    doc.createAllPages();
-
-                    for (let x = 0; x < pages; x++) {
-                        console.log('Rendering page ' + (x + 1) + '...');
-
-                        // render to canvas
-                        console.log("Rendering to canvas...");
-
-                        // add page item
-                        console.log("Adding page item...");
-
-                        const image = doc.getPage(x).createImage();
-
-                        // add content item
-                        let content = document.createElement('div');
-                        content.className = "content";
-                        content.appendChild(image);
-
-                        // add loader content
-                        let loaderContent = document.createElement('span');
-                        loaderContent.className = "loader";
-
-                        // add loader
-                        let loader = document.createElement('div');
-                        loader.className = "page-loader-wrapper";
-                        loader.appendChild(loaderContent);
-                        content.appendChild(loader);
-
-                        // add card
-                        let cardContent = document.createElement('div');
-                        cardContent.className = "card-content";
-                        cardContent.appendChild(content);
-
-                        let card = document.createElement('div');
-                        card.className = "card";
-                        card.appendChild(cardContent);
-
-                        let cell = document.createElement('div');
-                        cell.className = "cell";
-                        cell.style.position = "relative";
-                        cell.appendChild(card);
-
-                        pageList.appendChild(cell);
-
-                        // show results
-                        console.log('Page ' + (x + 1) + ' rendered');
-                    }
-
-                    let firstPage = await doc.getPage(0);
-                    firstPage.render();
-
-                    pageListTitle.innerHTML = "Number of pages: " + pages;
-
-                    pageListContainer.style.display = "block";
-
-                    if (autoOpenMode) {
-                        showPageItem(currentPageIndex);
-                    }
-
-                    showFileForm(false);
-
-                    setTimeout(function () {
-                        console.log('Scrolling to top...');
-                        scrollToTop();
-                    }, 100);
-                } else {
-                    console.log('Cannot render PDF pages: PDF is empty');
-                }
-
-                // clean memory
-                console.log('Cleaning objects...');
-
-                // initial state
-                buttonToInitialState();
-
-                console.log('Finished');
-            } catch (error) {
-                changeButton('Error while process PDF', 'danger');
-                console.log('Error while process PDF: ' + error.message);
-            }
-        }
-
-        function fileToByteArray(file) {
-            return new Promise((resolve, reject) => {
-                try {
-                    let reader = new FileReader();
-                    let fileByteArray = [];
-
-                    reader.readAsArrayBuffer(file);
-                    reader.onloadend = (evt) => {
-                        if (evt.target.readyState == FileReader.DONE) {
-                            let arrayBuffer = evt.target.result,
-                                array = new Uint8Array(arrayBuffer);
-                            for (byte of array) {
-                                fileByteArray.push(byte);
-                            }
-                        }
-                        resolve(fileByteArray);
-                    }
-                }
-                catch (e) {
-                    reject(e);
-                }
-            })
-        }
-
-        function changeButton(text, className) {
-            let btRun = document.getElementById('btRun');
-            btRun.firstChild.data = text;
-            btRun.className = 'button is-' + className;
-        }
-
-        function getUrlParam(param) {
-            let params = getAllUrlParams(window.location.href);
-
-            if (params != null && params !== undefined) {
-                if (params.hasOwnProperty(param)) {
-                    let value = params[param];
-
-                    if (value != null && value !== undefined) {
-                        return value;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        function getAllUrlParams(url) {
-            // get query string from url (optional) or window
-            var queryString = url ? url.split('?')[1] : window.location.search.slice(1);
-
-            // we'll store the parameters here
-            var obj = {};
-
-            // if query string exists
-            if (queryString) {
-
-                // stuff after # is not part of query string, so get rid of it
-                queryString = queryString.split('#')[0];
-
-                // split our query string into its component parts
-                var arr = queryString.split('&');
-
-                for (var i = 0; i < arr.length; i++) {
-                    // separate the keys and the values
-                    var a = arr[i].split('=');
-
-                    // in case params look like: list[]=thing1&list[]=thing2
-                    var paramNum = undefined;
-                    var paramName = a[0].replace(/\[\d*\]/, function (v) {
-                        paramNum = v.slice(1, -1);
-                        return '';
-                    });
-
-                    // set parameter value (use 'true' if empty)
-                    var paramValue = typeof (a[1]) === 'undefined' ? true : a[1];
-
-                    // if parameter name already exists
-                    if (obj[paramName]) {
-                        // convert value to array (if still string)
-                        if (typeof obj[paramName] === 'string') {
-                            obj[paramName] = [obj[paramName]];
-                        }
-                        // if no array index number specified...
-                        if (typeof paramNum === 'undefined') {
-                            // put the value on the end of the array
-                            obj[paramName].push(paramValue);
-                        }
-                        // if array index number specified...
-                        else {
-                            // put the value at that index number
-                            obj[paramName][paramNum] = paramValue;
-                        }
-                    }
-                    // if param name doesn't exist yet, set it
-                    else {
-                        obj[paramName] = paramValue;
-                    }
-                }
-            }
-
-            return obj;
-        }
-
-        function buttonToInitialState() {
-            changeButton('Process file', 'success');
-        }
-
-        function changeFileTitle(title) {
-            let fileTitle = document.getElementById('fileTitle');
-            fileTitle.innerHTML = decodeURI(title);
-        }
-
-        function changePageTitle(title) {
-            document.title = decodeURI(title) + " - PDF Viewer";
-        }
-
-        function showDebugConsole(show) {
-            let debugConsole = document.getElementById('debugConsole');
-
-            if (show) {
-                debugConsole.style.display = "block";
-            } else {
-                debugConsole.style.display = "none";
-            }
-        }
-
-        function showFileTitle(show) {
-            let fileTitle = document.getElementById('fileTitle');
-
-            if (show) {
-                fileTitle.style.display = "block";
-            } else {
-                fileTitle.style.display = "none";
-            }
-        }
-
-        function showFileForm(show) {
-            let fileForm = document.getElementById('fileForm');
-
-            if (show) {
-                fileForm.style.display = "block";
-            } else {
-                fileForm.style.display = "none";
-            }
-        }
-
-        function showLoading(show) {
-            let loading = document.getElementById('loadingContainer');
-
-            if (show) {
-                loading.className = "loader-wrapper is-active";
-            } else {
-                loading.className = "loader-wrapper";
-            }
-
-            return false;
-        }
-
-        function showFooter(show) {
-            let footer = document.getElementById('footer');
-
-            if (show) {
-                footer.style.display = "block";
-            } else {
-                footer.style.display = "none";
-            }
-        }
-
-        function scrollToTop() {
-            window.scrollTo({ top: 0 })
-        }
-
-        function openModal() {
-            let modal = document.getElementById('pageModal');
-
-            if (typeof modal != "undefined") {
-                modal.className = "modal is-active";
-            }
-        }
-
-        function closeModal() {
-            let modal = document.getElementById('pageModal');
-
-            if (typeof modal != "undefined") {
-                modal.className = "modal";
-            }
-
-            setTimeout(function () {
-                doc.renderPages();
-            }, 500)
-        }
-
-        function modalIsOpened() {
-            let modal = document.getElementById('pageModal');
-
-            if (modal.classList.contains("is-active")) {
-                return true;
-            }
-
-            return false;
-        }
-
-        function changeCurrentPageItemPlus(n) {
-            showPageItem(currentPageIndex += n);
-        }
-
-        function changeCurrentPageItem(index) {
-            showPageItem(index);
-        }
-
-        function showPageItem(index) {
-            let pages = document.getElementsByClassName("page-list-item");
-            let pageModalImage = document.getElementById("pageModalImage");
-
-            if (index > pages.length) {
-                currentPageIndex = pages.length;
-            } else if (index < 1) {
-                currentPageIndex = 1;
-            } else {
-                currentPageIndex = index;
-            }
-
-            let currentPage = doc.getPage(currentPageIndex - 1);
-            if (!currentPage.loaded) {
-                currentPage.render();
-            }
-
-            let page = pages[currentPageIndex - 1];
-
-            if (typeof page != "undefined") {
-                pageModalImage.src = page.src;
-            }
-
-            const prevLink = document.querySelector('.page-prev');
-            const nextLink = document.querySelector('.page-next');
-            if (currentPageIndex === 1) {
-                prevLink.classList.add('disabled')
-            } else {
-                prevLink.classList.remove('disabled')
-            }
-            if (currentPageIndex === pages.length) {
-                nextLink.classList.add('disabled')
-            } else {
-                nextLink.classList.remove('disabled')
-            }
-
-            openModal();
-        }
-
-        function resetOnLoad() {
-            currentPageIndex = 1;
-        }
-
-        function bindKeys() {
-            document.onkeydown = function (e) {
-                switch (e.which) {
-                    case 27:
-                        // esc
-                        if (modalIsOpened()) {
-                            closeModal();
-                            e.preventDefault();
-                        }
-
-                        break;
-
-                    case 37:
-                        // left
-                        if (modalIsOpened()) {
-                            changeCurrentPageItemPlus(-1)
-                            e.preventDefault();
-                        }
-
-                        break;
-
-                    case 39:
-                        // right
-                        if (modalIsOpened()) {
-                            changeCurrentPageItemPlus(1)
-                            e.preventDefault();
-                        }
-
-                        break;
-
-                    default: return;
-                }
-            };
-        }
-
-        function checkIfEverythingWasLoaded() {
-            if (pageLoaded && moduleLoaded) {
-                startApp();
-            }
-        }
-
-        function startUI() {
-            // change console methods
-            if (typeof console != "undefined") {
-                if (typeof console.log != 'undefined') {
-                    console.olog = console.log;
-                } else {
-                    console.olog = function () { };
-                }
-            }
-
-            console.log = function (message) {
-                // we will disable it for now
-                // console.olog(message);
-
-                var currentDate = new Date().toLocaleTimeString();
-
-                var e = document.createElement('p');
-                e.innerHTML = "➔ [" + currentDate + "] " + message;
-
-                document.getElementById('debugConsoleContent').prepend(e);
-            };
-
-            console.error = console.debug = console.info = console.log;
-
-            // check for wasm support
-            if (!('WebAssembly' in window)) {
-                console.log('You need a browser with Web Assembly support enabled :(');
-                changeButton('Web Assembly not supported', 'danger');
-                return;
-            }
-
-            // file input
-            var fileInput = document.querySelector('#file-container input[type=file]');
-            fileInput.onchange = () => {
-                if (fileInput.files.length > 0) {
-                    var fileName = document.querySelector('#file-container .file-name');
-                    fileName.textContent = fileInput.files[0].name;
-                }
-            }
-
-            // initial state
-            bindKeys();
-            buttonToInitialState();
-        }
-
-        function initializeFPDF() {
-            FPDF.Init = Module.cwrap('PDFium_Init');
-            FPDF.RenderPageBitmap = Module.cwrap('FPDF_RenderPageBitmap', '', ['number', 'number', 'number', 'number', 'number', 'number', 'number', 'number']);
-
-            FPDF.Bitmap_FillRect = Module.cwrap('FPDFBitmap_FillRect', '', ['number', 'number', 'number', 'number', 'number', 'number']);
-            FPDF.Bitmap_CreateEx = Module.cwrap('FPDFBitmap_CreateEx', 'number', ['number', 'number', 'number', 'number', 'number']);
-            FPDF.Bitmap_Destroy = Module.cwrap('FPDFBitmap_Destroy', '', ['number']);
-
-            FPDF.LoadPage = Module.cwrap('FPDF_LoadPage', 'number', ['number', 'number']);
-            FPDF.ClosePage = Module.cwrap('FPDF_ClosePage', '', ['number']);
-
-            FPDF.LoadMemDocument = Module.cwrap('FPDF_LoadMemDocument', 'number', ['number', 'number', 'string']);
-            FPDF.GetPageSizeByIndex = Module.cwrap('FPDF_GetPageSizeByIndex', 'number', ['number', 'number', 'number', 'number']);
-            FPDF.GetLastError = Module.cwrap('FPDF_GetLastError', 'number');
-            FPDF.GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
-            FPDF.CloseDocument = Module.cwrap('FPDF_CloseDocument', '', ['number']);
-            FPDF.DestroyLibrary = Module.cwrap('FPDF_DestroyLibrary');
-
-            window.heap = (J, s) => {
-                let E;
-                switch (J) {
-                    case Int8Array: E = Module.HEAP8; break;
-                    case Int16Array: E = Module.HEAP16; break;
-                    case Int32Array: E = Module.HEAP32; break;
-                    case Uint8Array: E = Module.HEAPU8; break;
-                    case Uint16Array: E = Module.HEAPU16; break;
-                    case Uint32Array: E = Module.HEAPU32; break;
-                    case Float32Array: E = Module.HEAPF32; break;
-                    case Float64Array: E = Module.HEAPF64; break;
-                }
-                const Z = J.BYTES_PER_ELEMENT; const m = Module.wasmExports.malloc(s * Z);
-                const a = Array(1 + s); a[0] = ({ s, J, Z, E, m, free: () => Module.wasmExports.free(m) });
-                for (let i = 0; i < s; i++) a[i + 1] = ({ p: m + (i * Z), get v() { return E[m / Z + i]; } });
-                return a;
-            };
-        }
-
-        function startApp() {
-            // initialize FPDF
-            initializeFPDF();
-
-            // let button start load files
-            let btRun = document.getElementById('btRun');
-            btRun.onclick = function () {
-                let urlInput = document.getElementById('urlInput');
-                let url = urlInput.value;
-
-                if (url.length > 0) {
-                    loadFileFromURL(url);
-                } else {
-                    loadFile();
-                }
-            }
-
-            // load data from url
-            let urlParamTitle = getUrlParam("title");
-            let urlParamUrl = getUrlParam("url");
-            let urlParamDebug = getUrlParam("debug");
-            let urlParamOpen = getUrlParam("open");
-
-            if (urlParamDebug && urlParamDebug === "1") {
-                debugMode = true;
-            } else {
-                debugMode = false;
-            }
-
-            if (urlParamOpen && urlParamOpen === "0") {
-                autoOpenMode = false;
-            } else {
-                autoOpenMode = true;
-            }
-
-            if (urlParamTitle) {
-                changeFileTitle(urlParamTitle);
-                changePageTitle(urlParamTitle);
-            }
-
-            if (urlParamUrl) {
-                let urlInput = document.getElementById('urlInput');
-                urlParamUrl.value = urlParamUrl;
-
-                loadFileFromURL(decodeURI(urlParamUrl));
-            }
-
-            // show inicial things
-            showDebugConsole(debugMode);
-            showFileTitle(true);
-            showFileForm(true);
-            showFooter(true);
-
-            setTimeout(function () {
-                showLoading(false);
-            }, 500);
-        }
-
-        window.onload = function (e) {
-            pageLoaded = true;
-
-            startUI();
-
-            console.log('The page was loaded!');
-
-            checkIfEverythingWasLoaded();
-        }
+        })();
     </script>
 
+    <script src="pdfium.js?v={pdfium-branch}"></script>
+
     <style>
-        /* general */
+        :root {
+            --viewer-bg: #525659;
+            --toolbar-bg: #323639;
+            --toolbar-fg: #f1f1f1;
+            --toolbar-border: rgba(255, 255, 255, 0.12);
+            --page-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
+        }
+
+        html,
         body {
-            touch-action: pan-x pan-y;
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #app {
             display: flex;
-            min-height: 100vh;
             flex-direction: column;
+            height: 100%;
         }
 
-        .section {
+        /* start screen */
+        #startScreen {
+            position: relative;
             flex: 1;
-        }
-
-        .footer {
-            padding-bottom: 1.5rem;
-            padding-top: 1.5rem;
-            display: none;
-        }
-
-        /* page list item */
-        .page-list-item {
-            box-sizing: border-box;
             display: flex;
+            align-items: center;
             justify-content: center;
-            padding: 2px;
-            cursor: pointer;
+            padding: 1.5rem;
+            background: var(--bulma-scheme-main-bis);
+            overflow-y: auto;
         }
 
-        /* modal */
-        .modal {
+        .theme-switch {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            margin-bottom: 0;
+        }
+
+        .start-card {
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .dropzone {
+            border: 2px dashed var(--bulma-border);
+            border-radius: 12px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            transition: border-color .2s, background-color .2s;
+            cursor: pointer;
+            background: var(--bulma-scheme-main);
+            color: var(--bulma-text);
+        }
+
+        .dropzone:hover {
+            border-color: var(--bulma-link);
+        }
+
+        .dropzone-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+        }
+
+        /* viewer */
+        #viewer {
+            flex: 1;
             display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        #toolbar {
+            display: flex;
+            align-items: center;
+            gap: .4rem .6rem;
+            padding: .4rem .6rem;
+            background: var(--toolbar-bg);
+            color: var(--toolbar-fg);
+            border-bottom: 1px solid var(--toolbar-border);
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left,
+        .toolbar-center,
+        .toolbar-right {
+            display: flex;
+            align-items: center;
+            gap: .3rem;
+        }
+
+        /* left and right grow equally so the page indicator stays centered */
+        .toolbar-left {
+            flex: 1 1 0;
+            min-width: 0;
+        }
+
+        .toolbar-right {
+            flex: 1 1 0;
+            justify-content: flex-end;
+        }
+
+        .toolbar-center {
+            flex: 0 0 auto;
+        }
+
+        .toolbar-title {
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 40vw;
+        }
+
+        .tool-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 2rem;
+            height: 2rem;
+            padding: 0 .5rem;
+            border: none;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--toolbar-fg);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color .15s;
+        }
+
+        .tool-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.14);
+        }
+
+        .tool-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .tool-btn:disabled {
+            opacity: .4;
+            cursor: default;
+        }
+
+        .tool-logo {
+            padding: 0 .25rem;
+        }
+
+        .tool-logo img {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .page-indicator {
+            display: flex;
+            align-items: center;
+            gap: .35rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .page-indicator input {
+            width: 3.2rem;
+            height: 2rem;
+            text-align: center;
+            border: 1px solid var(--toolbar-border);
+            border-radius: 6px;
+            background: rgba(0, 0, 0, 0.25);
+            color: var(--toolbar-fg);
+        }
+
+        .zoom-level {
+            min-width: 3.5rem;
+            text-align: center;
+            font-variant-numeric: tabular-nums;
+        }
+
+        #pagesContainer {
+            position: relative;
+            flex: 1;
+            overflow: auto;
+            background: var(--viewer-bg);
+            padding: 1.5rem 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .page {
+            position: relative;
+            margin: 0 auto 1.25rem auto;
+            background: #fff;
+            box-shadow: var(--page-shadow);
+        }
+
+        .page canvas {
+            display: block;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
         }
 
-        .modal-content {
-            max-height: none !important;
-            overflow: hidden;
-            width: 78%;
+        .page-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #b9b9b9;
+        }
+
+        .page-spinner {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 3px solid #e3e3e3;
+            border-top-color: #9aa0a6;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* overlay */
+        #loadingOverlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            background: var(--bulma-scheme-main);
+            z-index: 50;
+            transition: opacity .25s;
+        }
+
+        #loadingOverlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* drag overlay */
+        #dropOverlay {
+            position: fixed;
+            inset: 0;
+            z-index: 55;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(50, 54, 57, 0.82);
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        #dropOverlay.is-active {
+            display: flex;
+        }
+
+        .drop-hint {
+            border: 3px dashed rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            padding: 3rem 4rem;
             text-align: center;
         }
 
-        /* next & previous buttons */
-        .page-prev,
-        .page-next {
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            padding: 16px;
-            margin-top: -34px;
-            color: white;
-            font-weight: bold;
-            font-size: 20px;
-            transition: 0.6s ease;
-            border-radius: 0 3px 3px 0;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-
-        .page-prev.disabled,
-        .page-next.disabled {
-            cursor: not-allowed;
-            color: unset;
-        }
-
-        .page-next {
-            right: 0;
-            border-radius: 3px 0 0 3px;
-        }
-
-        .page-prev {
-            left: 0;
-            border-radius: 3px 0 0 3px;
-        }
-
-        /* page list */
-        #pageList .card-content {
-            padding: 0;
-        }
-
-        .page-loader-wrapper {
-            padding: 30px 10px;
-        }
-
-        .page-loader-wrapper .loader {
-            -webkit-animation: spinAround .5s infinite linear;
-            animation: spinAround .5s infinite linear;
-            border: 2px solid #dbdbdb;
-            border-radius: 9999px;
-            border-right-color: transparent;
-            border-top-color: transparent;
-            content: "";
-            display: block;
-            height: 2em;
-            width: 2em;
-        }
-
-        /*  modal */
-        .modal-close {
-            margin-right: -12px;
-        }
-
-        /* page list container */
-        #pageListContainer {
-            margin-bottom: 30px;
-            display: none;
-        }
-
-        /* page title */
-        #pageListTitle {
-            margin-bottom: 24px;
-            font-weight: bold;
-        }
-
-        /* page modal image */
-        #pageModalImage {
-            max-height: 100%;
-        }
-
-        /* loader */
-        .loader-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            width: 100%;
-            background-color: var(--bulma-box-background-color);
+        /* toast */
+        #toast {
+            position: fixed;
+            left: 50%;
+            bottom: 1.5rem;
+            transform: translateX(-50%) translateY(2rem);
+            z-index: 60;
             opacity: 0;
-            z-index: -1;
-            transition: opacity .3s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 6px;
+            transition: opacity .25s, transform .25s;
+            pointer-events: none;
         }
 
-        .loader {
-            height: 80px;
-            width: 80px;
-            margin: 0 auto;
-        }
-
-        .is-active {
+        #toast.is-active {
             opacity: 1;
-            z-index: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
-        /* file title */
-        #fileTitle {
+        /* debug console */
+        #debugConsole {
+            position: fixed;
+            right: 1rem;
+            bottom: 1rem;
+            width: min(420px, 90vw);
+            max-height: 40vh;
+            overflow: auto;
+            z-index: 40;
             display: none;
+            font-size: .8rem;
         }
 
-        /* file form */
-        #fileForm {
-            display: none;
+        #debugConsoleContent p {
+            margin: 0 0 .25rem 0;
+        }
+
+        @media (max-width: 640px) {
+            .toolbar-title {
+                display: none;
+            }
+
+            #pagesContainer {
+                padding: .75rem 0;
+            }
+
+            .tool-btn {
+                min-width: 1.8rem;
+                height: 1.8rem;
+                padding: 0 .3rem;
+            }
+
+            .zoom-level {
+                min-width: 2.6rem;
+                font-size: .85rem;
+            }
+
+            .page-indicator input {
+                width: 2.6rem;
+                height: 1.8rem;
+            }
         }
     </style>
 </head>
 
 <body>
-    <!-- loading -->
-    <div id="loadingContainer">
-        <div class="box">
-            <div class="loader-wrapper is-active">
-                <div class="loader is-loading"></div>
+    <div id="app">
+        <!-- start screen -->
+        <section id="startScreen">
+            <div class="theme-switch buttons has-addons">
+                <button data-theme-choice="system" class="button is-small" title="Follow system theme">System</button>
+                <button data-theme-choice="light" class="button is-small" title="Light theme">Light</button>
+                <button data-theme-choice="dark" class="button is-small" title="Dark theme">Dark</button>
             </div>
+
+            <div class="start-card">
+                <h1 class="title is-4 has-text-centered">PDF Viewer</h1>
+                <p class="subtitle is-6 has-text-centered has-text-grey">
+                    View PDF files locally in your browser. Nothing is uploaded.
+                </p>
+
+                <div id="dropzone" class="dropzone">
+                    <img class="dropzone-logo" src="logo.png?v={pdfium-branch}" alt="PDF Viewer">
+                    <p class="mt-3"><strong>Drop a PDF here</strong> or click to browse</p>
+                    <input id="fileInput" type="file" accept="application/pdf" hidden>
+                </div>
+
+                <div class="field has-addons mt-5">
+                    <div class="control is-expanded">
+                        <input id="urlInput" class="input" type="text" placeholder="Or paste a public PDF URL">
+                    </div>
+                    <div class="control">
+                        <button id="urlButton" class="button is-link">Open</button>
+                    </div>
+                </div>
+
+                <p class="has-text-centered has-text-grey is-size-7 mt-6">
+                    Powered by the open source
+                    <a target="_blank" href="https://github.com/paulocoutinhox/pdfium-lib">PDF Viewer</a>
+                    project, running entirely on the client side. PDFium branch "{pdfium-branch}".
+                </p>
+            </div>
+        </section>
+
+        <!-- viewer -->
+        <section id="viewer">
+            <div id="toolbar">
+                <div class="toolbar-left">
+                    <button id="openButton" class="tool-btn tool-logo" title="Open another file">
+                        <img src="logo.png?v={pdfium-branch}" alt="PDF Viewer">
+                    </button>
+                    <span id="fileTitle" class="toolbar-title"></span>
+                </div>
+
+                <div class="toolbar-center page-indicator">
+                    <button id="prevPage" class="tool-btn" title="Previous page">‹</button>
+                    <input id="pageInput" type="text" inputmode="numeric" value="1">
+                    <span>/</span>
+                    <span id="pageCount">0</span>
+                    <button id="nextPage" class="tool-btn" title="Next page">›</button>
+                </div>
+
+                <div class="toolbar-right">
+                    <button id="zoomOut" class="tool-btn" title="Zoom out">−</button>
+                    <span id="zoomLevel" class="zoom-level">100%</span>
+                    <button id="zoomIn" class="tool-btn" title="Zoom in">+</button>
+                    <button id="fitWidth" class="tool-btn" title="Fit width">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M3 9V5a2 2 0 0 1 2-2h4M21 9V5a2 2 0 0 0-2-2h-4M3 15v4a2 2 0 0 0 2 2h4M21 15v4a2 2 0 0 1-2 2h-4" />
+                        </svg>
+                    </button>
+                    <button id="downloadButton" class="tool-btn" title="Download">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="pagesContainer"></div>
+        </section>
+    </div>
+
+    <!-- loading overlay -->
+    <div id="loadingOverlay">
+        <div class="page-spinner"></div>
+        <p id="loadingText" class="has-text-grey">Loading engine…</p>
+    </div>
+
+    <!-- drag overlay -->
+    <div id="dropOverlay">
+        <div class="drop-hint">
+            <img class="dropzone-logo" src="logo.png?v={pdfium-branch}" alt="PDF Viewer">
+            <p class="mt-3">Drop the PDF to open it</p>
         </div>
     </div>
 
-    <!-- content -->
-    <section class="section is-centered">
-        <div class="container">
+    <!-- toast -->
+    <div id="toast" class="notification is-danger"></div>
 
-            <!-- title -->
-            <h1 id="fileTitle" class="title" style="display: none;">PDF Viewer</h1>
+    <!-- debug console -->
+    <div id="debugConsole" class="box">
+        <p class="has-text-weight-bold mb-2">Debug console</p>
+        <div id="debugConsoleContent"></div>
+    </div>
 
-            <div id="fileForm" style="display: none;">
-                <br>
-                <p>1 - Select your PDF file:</p>
-                <br>
+    <script>
+        // pdfium render flags and bitmap constants
+        const FPDF_FLAGS = {
+            ANNOT: 0x01,
+            REVERSE_BYTE_ORDER: 0x10,
+        };
 
-                <!-- file input -->
-                <div id="file-container" class="file is-info has-name is-boxed">
-                    <label class="file-label">
-                        <input class="file-input" id="fileInput" type="file" accept="application/pdf">
-                        <span class="file-cta">
-                            <span class="file-label">
-                                Choose a file…
-                            </span>
-                        </span>
-                        <span class="file-name">
-                            No file uploaded
-                        </span>
-                    </label>
-                </div>
-                <br>
-                <br>
+        const LAST_ERROR = {
+            0: "success",
+            1: "unknown error",
+            2: "file not found or could not be opened",
+            3: "file not in PDF format or corrupted",
+            4: "password required or incorrect password",
+            5: "unsupported security scheme",
+            6: "page not found or content error",
+        };
 
-                <!-- url input -->
-                <p>Or type any PDF public url:</p>
-                <br>
-                <input class="input" type="text" placeholder="" id="urlInput">
-                <br>
-                <br>
+        const BITMAP_BGRA = 4;
+        const BYTES_PER_PIXEL = 4;
 
-                <!-- process button -->
-                <p>2 - Press button to process:</p>
-                <br>
-                <button class="button is-warning" id="btRun">Loading...</button>
-                <br>
-                <br>
-                <br>
-            </div>
+        // viewer tuning
+        const MIN_ZOOM = 0.25;
+        const MAX_ZOOM = 5.0;
+        const ZOOM_STEP = 0.2;
+        const RENDER_MARGIN_RATIO = 1.5;
+        const MAX_PIXEL_DIMENSION = 4096;
+        const PIXEL_RATIO = Math.min(window.devicePixelRatio || 1, 2);
 
-            <!-- page list container -->
-            <div id="pageListContainer" style="display: none;">
-                <p style="font-weight: bold;" id="pageListTitle">Number of pages: 0</p>
+        let Module = null;
+        const FPDF = {};
 
-                <!-- page as a cell -->
-                <div class="fixed-grid has-auto-count">
-                    <div class="grid" id="pageList"></div>
-                </div>
+        // document holds the live pdfium handles, the source bytes and the read callback
+        let activeDocument = null;
+        let zoom = 1.0;
+        let fitMode = true;
+        let currentPage = 1;
+        let renderQueue = [];
+        let pumpScheduled = false;
+        let scrollRaf = null;
 
-                <div class="modal" id="pageModal">
-                    <div class="modal-background" onclick="closeModal()"></div>
-                    <div class="modal-content">
-                        <img id="pageModalImage" src="">
-                    </div>
+        // dom references
+        const dom = {};
 
-                    <!-- modal buttons -->
-                    <a class="page-prev" onclick="changeCurrentPageItemPlus(-1)">&#10094;</a>
+        // resolves once the wasm engine is ready to accept calls
+        let markEngineReady;
+        const engineReady = new Promise((resolve) => { markEngineReady = resolve; });
 
-                    <a class="page-next" onclick="changeCurrentPageItemPlus(1)">&#10095;</a>
+        // pdfium module bootstrap
+        PDFiumModule().then((instance) => {
+            Module = instance;
+            bindFunctions();
+            FPDF.Init();
+            markEngineReady();
+            setLoading(false);
+            log("Engine ready");
+        });
 
-                    <button onclick="closeModal()" class="modal-close is-large" aria-label="close"></button>
-                </div>
-            </div>
+        function bindFunctions() {
+            FPDF.Init = Module.cwrap('PDFium_Init');
+            FPDF.LoadCustomDocument = Module.cwrap('FPDF_LoadCustomDocument', 'number', ['number', 'string']);
+            FPDF.CloseDocument = Module.cwrap('FPDF_CloseDocument', '', ['number']);
+            FPDF.GetPageCount = Module.cwrap('FPDF_GetPageCount', 'number', ['number']);
+            FPDF.GetPageSizeByIndex = Module.cwrap('FPDF_GetPageSizeByIndex', 'number', ['number', 'number', 'number', 'number']);
+            FPDF.GetLastError = Module.cwrap('FPDF_GetLastError', 'number');
+            FPDF.LoadPage = Module.cwrap('FPDF_LoadPage', 'number', ['number', 'number']);
+            FPDF.ClosePage = Module.cwrap('FPDF_ClosePage', '', ['number']);
+            FPDF.RenderPageBitmap = Module.cwrap('FPDF_RenderPageBitmap', '', ['number', 'number', 'number', 'number', 'number', 'number', 'number', 'number']);
+            FPDF.Bitmap_CreateEx = Module.cwrap('FPDFBitmap_CreateEx', 'number', ['number', 'number', 'number', 'number', 'number']);
+            FPDF.Bitmap_FillRect = Module.cwrap('FPDFBitmap_FillRect', '', ['number', 'number', 'number', 'number', 'number', 'number']);
+            FPDF.Bitmap_Destroy = Module.cwrap('FPDFBitmap_Destroy', '', ['number']);
+        }
 
-            <!-- debug console -->
-            <div class="card" id="debugConsole" style="display: none;">
-                <header class="card-header">
-                    <p class="card-header-title">
-                        Debug console
-                    </p>
-                </header>
-                <div class="card-content">
-                    <div class="content">
-                        <div id="debugConsoleContent">
-                            <p>➔ Debug messages will be showed here</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        // streaming loader: pdfium reads only the blocks it needs from the source bytes
+        function openDocument(bytes, name, password = "") {
+            closeDocument();
 
-    </section>
+            // register the block reader so pdfium can pull ranges on demand
+            const readBlock = (param, position, bufferPtr, size) => {
+                Module.HEAPU8.set(bytes.subarray(position, position + size), bufferPtr);
+                return 1;
+            };
 
-    <!-- footer -->
-    <footer id="footer" class="footer" style="display: none;">
-        <div class="content has-text-centered is-small">
-            <p>
-                This application is powered by an open source project called PDF Viewer and can be found <a
-                    target="_blank" href="https://github.com/paulocoutinhox/pdfium-lib">here</a>. No data is stored and
-                everything run only on client side.
-            </p>
-            <p>
-                PDFium branch "{pdfium-branch}".
-            </p>
-        </div>
-    </footer>
+            const readerPtr = Module.addFunction(readBlock, 'iiiii');
+
+            // build the FPDF_FILEACCESS struct: m_FileLen, m_GetBlock, m_Param
+            const fileAccessPtr = Module.wasmExports.malloc(12);
+            Module.setValue(fileAccessPtr + 0, bytes.length, 'i32');
+            Module.setValue(fileAccessPtr + 4, readerPtr, 'i32');
+            Module.setValue(fileAccessPtr + 8, 0, 'i32');
+
+            const handle = FPDF.LoadCustomDocument(fileAccessPtr, password);
+
+            // the struct is no longer needed once the document is created
+            Module.wasmExports.free(fileAccessPtr);
+
+            if (!handle) {
+                Module.removeFunction(readerPtr);
+
+                const code = FPDF.GetLastError();
+
+                // ask for a password when the document is protected
+                if (code === 4) {
+                    const entered = window.prompt("This PDF is password protected. Enter the password:");
+
+                    if (entered !== null) {
+                        openDocument(bytes, name, entered);
+                        return;
+                    }
+                }
+
+                throw new Error(LAST_ERROR[code] || "could not open document");
+            }
+
+            const pageCount = FPDF.GetPageCount(handle);
+
+            // reject documents that opened but carry no pages
+            if (pageCount <= 0) {
+                FPDF.CloseDocument(handle);
+                Module.removeFunction(readerPtr);
+                throw new Error("this document has no pages");
+            }
+
+            activeDocument = {
+                handle,
+                readerPtr,
+                bytes,
+                name,
+                pageCount,
+                sizes: new Array(pageCount).fill(null),
+                rendered: new Set(),
+            };
+
+            log('Opened "' + name + '" with ' + pageCount + ' page(s)');
+
+            // show the viewer first so the container has a real width to measure against
+            showViewer(name, pageCount);
+            buildPages();
+            fitWidth();
+        }
+
+        function closeDocument() {
+            if (!activeDocument) {
+                return;
+            }
+
+            FPDF.CloseDocument(activeDocument.handle);
+            Module.removeFunction(activeDocument.readerPtr);
+
+            activeDocument = null;
+            renderQueue = [];
+        }
+
+        // page size is cheap and does not require loading the full page
+        function getPageSize(index) {
+            const cached = activeDocument.sizes[index];
+
+            if (cached) {
+                return cached;
+            }
+
+            const widthPtr = Module.wasmExports.malloc(8);
+            const heightPtr = Module.wasmExports.malloc(8);
+
+            FPDF.GetPageSizeByIndex(activeDocument.handle, index, widthPtr, heightPtr);
+
+            // read the doubles straight from the heap, malloc keeps them 8-byte aligned
+            const size = {
+                width: Module.HEAPF64[widthPtr >> 3],
+                height: Module.HEAPF64[heightPtr >> 3],
+            };
+
+            Module.wasmExports.free(widthPtr);
+            Module.wasmExports.free(heightPtr);
+
+            activeDocument.sizes[index] = size;
+            return size;
+        }
+
+        // render a single page into an image bitmap at the current zoom
+        function renderPage(index) {
+            const size = getPageSize(index);
+            const scale = Math.min(zoom * PIXEL_RATIO, MAX_PIXEL_DIMENSION / Math.max(size.width, size.height));
+
+            const pixelWidth = Math.max(1, Math.ceil(size.width * scale));
+            const pixelHeight = Math.max(1, Math.ceil(size.height * scale));
+            const byteCount = pixelWidth * pixelHeight * BYTES_PER_PIXEL;
+
+            const bufferPtr = Module.wasmExports.malloc(byteCount);
+            const bitmap = FPDF.Bitmap_CreateEx(pixelWidth, pixelHeight, BITMAP_BGRA, bufferPtr, pixelWidth * BYTES_PER_PIXEL);
+            const page = FPDF.LoadPage(activeDocument.handle, index);
+
+            FPDF.Bitmap_FillRect(bitmap, 0, 0, pixelWidth, pixelHeight, 0xFFFFFFFF);
+            FPDF.RenderPageBitmap(bitmap, page, 0, 0, pixelWidth, pixelHeight, 0, FPDF_FLAGS.REVERSE_BYTE_ORDER | FPDF_FLAGS.ANNOT);
+
+            // copy pixels out of the heap before releasing the native buffer
+            const pixels = new Uint8ClampedArray(Module.HEAPU8.buffer, bufferPtr, byteCount).slice();
+
+            FPDF.ClosePage(page);
+            FPDF.Bitmap_Destroy(bitmap);
+            Module.wasmExports.free(bufferPtr);
+
+            return new ImageData(pixels, pixelWidth, pixelHeight);
+        }
+
+        // build placeholder elements sized by page aspect ratio without rendering yet
+        function buildPages() {
+            dom.pagesContainer.innerHTML = "";
+
+            // a new document always starts at the top, never the previous scroll position
+            dom.pagesContainer.scrollTop = 0;
+            currentPage = 1;
+
+            for (let index = 0; index < activeDocument.pageCount; index++) {
+                const size = getPageSize(index);
+
+                const page = document.createElement('div');
+                page.className = "page";
+                page.dataset.index = index;
+
+                const placeholder = document.createElement('div');
+                placeholder.className = "page-placeholder";
+                placeholder.innerHTML = '<div class="page-spinner"></div>';
+                page.appendChild(placeholder);
+
+                dom.pagesContainer.appendChild(page);
+                applyPageSize(page, size);
+            }
+
+            refreshVisiblePages();
+        }
+
+        function applyPageSize(page, size) {
+            page.style.width = Math.round(size.width * zoom) + "px";
+            page.style.height = Math.round(size.height * zoom) + "px";
+        }
+
+        // decide which pages to render and which to release based on the viewport
+        function refreshVisiblePages() {
+            const container = dom.pagesContainer;
+            const margin = container.clientHeight * RENDER_MARGIN_RATIO;
+            const top = container.scrollTop - margin;
+            const bottom = container.scrollTop + container.clientHeight + margin;
+
+            for (const page of container.children) {
+                const index = Number(page.dataset.index);
+                const visible = page.offsetTop + page.offsetHeight >= top && page.offsetTop <= bottom;
+
+                if (visible && !activeDocument.rendered.has(index)) {
+                    enqueueRender(index);
+                } else if (!visible && activeDocument.rendered.has(index)) {
+                    releasePage(page, index);
+                }
+            }
+
+            updateCurrentPage();
+        }
+
+        function enqueueRender(index) {
+            if (!renderQueue.includes(index)) {
+                renderQueue.push(index);
+                schedulePump();
+            }
+        }
+
+        // render one page per frame to keep scrolling smooth
+        function schedulePump() {
+            if (pumpScheduled) {
+                return;
+            }
+
+            pumpScheduled = true;
+
+            requestAnimationFrame(() => {
+                pumpScheduled = false;
+
+                const index = renderQueue.shift();
+
+                if (index === undefined || !activeDocument) {
+                    return;
+                }
+
+                paintPage(index);
+
+                if (renderQueue.length > 0) {
+                    schedulePump();
+                }
+            });
+        }
+
+        function paintPage(index) {
+            const page = dom.pagesContainer.children[index];
+
+            if (!page || activeDocument.rendered.has(index)) {
+                return;
+            }
+
+            const imageData = renderPage(index);
+
+            const canvas = document.createElement('canvas');
+            canvas.width = imageData.width;
+            canvas.height = imageData.height;
+            canvas.getContext('2d').putImageData(imageData, 0, 0);
+
+            page.innerHTML = "";
+            page.appendChild(canvas);
+            activeDocument.rendered.add(index);
+        }
+
+        function releasePage(page, index) {
+            page.innerHTML = '<div class="page-placeholder"><div class="page-spinner"></div></div>';
+            activeDocument.rendered.delete(index);
+        }
+
+        // find the page closest to the viewport center for the page indicator
+        function updateCurrentPage() {
+            const container = dom.pagesContainer;
+            const center = container.scrollTop + container.clientHeight / 2;
+
+            let closest = 1;
+            let smallest = Infinity;
+
+            for (const page of container.children) {
+                const pageCenter = page.offsetTop + page.offsetHeight / 2;
+                const distance = Math.abs(pageCenter - center);
+
+                if (distance < smallest) {
+                    smallest = distance;
+                    closest = Number(page.dataset.index) + 1;
+                }
+            }
+
+            currentPage = closest;
+            dom.pageInput.value = String(closest);
+            dom.prevPage.disabled = closest <= 1;
+            dom.nextPage.disabled = closest >= activeDocument.pageCount;
+        }
+
+        function scrollToPage(number) {
+            const clamped = Math.min(Math.max(number, 1), activeDocument.pageCount);
+            const page = dom.pagesContainer.children[clamped - 1];
+
+            if (page) {
+                dom.pagesContainer.scrollTo({ top: page.offsetTop - 16, behavior: 'smooth' });
+            }
+        }
+
+        // re-layout every page when the zoom changes and re-render what is visible
+        function applyZoom(nextZoom) {
+            zoom = Math.min(Math.max(nextZoom, MIN_ZOOM), MAX_ZOOM);
+            dom.zoomLevel.textContent = Math.round(zoom * 100) + "%";
+
+            for (const page of dom.pagesContainer.children) {
+                const index = Number(page.dataset.index);
+                applyPageSize(page, getPageSize(index));
+
+                if (activeDocument.rendered.has(index)) {
+                    releasePage(page, index);
+                }
+            }
+
+            renderQueue = [];
+            refreshVisiblePages();
+        }
+
+        // manual zoom from the user, which turns off automatic width fitting
+        function setZoom(nextZoom) {
+            fitMode = false;
+            applyZoom(nextZoom);
+        }
+
+        // fit to the widest page so mixed-size documents never overflow horizontally
+        function fitWidth() {
+            const available = dom.pagesContainer.clientWidth - 24;
+
+            let widest = 0;
+
+            for (let index = 0; index < activeDocument.pageCount; index++) {
+                widest = Math.max(widest, getPageSize(index).width);
+            }
+
+            fitMode = true;
+            applyZoom(available / widest);
+        }
+
+        // file sources
+        async function openFromFile(file) {
+            try {
+                setLoading(true, "Reading file…");
+                log('Reading file "' + file.name + '"');
+
+                await engineReady;
+                const buffer = await file.arrayBuffer();
+                openDocument(new Uint8Array(buffer), file.name);
+
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+                showError(error.message);
+            }
+        }
+
+        async function openFromURL(url) {
+            try {
+                setLoading(true, "Downloading…");
+                log("Downloading " + url);
+
+                await engineReady;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error("could not download the file");
+                }
+
+                const buffer = await response.arrayBuffer();
+                const name = decodeURIComponent(url.split('/').pop() || "document.pdf");
+                openDocument(new Uint8Array(buffer), name);
+
+                setLoading(false);
+            } catch (error) {
+                setLoading(false);
+                showError(error.message);
+            }
+        }
+
+        function downloadActive() {
+            const blob = new Blob([activeDocument.bytes], { type: 'application/pdf' });
+            const link = document.createElement('a');
+
+            link.href = URL.createObjectURL(blob);
+            link.download = activeDocument.name;
+            link.click();
+
+            URL.revokeObjectURL(link.href);
+        }
+
+        // ui state
+        function showViewer(name, pageCount) {
+            dom.fileTitle.textContent = name;
+            dom.pageCount.textContent = String(pageCount);
+            dom.startScreen.style.display = "none";
+            dom.viewer.style.display = "flex";
+
+            document.title = name + " - PDF Viewer";
+            zoom = 1.0;
+            dom.zoomLevel.textContent = "100%";
+        }
+
+        function showStart() {
+            closeDocument();
+            dom.viewer.style.display = "none";
+            dom.startScreen.style.display = "flex";
+            document.title = "PDFium PDF Viewer";
+        }
+
+        function setLoading(active, text) {
+            if (!dom.loadingOverlay) {
+                return;
+            }
+
+            if (text) {
+                dom.loadingText.textContent = text;
+            }
+
+            dom.loadingOverlay.classList.toggle('is-hidden', !active);
+        }
+
+        let toastTimer = null;
+
+        function showError(message) {
+            log("Error: " + message);
+
+            dom.toast.textContent = message;
+            dom.toast.classList.add('is-active');
+
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => dom.toast.classList.remove('is-active'), 4000);
+        }
+
+        function log(message) {
+            if (!dom.debugConsoleContent) {
+                return;
+            }
+
+            const line = document.createElement('p');
+            line.textContent = "➔ [" + new Date().toLocaleTimeString() + "] " + message;
+            dom.debugConsoleContent.prepend(line);
+        }
+
+        // wiring
+        function bindEvents() {
+            dom.dropzone.onclick = () => dom.fileInput.click();
+
+            dom.fileInput.onchange = () => {
+                const file = dom.fileInput.files[0];
+
+                // reset so picking the same file again still fires the change event
+                dom.fileInput.value = "";
+
+                if (file) {
+                    openFromFile(file);
+                }
+            };
+
+            dom.urlButton.onclick = () => dom.urlInput.value && openFromURL(dom.urlInput.value.trim());
+
+            dom.urlInput.onkeydown = (event) => {
+                if (event.key === 'Enter') {
+                    dom.urlButton.click();
+                }
+            };
+
+            dom.openButton.onclick = showStart;
+            dom.downloadButton.onclick = downloadActive;
+
+            dom.prevPage.onclick = () => scrollToPage(currentPage - 1);
+            dom.nextPage.onclick = () => scrollToPage(currentPage + 1);
+            dom.pageInput.onchange = () => scrollToPage(Number(dom.pageInput.value));
+
+            dom.zoomIn.onclick = () => setZoom(zoom + ZOOM_STEP);
+            dom.zoomOut.onclick = () => setZoom(zoom - ZOOM_STEP);
+            dom.fitWidth.onclick = fitWidth;
+
+            dom.pagesContainer.onscroll = onScroll;
+
+            // ctrl + wheel zooms, like a native viewer
+            dom.pagesContainer.addEventListener('wheel', (event) => {
+                if (event.ctrlKey) {
+                    event.preventDefault();
+                    setZoom(zoom + (event.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP));
+                }
+            }, { passive: false });
+
+            // keep fitting to width on resize and rotation unless the user zoomed manually
+            window.onresize = () => {
+                if (!activeDocument) {
+                    return;
+                }
+
+                if (fitMode) {
+                    fitWidth();
+                } else {
+                    refreshVisiblePages();
+                }
+            };
+            document.onkeydown = onKeyDown;
+
+            bindDragAndDrop();
+        }
+
+        function onScroll() {
+            if (scrollRaf) {
+                return;
+            }
+
+            scrollRaf = requestAnimationFrame(() => {
+                scrollRaf = null;
+                refreshVisiblePages();
+            });
+        }
+
+        function onKeyDown(event) {
+            if (!activeDocument || dom.viewer.style.display === "none") {
+                return;
+            }
+
+            const actions = {
+                ArrowLeft: () => scrollToPage(currentPage - 1),
+                ArrowRight: () => scrollToPage(currentPage + 1),
+                Home: () => scrollToPage(1),
+                End: () => scrollToPage(activeDocument.pageCount),
+            };
+
+            if (actions[event.key]) {
+                actions[event.key]();
+                event.preventDefault();
+            }
+        }
+
+        // accept a dropped pdf anywhere on the window, even while a document is open
+        function bindDragAndDrop() {
+            const stop = (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+            };
+
+            const hasFiles = (event) => Array.from(event.dataTransfer?.types || []).includes('Files');
+
+            // a counter keeps the overlay stable across nested dragenter and dragleave events
+            let dragDepth = 0;
+
+            window.addEventListener('dragenter', (event) => {
+                if (!hasFiles(event)) {
+                    return;
+                }
+
+                stop(event);
+                dragDepth++;
+                dom.dropOverlay.classList.add('is-active');
+            });
+
+            window.addEventListener('dragover', (event) => hasFiles(event) && stop(event));
+
+            window.addEventListener('dragleave', (event) => {
+                if (!hasFiles(event)) {
+                    return;
+                }
+
+                stop(event);
+                dragDepth = Math.max(0, dragDepth - 1);
+
+                if (dragDepth === 0) {
+                    dom.dropOverlay.classList.remove('is-active');
+                }
+            });
+
+            window.addEventListener('drop', (event) => {
+                if (!hasFiles(event)) {
+                    return;
+                }
+
+                stop(event);
+                dragDepth = 0;
+                dom.dropOverlay.classList.remove('is-active');
+
+                const file = Array.from(event.dataTransfer.files).find((f) => f.type === 'application/pdf');
+
+                if (file) {
+                    openFromFile(file);
+                } else {
+                    showError("Please drop a PDF file.");
+                }
+            });
+        }
+
+        // theme: "system" follows prefers-color-scheme, "light" and "dark" force a scheme
+        function applyTheme(choice) {
+            if (choice === 'system') {
+                document.documentElement.removeAttribute('data-theme');
+            } else {
+                document.documentElement.setAttribute('data-theme', choice);
+            }
+
+            localStorage.setItem('pdfviewer-theme', choice);
+
+            for (const button of document.querySelectorAll('[data-theme-choice]')) {
+                button.classList.toggle('is-link', button.dataset.themeChoice === choice);
+            }
+        }
+
+        function setupTheme() {
+            const saved = localStorage.getItem('pdfviewer-theme') || 'system';
+
+            applyTheme(saved);
+
+            for (const button of document.querySelectorAll('[data-theme-choice]')) {
+                button.onclick = () => applyTheme(button.dataset.themeChoice);
+            }
+        }
+
+        function getUrlParam(name) {
+            return new URLSearchParams(window.location.search).get(name);
+        }
+
+        // apply optional url parameters: url, title, debug
+        function applyUrlParams() {
+            const url = getUrlParam("url");
+            const title = getUrlParam("title");
+
+            if (getUrlParam("debug") === "1") {
+                dom.debugConsole.style.display = "block";
+            }
+
+            if (title) {
+                document.title = decodeURIComponent(title) + " - PDF Viewer";
+            }
+
+            if (url) {
+                openFromURL(decodeURIComponent(url));
+            }
+        }
+
+        function init() {
+            const ids = [
+                'startScreen', 'viewer', 'dropzone', 'fileInput', 'urlInput', 'urlButton',
+                'openButton', 'fileTitle', 'pagesContainer', 'prevPage', 'nextPage', 'pageInput',
+                'pageCount', 'zoomOut', 'zoomIn', 'zoomLevel', 'fitWidth', 'downloadButton',
+                'loadingOverlay', 'loadingText', 'dropOverlay', 'toast', 'debugConsole', 'debugConsoleContent',
+            ];
+
+            for (const id of ids) {
+                dom[id] = document.getElementById(id);
+            }
+
+            if (!('WebAssembly' in window)) {
+                setLoading(false);
+                showError("Your browser does not support WebAssembly.");
+                return;
+            }
+
+            setupTheme();
+            bindEvents();
+            applyUrlParams();
+        }
+
+        // the script runs at the end of the body, so the dom is already available
+        init();
+    </script>
 
     <!-- google analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-J2FWK7KZMQ"></script>
