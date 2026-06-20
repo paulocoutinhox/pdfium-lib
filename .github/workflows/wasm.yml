@@ -48,8 +48,8 @@ jobs:
           mkdir -p emsdk
           cd emsdk
           git clone https://github.com/emscripten-core/emsdk.git .
-          ./emsdk install 4.0.10
-          ./emsdk activate 4.0.10
+          ./emsdk install 6.0.0
+          ./emsdk activate 6.0.0
           echo "EMSDK=${{ github.workspace }}/emsdk" >> $GITHUB_ENV
           echo "${{ github.workspace }}/emsdk:${{ github.workspace }}/emsdk/upstream/emscripten" >> $GITHUB_PATH
 
