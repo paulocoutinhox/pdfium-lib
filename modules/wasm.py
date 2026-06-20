@@ -822,6 +822,11 @@ def run_task_generate():
             )
 
             f.copy_file(
+                os.path.join(template_dir, "logo.png"),
+                os.path.join(node_dir, "logo.png"),
+            )
+
+            f.copy_file(
                 os.path.join(template_dir, "package.json"),
                 os.path.join(main_dir, "package.json"),
             )
