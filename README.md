@@ -121,7 +121,7 @@ Support the continuous development of this project.
 ## My other projects
 
 - XPLPC - Cross Platform Lite Procedure Call: [https://github.com/xplpc/xplpc](https://github.com/xplpc/xplpc)
-- Nativium - C++ Multiplatform Modular Toolkit Template: [https://github.com/nativium/nativium](https://github.com/nativium/nativium)
+- IonClaw - A cross-platform AI agent orchestrator in C++ that turns any device — including your phone — into a self-contained, multi-agent automation platform: [https://github.com/ionclaw-org/ionclaw](https://github.com/ionclaw-org/ionclaw)
 
 ## License
 
