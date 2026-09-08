@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cmath>
+#include <cstdint>
+#include <vector>
 
 #include "fpdfview.h"
 
@@ -15,6 +17,7 @@ int main(int argc, char **argv)
     config.m_pIsolate = nullptr;
     config.m_v8EmbedderSlot = 0;
     config.m_pPlatform = nullptr;
+    config.m_RendererType = FPDF_RENDERERTYPE_AGG;
 
     FPDF_InitLibraryWithConfig(&config);
 
@@ -80,16 +83,17 @@ int main(int argc, char **argv)
         // render page
         FPDF_PAGE page = FPDF_LoadPage(doc, 0);
 
-        uint8_t buffer[(int)pageWidth * (int)pageHeight * 4];
+        // a heap buffer, since variable length arrays are not standard c++
+        std::vector<uint8_t> buffer((size_t)pageWidth * (size_t)pageHeight * 4);
 
-        FPDF_BITMAP createdpages = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, FPDFBitmap_BGRx, buffer, (int)pageWidth * 4);
-        uint background = 0xFFFFFFFF;
+        FPDF_BITMAP createdpages = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, FPDFBitmap_BGRx, buffer.data(), (int)pageWidth * 4);
+        uint32_t background = 0xFFFFFFFF;
         FPDFBitmap_FillRect(createdpages, 0, 0, (int)pageWidth, (int)pageHeight, background);
         FPDF_RenderPageBitmap(createdpages, page, 0, 0, (int)pageWidth, (int)pageHeight, 0, FPDF_ANNOT);
         FPDFBitmap_Destroy(createdpages);
         FPDF_ClosePage(page);
 
-        std::cout << "Buffer size: " << (sizeof(buffer) / sizeof((buffer)[0])) << std::endl;
+        std::cout << "Buffer size: " << buffer.size() << std::endl;
     }
 
     FPDF_CloseDocument(doc);

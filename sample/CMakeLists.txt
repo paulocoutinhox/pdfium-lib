@@ -1,9 +1,36 @@
 cmake_minimum_required(VERSION 3.24)
 project(sample)
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# platform
+if(APPLE)
+    set(PDFIUM_PLATFORM "macos")
+elseif(WIN32)
+    set(PDFIUM_PLATFORM "windows")
+else()
+    set(PDFIUM_PLATFORM "linux")
+endif()
+
+set(PDFIUM_INCLUDE_DIR "../build/${PDFIUM_PLATFORM}/release/include")
+
+# macos ships a single universal library, the other platforms keep one directory per arch
+if(APPLE)
+    set(PDFIUM_LIB_DIR "../build/${PDFIUM_PLATFORM}/release/lib")
+else()
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "^(aarch64|arm64|ARM64)$")
+        set(PDFIUM_ARCH "arm64")
+    else()
+        set(PDFIUM_ARCH "x64")
+    endif()
+
+    set(PDFIUM_LIB_DIR "../build/${PDFIUM_PLATFORM}/release/lib/${PDFIUM_ARCH}")
+endif()
+
 # sources
 file(GLOB S_FILES_PROJECT "src/*.cpp")
-file(GLOB H_FILES_PDFIUM "../build/macos/release/include/*.h")
+file(GLOB H_FILES_PDFIUM "${PDFIUM_INCLUDE_DIR}/*.h")
 
 set(
     PROJ_FILES
@@ -11,21 +38,32 @@ set(
     ${H_FILES_PDFIUM}
 )
 
-# frameworks
-find_library(FWK_CORE_GRAPHICS CoreGraphics)
-find_library(FWK_FOUNDATION Foundation)
-find_library(FWK_SECURITY Security)
-
 # target
 add_executable(${PROJECT_NAME} ${PROJ_FILES})
 
 # links
 target_link_libraries(${PROJECT_NAME} PRIVATE "pdfium")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_FOUNDATION})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_CORE_GRAPHICS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_SECURITY})
+if(APPLE)
+    find_library(FWK_CORE_GRAPHICS CoreGraphics)
+    find_library(FWK_FOUNDATION Foundation)
+    find_library(FWK_SECURITY Security)
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_FOUNDATION})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_CORE_GRAPHICS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_SECURITY})
+elseif(WIN32)
+    # pdfium is built with the static release crt, so anything linking against it
+    # has to use the same one or the link fails on duplicated runtime symbols.
+    # the system libraries it needs are already in the msvc defaults cmake links
+    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded")
+else()
+    find_package(Threads REQUIRED)
+
+    target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_DL_LIBS})
+endif()
 
 # paths
-target_link_directories(${PROJECT_NAME} PRIVATE "../build/macos/release/lib")
-target_include_directories(${PROJECT_NAME} PRIVATE "../build/macos/release/include")
+target_link_directories(${PROJECT_NAME} PRIVATE ${PDFIUM_LIB_DIR})
+target_include_directories(${PROJECT_NAME} PRIVATE ${PDFIUM_INCLUDE_DIR})

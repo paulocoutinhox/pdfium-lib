@@ -20,6 +20,20 @@ targets_macos = [
     {"target_os": "macos", "target_cpu": "arm64", "pdfium_os": "mac"},
 ]
 
+# linux
+configurations_linux = ["release"]
+shared_lib_linux = False
+targets_linux = [
+    {"target_os": "linux", "target_cpu": "x64", "pdfium_os": "linux"},
+]
+
+# windows
+configurations_windows = ["release"]
+shared_lib_windows = False
+targets_windows = [
+    {"target_os": "windows", "target_cpu": "x64", "pdfium_os": "win"},
+]
+
 # ios
 configurations_ios = ["release"]
 shared_lib_ios = False

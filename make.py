@@ -37,6 +37,20 @@ Tasks:
   - test-macos
   - archive-macos
 
+  - build-pdfium-linux
+  - patch-linux
+  - build-linux
+  - install-linux
+  - test-linux
+  - archive-linux
+
+  - build-pdfium-windows
+  - patch-windows
+  - build-windows
+  - install-windows
+  - test-windows
+  - archive-windows
+
   - build-pdfium-android
   - patch-android
   - build-android
@@ -64,8 +78,10 @@ import modules.android as android
 import modules.common as common
 import modules.config as c
 import modules.ios as ios
+import modules.linux as linux
 import modules.macos as macos
 import modules.wasm as wasm
+import modules.windows as windows
 
 
 def main(options):
@@ -159,6 +175,62 @@ def main(options):
     # archive - macos
     elif task == "archive-macos":
         macos.run_task_archive()
+
+    #######################
+    # Linux
+    #######################
+
+    # build pdfium - linux
+    elif task == "build-pdfium-linux":
+        linux.run_task_build_pdfium()
+
+    # patch - linux
+    elif task == "patch-linux":
+        linux.run_task_patch()
+
+    # build - linux
+    elif task == "build-linux":
+        linux.run_task_build()
+
+    # install - linux
+    elif task == "install-linux":
+        linux.run_task_install()
+
+    # test - linux
+    elif task == "test-linux":
+        linux.run_task_test()
+
+    # archive - linux
+    elif task == "archive-linux":
+        linux.run_task_archive()
+
+    #######################
+    # Windows
+    #######################
+
+    # build pdfium - windows
+    elif task == "build-pdfium-windows":
+        windows.run_task_build_pdfium()
+
+    # patch - windows
+    elif task == "patch-windows":
+        windows.run_task_patch()
+
+    # build - windows
+    elif task == "build-windows":
+        windows.run_task_build()
+
+    # install - windows
+    elif task == "install-windows":
+        windows.run_task_install()
+
+    # test - windows
+    elif task == "test-windows":
+        windows.run_task_test()
+
+    # archive - windows
+    elif task == "archive-windows":
+        windows.run_task_archive()
 
     #######################
     # Android

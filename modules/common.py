@@ -157,6 +157,27 @@ def get_build_args(
     elif target_os == "linux":
         args.append("clang_use_chrome_plugins=false")
         args.append("pdf_is_standalone=true")
+
+        # the bundled libc++ is never linked into a static_library and its symbols
+        # carry the __Cr abi namespace, so the consumer would fail on undefined
+        # std::__Cr symbols. build against the system c++ runtime instead
+        args.append("use_custom_libcxx=false")
+
+        # building against the host toolchain avoids depending on the chromium
+        # sysroot, which is not installed by a minimal checkout
+        args.append("use_sysroot=false")
+
+        # static lib
+        if not shared:
+            args.append("pdf_is_complete_lib=true")
+    elif target_os == "win":
+        args.append("clang_use_chrome_plugins=false")
+        args.append("pdf_is_standalone=true")
+        args.append("use_custom_libcxx=false")
+
+        # static lib
+        if not shared:
+            args.append("pdf_is_complete_lib=true")
     elif target_os.startswith("mac"):
         args.append('mac_deployment_target="11.0.0"')
         args.append("clang_use_chrome_plugins=false")
