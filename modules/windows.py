@@ -136,7 +136,6 @@ def run_task_install():
                 "pdfium.lib",
             )
 
-            # there is no fat binary on windows, so each arch keeps its own directory
             target_lib_path = os.path.join(
                 "build",
                 target["target_os"],
@@ -184,30 +183,39 @@ def run_task_test():
     sample_dir = os.path.join(current_dir, "sample")
     build_dir = os.path.join(sample_dir, "build")
 
-    f.recreate_dir(build_dir)
+    # configs
+    for config in c.configurations_windows:
+        f.recreate_dir(build_dir)
 
-    os.chdir(build_dir)
+        os.chdir(build_dir)
 
-    # generate project
-    command = ["cmake", "../"]
-    r.run(command)
+        cmake_config = config.capitalize()
 
-    # build
-    command = ["cmake", "--build", ".", "--config", "Release"]
-    r.run(command)
+        # generate project
+        command = [
+            "cmake",
+            "-DPDFIUM_CONFIG={0}".format(config),
+            "-DCMAKE_BUILD_TYPE={0}".format(cmake_config),
+            "../",
+        ]
+        r.run(command)
 
-    # copy assets
-    f.copy_file(
-        os.path.join(sample_dir, "assets", "f1.pdf"),
-        os.path.join(build_dir, "f1.pdf"),
-    )
+        # build
+        command = ["cmake", "--build", ".", "--config", cmake_config]
+        r.run(command)
 
-    # run
-    command = ["sample.exe"]
-    r.run(command)
+        # copy assets
+        f.copy_file(
+            os.path.join(sample_dir, "assets", "f1.pdf"),
+            os.path.join(build_dir, "f1.pdf"),
+        )
 
-    # finish
-    os.chdir(current_dir)
+        # run
+        command = ["sample.exe"]
+        r.run(command)
+
+        # finish
+        os.chdir(current_dir)
 
     l.ok()
 
