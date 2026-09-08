@@ -143,6 +143,7 @@ def get_build_args(
         args.append("ios_enable_code_signing=false")
         args.append("use_blink=true")
         args.append("pdf_is_standalone=true")
+        args.append("use_custom_libcxx=false")
         args.append('target_environment="{0}"'.format(target_environment))
         args.append('ios_deployment_target="12.0"')
 
