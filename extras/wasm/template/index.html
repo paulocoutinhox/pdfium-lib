@@ -497,7 +497,8 @@
             6: "page not found or content error",
         };
 
-        const BITMAP_BGRA = 4;
+        // BGRx, not BGRA: an alpha destination makes blend modes composite against the white fill
+        const BITMAP_BGRX = 3;
         const BYTES_PER_PIXEL = 4;
 
         // viewer tuning
@@ -668,7 +669,7 @@
             const byteCount = pixelWidth * pixelHeight * BYTES_PER_PIXEL;
 
             const bufferPtr = Module.wasmExports.malloc(byteCount);
-            const bitmap = FPDF.Bitmap_CreateEx(pixelWidth, pixelHeight, BITMAP_BGRA, bufferPtr, pixelWidth * BYTES_PER_PIXEL);
+            const bitmap = FPDF.Bitmap_CreateEx(pixelWidth, pixelHeight, BITMAP_BGRX, bufferPtr, pixelWidth * BYTES_PER_PIXEL);
             const page = FPDF.LoadPage(activeDocument.handle, index);
 
             FPDF.Bitmap_FillRect(bitmap, 0, 0, pixelWidth, pixelHeight, 0xFFFFFFFF);
