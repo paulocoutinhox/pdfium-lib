@@ -1,4 +1,5 @@
 import os
+import sys
 
 from pygemstones.io import file as f
 from pygemstones.system import runner as r
@@ -8,18 +9,28 @@ import modules.config as c
 
 
 # -----------------------------------------------------------------------------
+# Runs a gclient command, on any platform.
+def run_gclient(args, cwd):
+    # On windows gclient is a batch file, which cannot be started without a shell.
+    if sys.platform == "win32":
+        r.run(" ".join(args), cwd=cwd, shell=True)
+    else:
+        r.run(args, cwd=cwd)
+
+
+# -----------------------------------------------------------------------------
 def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
     l.colored("Building PDFium...", l.YELLOW)
 
     build_dir = os.path.join("build", target)
     f.create_dir(build_dir)
 
-    # remove old data
+    # Removes the previous checkout.
     l.colored("Removing old PDFium directory...", l.YELLOW)
     target_dir = os.path.join(build_dir, "pdfium")
     f.remove_dir(target_dir)
 
-    # clone pdfium
+    # Clones pdfium with gclient.
     l.colored("Cloning PDFium with gclient...", l.YELLOW)
     config_args = [
         "gclient",
@@ -31,9 +42,9 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
     if not enable_v8:
         config_args.extend(["--custom-var", "checkout_configuration=minimal"])
 
-    r.run(config_args, cwd=build_dir)
+    run_gclient(config_args, build_dir)
 
-    # append target os
+    # Appends the target os to the gclient file.
     if append_target_os:
         l.colored(
             "Appending target os ({}) to gclient file...".format(target),
@@ -43,7 +54,7 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
         f.append_to_file(gclient_file, "target_os = [ '{}' ]".format(target))
 
     l.colored(f"Syncing repository with branch {c.pdfium_git_branch}...", l.YELLOW)
-    r.run(
+    run_gclient(
         [
             "gclient",
             "sync",
@@ -52,10 +63,10 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
             "--no-history",
             "--shallow",
         ],
-        cwd=build_dir,
+        build_dir,
     )
 
-    # reset and clean directories
+    # Reverts the directories a previous patch task may have changed.
     folders_to_reset = [
         "pdfium",
         "pdfium/build",

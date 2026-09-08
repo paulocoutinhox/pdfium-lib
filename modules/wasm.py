@@ -23,15 +23,15 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "emscripten", "pdfium")
 
-    # shared lib
+    # Turns the library target into a shared one.
     if c.shared_lib_wasm:
         patch.apply_shared_library("emscripten")
 
-    # public headers
+    # Removes the component build guards from the public headers.
     if c.shared_lib_wasm:
         patch.apply_public_headers("emscripten")
 
-    # build target
+    # Adjusts the build target for emscripten.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -62,7 +62,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build target", l.PURPLE)
 
-    # compiler
+    # Adjusts the compiler configuration.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -92,7 +92,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build compiler", l.PURPLE)
 
-    # stack protector
+    # Disables the stack protector.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -116,7 +116,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: stack protector", l.PURPLE)
 
-    # fxcrt
+    # Adjusts the fxcrt target.
     source_file = os.path.join(
         source_dir,
         "core",
@@ -138,7 +138,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: fxcrt", l.PURPLE)
 
-    # fxge
+    # Adjusts the fxge target.
     source_file = os.path.join(
         source_dir,
         "core",
@@ -160,7 +160,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: fxge", l.PURPLE)
 
-    # build config
+    # Adjusts the build configuration.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -172,8 +172,7 @@ def run_task_patch():
     if not f.file_exists(source_file):
         content = """config("compiler") {
   defines = [
-    # Enable fseeko() and ftello() (required by libopenjpeg20)
-    # https://github.com/emscripten-core/emscripten/issues/4932
+    # Enables fseeko() and ftello(), which libopenjpeg20 requires, as described in https://github.com/emscripten-core/emscripten/issues/4932.
     "_POSIX_C_SOURCE=200112",
   ]
 }"""
@@ -184,7 +183,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: build config", l.PURPLE)
 
-    # toolchain warn
+    # Silences the unknown warning options of the toolchain.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -207,7 +206,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: toolchain warn", l.PURPLE)
 
-    # toolchain wasm
+    # Points the toolchain at the installed emscripten.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -231,7 +230,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: toolchain wasm", l.PURPLE)
 
-    # skia
+    # Drops the skia dependency, which the wasm build does not use.
     source_file = os.path.join(
         source_dir,
         "BUILD.gn",
@@ -259,9 +258,9 @@ def run_task_build():
 
     current_dir = f.current_dir()
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_wasm:
-        # targets
+        # Walks every target.
         for target in c.targets_wasm:
             main_dir = os.path.join(
                 "build",
@@ -281,7 +280,7 @@ def run_task_build():
                 )
             )
 
-            # generating files...
+            # Generates the ninja files.
             l.colored(
                 'Generating files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -308,7 +307,7 @@ def run_task_build():
             ]
             r.run(" ".join(command), shell=True)
 
-            # compiling...
+            # Compiles the library.
             l.colored(
                 'Compiling to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -336,7 +335,7 @@ def run_task_build():
 def run_task_install():
     l.colored("Installing libraries...", l.YELLOW)
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
             f.recreate_dir(
@@ -370,7 +369,7 @@ def run_task_install():
 
             f.copy_file(source_lib_path, target_lib_path)
 
-            # fix include path
+            # Rewrites the public includes so they resolve outside the checkout.
             source_include_path = os.path.join(
                 "build",
                 target["target_os"],
@@ -383,7 +382,7 @@ def run_task_install():
             for header in headers:
                 f.replace_in_file(header, '#include "public/', '#include "../')
 
-            # check file
+            # Reports the resulting file.
             l.colored("File data...", l.YELLOW)
             command = ["file", target_lib_path]
             r.run(" ".join(command), shell=True)
@@ -392,7 +391,7 @@ def run_task_install():
             command = ["ls", "-lh ", target_lib_path]
             r.run(" ".join(command), shell=True)
 
-            # headers
+            # Copies the public headers.
             l.colored("Copying header files...", l.YELLOW)
 
             include_dir = os.path.join("build", "emscripten", "pdfium", "public")
@@ -448,7 +447,7 @@ def run_task_test():
 
             f.recreate_dir(build_dir)
 
-            # build
+            # Builds the sample.
             command = [
                 "em++",
                 "{0}".format("-g" if config == "debug" else ""),
@@ -501,7 +500,7 @@ def run_task_test_wasmtime():
                 l.YELLOW,
             )
 
-            # paths
+            # Resolves the directories used below.
             relative_dir = os.path.join(
                 "build",
                 target["target_os"],
@@ -513,18 +512,18 @@ def run_task_test_wasmtime():
             node_dir = os.path.join(root_dir, "node")
             wasm_file = os.path.join(node_dir, "pdfium.std.wasm")
 
-            # check if wasm file exists
+            # Requires the wasm file to exist.
             if not f.file_exists(wasm_file):
                 l.e(f"WASM file not found: {wasm_file}")
                 continue
 
             l.bullet(f"WASM file: {wasm_file}", l.YELLOW)
 
-            # create engine and load the pdfium.wasm module
+            # Creates the engine and loads the pdfium.wasm module.
             engine = Engine()
             module = Module.from_file(engine, wasm_file)
 
-            # create WASI context and store
+            # Creates the WASI context and the store.
             wasi_config = WasiConfig()
             wasi_config.inherit_stdin()
             wasi_config.inherit_stdout()
@@ -533,23 +532,23 @@ def run_task_test_wasmtime():
             store = Store(engine)
             store.set_wasi(wasi_config)
 
-            # create a linker and add WASI support
+            # Creates a linker with WASI support.
             linker = Linker(engine)
             linker.define_wasi()
 
-            # define stub functions for unknown imports
+            # Defines stub functions for the unknown imports.
             for imp in module.imports:
                 module_name = imp.module
                 field_name = imp.name
 
-                # check if this is a function import
+                # Only function imports need a stub.
                 if isinstance(imp.type, FuncType):
                     func_type = imp.type
 
-                    # create a stub function that returns default values
+                    # Creates a stub function returning default values.
                     def make_stub(ft):
                         def stub_func(*_args):
-                            # return default values (0 or None) based on results
+                            # Returns zero or None according to the declared results.
                             if ft.results:
                                 if len(ft.results) == 1:
                                     return 0
@@ -563,14 +562,14 @@ def run_task_test_wasmtime():
                             module_name, field_name, func_type, make_stub(func_type)
                         )
                     except Exception:
-                        # already defined (e.g., by WASI)
+                        # The import is already defined, by WASI for example.
                         pass
 
-            # instantiate the module
+            # Instantiates the module.
             instance = linker.instantiate(store, module)
             exports = instance.exports(store)
 
-            # get and call FPDF_InitLibrary function
+            # Calls FPDF_InitLibrary.
             try:
                 init_library = exports["FPDF_InitLibrary"]
                 init_library(store)
@@ -579,7 +578,7 @@ def run_task_test_wasmtime():
                 l.e("Function 'FPDF_InitLibrary' not found")
                 continue
 
-            # test with a sample PDF file
+            # Tests with a sample PDF file.
             sample_pdf = os.path.join(
                 current_dir, "sample-wasm", "assets", "web-assembly.pdf"
             )
@@ -590,23 +589,23 @@ def run_task_test_wasmtime():
 
             l.bullet(f"Testing with PDF: {sample_pdf}", l.YELLOW)
 
-            # read PDF data
+            # Reads the PDF data.
             pdf_path = Path(sample_pdf)
             pdf_data = pdf_path.read_bytes()
 
-            # allocate memory for the PDF data
+            # Allocates memory for the PDF data.
             malloc = exports["malloc"]
             memory = exports["memory"]
 
-            # allocate buffer in WASM memory
+            # Allocates the buffer in the WASM memory.
             buf_ptr = malloc(store, len(pdf_data))
             mem_data = memory.data_ptr(store)
 
-            # copy PDF data to WASM memory
+            # Copies the PDF data into the WASM memory.
             for i, byte in enumerate(pdf_data):
                 mem_data[buf_ptr + i] = byte
 
-            # load the PDF document from memory
+            # Loads the PDF document from memory.
             fpdf_load_mem_document = exports["FPDF_LoadMemDocument"]
             doc = fpdf_load_mem_document(store, buf_ptr, len(pdf_data), 0)
 
@@ -615,23 +614,23 @@ def run_task_test_wasmtime():
                 error = get_last_error(store)
                 l.e(f"Failed to load PDF. Error code: {error}")
 
-                # free the allocated memory
+                # Frees the allocated memory.
                 free = exports["free"]
                 free(store, buf_ptr)
                 continue
 
-            # get page count
+            # Reads the page count.
             fpdf_get_page_count = exports["FPDF_GetPageCount"]
             page_count = fpdf_get_page_count(store, doc)
 
             l.bullet(f"PDF: {pdf_path.name}", l.GREEN)
             l.bullet(f"Number of pages: {page_count}", l.GREEN)
 
-            # close the document
+            # Closes the document.
             fpdf_close_document = exports["FPDF_CloseDocument"]
             fpdf_close_document(store, doc)
 
-            # free the allocated memory
+            # Frees the allocated memory.
             free = exports["free"]
             free(store, buf_ptr)
 
@@ -648,7 +647,7 @@ def run_task_generate():
 
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
-            # paths
+            # Resolves the directories used below.
             utils_dir = os.path.join(current_dir, "extras", "wasm", "utils")
             template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
@@ -669,7 +668,7 @@ def run_task_generate():
 
             f.recreate_dir(gen_dir)
 
-            # doxygen
+            # Runs doxygen.
             l.colored("Doxygen...", l.YELLOW)
 
             doxygen_file = os.path.join(
@@ -686,18 +685,18 @@ def run_task_generate():
             ]
             r.run(" ".join(command), cwd=include_dir, shell=True)
 
-            # copy xml files
+            # Copies the xml files.
             l.colored("Copying xml files...", l.YELLOW)
 
             xml_dir = os.path.join(include_dir, "xml")
             f.copy_dir(xml_dir, os.path.join(gen_dir, "xml"))
             f.remove_dir(xml_dir)
 
-            # copy utils files
+            # Copies the utils files.
             l.colored("Copying utils files...", l.YELLOW)
             f.copy_dir(utils_dir, os.path.join(gen_dir, "utils"))
 
-            # node modules
+            # Installs the node modules.
             l.colored("Installing node modules...", l.YELLOW)
 
             gen_utils_dir = os.path.join(
@@ -711,7 +710,7 @@ def run_task_generate():
             ]
             r.run(" ".join(command), cwd=gen_utils_dir, shell=True)
 
-            # generate
+            # Generates the module.
             l.colored("Compiling with emscripten...", l.YELLOW)
 
             gen_out_dir = os.path.join(
@@ -774,7 +773,7 @@ def run_task_generate():
                 "--no-entry",
             ]
 
-            # Generate UMD (CommonJS + AMD) module and .wasm file
+            # Generates the UMD module, for CommonJS and AMD, along with the wasm file.
             umd_command = [
                 *base_command,
                 "-o",
@@ -782,7 +781,7 @@ def run_task_generate():
             ]
             r.run(" ".join(umd_command), cwd=gen_utils_dir, shell=True)
 
-            # Generate ES6 module, only .js will be generated (no .wasm)
+            # Generates the ES6 module, which produces only the js file.
             l.colored("Compiling ES6 module with emscripten...", l.YELLOW)
             es6_command = [
                 *base_command,
@@ -793,7 +792,7 @@ def run_task_generate():
             ]
             r.run(" ".join(es6_command), cwd=gen_utils_dir, shell=True)
 
-            # Generate STANDALONE module, only .js will be generated (no .wasm)
+            # Generates the standalone module, which produces only the js file.
             l.colored("Compiling STANDALONE module with emscripten...", l.YELLOW)
             std_command = [
                 *base_command,
@@ -807,13 +806,13 @@ def run_task_generate():
             ]
             r.run(" ".join(std_command), cwd=gen_utils_dir, shell=True)
 
-            # copy files
+            # Copies the compiled files.
             l.colored("Copying compiled files...", l.YELLOW)
 
             f.remove_dir(node_dir)
             f.copy_dir(gen_out_dir, node_dir)
 
-            # copy template files
+            # Copies the template files.
             l.colored("Copying template files...", l.YELLOW)
 
             f.copy_file(
@@ -836,7 +835,7 @@ def run_task_generate():
                 os.path.join(main_dir, "package.json"),
             )
 
-            # change template tags
+            # Replaces the template tags.
             l.colored("Replacing template tags...", l.YELLOW)
 
             f.replace_in_file(
@@ -851,7 +850,7 @@ def run_task_generate():
                 c.pdfium_git_branch.strip("chromium/"),
             )
 
-            # test
+            # Reports how to test it on a browser.
             l.colored(
                 "Test on browser with: python3 -m http.server --directory {0}".format(
                     http_dir
@@ -873,17 +872,17 @@ def run_task_publish():
     )
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
-    # copy generated files
+    # Copies the generated files.
     f.remove_dir(publish_dir)
     f.copy_dir(node_dir, publish_dir)
 
-    # copy template files
+    # Copies the template files.
     f.copy_file(
         os.path.join(template_dir, "README.md"),
         os.path.join(publish_dir, "README.md"),
     )
 
-    # finish
+    # Returns to the starting directory.
     l.ok()
 
 
@@ -898,17 +897,17 @@ def run_task_publish_to_web():
     )
     template_dir = os.path.join(current_dir, "extras", "wasm", "template")
 
-    # copy generated files
+    # Copies the generated files.
     f.remove_dir(publish_dir)
     f.copy_dir(node_dir, publish_dir)
 
-    # copy template files
+    # Copies the template files.
     f.copy_file(
         os.path.join(template_dir, "README.md"),
         os.path.join(publish_dir, "README.md"),
     )
 
-    # clone gh-pages branch
+    # Clones the gh-pages branch.
     command = "git init ."
     r.run(command, cwd=publish_dir, shell=True)
 
@@ -924,7 +923,7 @@ def run_task_publish_to_web():
     command = 'git push "git@github.com:pdfviewer/pdfviewer.github.io.git" master:master --force'
     r.run(command, cwd=publish_dir, shell=True)
 
-    # finish
+    # Returns to the starting directory.
     l.colored("Test on browser: https://pdfviewer.github.io/", l.YELLOW)
 
     l.ok()
@@ -955,13 +954,13 @@ def run_task_archive():
                 filter=filter_files,
             )
 
-            # Create per config "npm install"-compatible tarball
+            # Creates a tarball per configuration that npm install accepts.
             per_config_tar = tarfile.open(
                 os.path.join(current_dir, f"wasm-{config}.tgz"), "w:gz"
             )
             per_config_tar.add(
                 name=lib_dir,
-                # Use "package" as the root directory to be compatible with "npm install"
+                # The root directory has to be named package for npm install to accept it.
                 arcname="package",
                 filter=filter_files,
             )

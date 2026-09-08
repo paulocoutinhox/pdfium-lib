@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
 
     <script>
-        // apply the saved theme before paint to avoid a flash of the wrong scheme
+        // The saved theme is applied before paint to avoid a flash of the wrong scheme.
         (function () {
             const saved = localStorage.getItem('pdfviewer-theme');
 
@@ -61,7 +61,7 @@
             height: 100%;
         }
 
-        /* start screen */
+        /* Start screen. */
         #startScreen {
             position: relative;
             flex: 1;
@@ -106,7 +106,7 @@
             object-fit: contain;
         }
 
-        /* viewer */
+        /* Viewer. */
         #viewer {
             flex: 1;
             display: none;
@@ -133,7 +133,7 @@
             gap: .3rem;
         }
 
-        /* left and right grow equally so the page indicator stays centered */
+        /* Left and right grow equally so the page indicator stays centered. */
         .toolbar-left {
             flex: 1 1 0;
             min-width: 0;
@@ -271,7 +271,7 @@
             }
         }
 
-        /* overlay */
+        /* Loading overlay. */
         #loadingOverlay {
             position: fixed;
             inset: 0;
@@ -290,7 +290,7 @@
             pointer-events: none;
         }
 
-        /* drag overlay */
+        /* Drag overlay. */
         #dropOverlay {
             position: fixed;
             inset: 0;
@@ -315,7 +315,7 @@
             text-align: center;
         }
 
-        /* toast */
+        /* Toast. */
         #toast {
             position: fixed;
             left: 50%;
@@ -332,7 +332,7 @@
             transform: translateX(-50%) translateY(0);
         }
 
-        /* debug console */
+        /* Debug console. */
         #debugConsole {
             position: fixed;
             right: 1rem;
@@ -379,7 +379,7 @@
 
 <body>
     <div id="app">
-        <!-- start screen -->
+        <!-- Start screen. -->
         <section id="startScreen">
             <div class="theme-switch buttons has-addons">
                 <button data-theme-choice="system" class="button is-small" title="Follow system theme">System</button>
@@ -416,7 +416,7 @@
             </div>
         </section>
 
-        <!-- viewer -->
+        <!-- Viewer. -->
         <section id="viewer">
             <div id="toolbar">
                 <div class="toolbar-left">
@@ -455,13 +455,13 @@
         </section>
     </div>
 
-    <!-- loading overlay -->
+    <!-- Loading overlay. -->
     <div id="loadingOverlay">
         <div class="page-spinner"></div>
         <p id="loadingText" class="has-text-grey">Loading engine…</p>
     </div>
 
-    <!-- drag overlay -->
+    <!-- Drag overlay. -->
     <div id="dropOverlay">
         <div class="drop-hint">
             <img class="dropzone-logo" src="logo.png?v={pdfium-branch}" alt="PDF Viewer">
@@ -469,21 +469,20 @@
         </div>
     </div>
 
-    <!-- toast -->
+    <!-- Toast. -->
     <div id="toast" class="notification is-danger"></div>
 
-    <!-- debug console -->
+    <!-- Debug console. -->
     <div id="debugConsole" class="box">
         <p class="has-text-weight-bold mb-2">Debug console</p>
         <div id="debugConsoleContent"></div>
     </div>
 
     <script>
-        // the engine version, replaced at build time, busts the cache of the worker and
-        // of every asset it loads whenever a new release is published
+        // The engine version is replaced at build time and busts the cache of the worker and of every asset it loads.
         const PDFIUM_VERSION = "{pdfium-branch}";
 
-        // viewer tuning
+        // Viewer tuning.
         const MIN_ZOOM = 0.25;
         const MAX_ZOOM = 5.0;
         const ZOOM_STEP = 0.2;
@@ -495,27 +494,27 @@
 
         let worker = null;
 
-        // document holds the page geometry and the source blob, never the pdfium handles
+        // The document holds the page geometry and the source blob, never the pdfium handles.
         let activeDocument = null;
         let zoom = 1.0;
         let fitMode = true;
         let currentPage = 1;
         let scrollRaf = null;
 
-        // renders in flight are tagged with a generation so a zoom can invalidate them
+        // Renders in flight are tagged with a generation so that a zoom can invalidate them.
         let generation = 0;
         let openRequest = null;
 
-        // cheap previews are kept for the whole document, full renders only while on screen
+        // Previews are kept for the whole document, while full renders live only while on screen.
         const previewCache = new Map();
         const requestedPreviews = new Set();
         const requestedFull = new Map();
         const fullPages = new Set();
 
-        // dom references
+        // Dom references.
         const dom = {};
 
-        // resolves once the wasm engine is ready to accept calls
+        // Resolves once the wasm engine is ready to accept calls.
         let markEngineReady;
         const engineReady = new Promise((resolve) => { markEngineReady = resolve; });
 
@@ -556,7 +555,7 @@
             }
         }
 
-        // the buffer moves to the worker, the blob stays here so downloads cost no extra memory
+        // Opens a document, moving the buffer to the worker and keeping the blob here so downloads cost no extra memory.
         function openDocument(buffer, name, blob) {
             return new Promise((resolve, reject) => {
                 closeDocument();
@@ -583,7 +582,7 @@
 
             log('Opened "' + request.name + '" with ' + message.pageCount + ' page(s)');
 
-            // show the viewer first so the container has a real width to measure against
+            // The viewer is shown first so that the container has a real width to measure against.
             showViewer(request.name, message.pageCount);
             buildPages();
             fitWidth();
@@ -594,7 +593,7 @@
         function onDocumentFailed(message) {
             const request = openRequest;
 
-            // ask for a password when the document is protected, reusing the bytes the worker holds
+            // A protected document is retried with a password, reusing the bytes the worker holds.
             if (message.needsPassword) {
                 const entered = window.prompt("This PDF is password protected. Enter the password:");
 
@@ -633,16 +632,16 @@
             generation++;
         }
 
-        // the scale a page is rendered at, capped so huge pages never blow up the bitmap
+        // Returns the scale a page is rendered at, capped so that huge pages never blow up the bitmap.
         function renderScale(size) {
             return Math.min(zoom * PIXEL_RATIO, MAX_PIXEL_DIMENSION / Math.max(size.width, size.height));
         }
 
-        // build placeholder elements sized by page aspect ratio without rendering yet
+        // Builds one placeholder per page, sized by its aspect ratio and not rendered yet.
         function buildPages() {
             dom.pagesContainer.innerHTML = "";
 
-            // a new document always starts at the top, never the previous scroll position
+            // A new document always starts at the top, never at the previous scroll position.
             dom.pagesContainer.scrollTop = 0;
             currentPage = 1;
 
@@ -670,7 +669,7 @@
             page.style.height = Math.round(size.height * zoom) + "px";
         }
 
-        // decide which pages to request and which to drop back to a preview
+        // Requests the pages near the viewport and drops the others back to a preview.
         function refreshVisiblePages() {
             const container = dom.pagesContainer;
             const margin = container.clientHeight * RENDER_MARGIN_RATIO;
@@ -692,14 +691,14 @@
             updateCurrentPage();
         }
 
-        // ask for a coarse preview once, then the sharp render for the current zoom
+        // Requests a coarse preview once, then the sharp render for the current zoom.
         function requestPage(index, priority) {
             const size = activeDocument.sizes[index];
             const scale = renderScale(size);
             const previewScale = Math.min(scale, PREVIEW_MAX_WIDTH / size.width);
 
             if (requestedPreviews.has(index)) {
-                // a page on screen is in use, so it must not be the next preview evicted
+                // A page on screen is in use, so it must not be the next preview evicted.
                 touchPreview(index);
             } else {
                 requestedPreviews.add(index);
@@ -715,7 +714,7 @@
         function onPageRendered(message) {
             const image = toPaintable(message);
 
-            // a render that finished after a zoom or a close is no longer wanted
+            // A render that finished after a zoom or a close is no longer wanted.
             if (message.gen < generation || !activeDocument) {
                 releasePaintable(image);
                 return;
@@ -731,7 +730,7 @@
             if (message.quality === 'preview') {
                 cachePreview(message.index, image);
 
-                // a sharp render already on screen must not be replaced by the preview
+                // A sharp render already on screen must not be replaced by the preview.
                 if (!fullPages.has(message.index)) {
                     paint(page, image, false);
                 }
@@ -739,8 +738,7 @@
                 return;
             }
 
-            // the page may have scrolled out of range while this render was in flight,
-            // in which case releasePage already dropped the request and we throw it away
+            // The page may have scrolled out of range while this render was in flight, and releasePage already dropped the request.
             if (requestedFull.get(message.index) !== message.scale) {
                 releasePaintable(image);
                 return;
@@ -750,7 +748,7 @@
             fullPages.add(message.index);
         }
 
-        // previews are small but a long document still adds up, so keep the recent ones only
+        // Caches a preview, keeping only the most recently used ones since a long document adds up.
         function cachePreview(index, image) {
             releasePaintable(previewCache.get(index));
             previewCache.delete(index);
@@ -765,7 +763,7 @@
             }
         }
 
-        // re-inserting moves the entry to the end, which is what keeps the eviction order honest
+        // Marks a preview as recently used, by moving its entry to the end.
         function touchPreview(index) {
             const image = previewCache.get(index);
 
@@ -793,8 +791,8 @@
             }
         }
 
-        // consume hands the bitmap straight to the canvas without a copy, which empties it,
-        // so only one-shot full renders do it and cached previews are drawn instead
+        // Paints an image into a page, where consume hands the bitmap to the canvas without a copy and empties it.
+        // Only one shot full renders consume, while cached previews are drawn.
         function paint(page, image, consume) {
             const canvas = document.createElement('canvas');
 
@@ -815,11 +813,11 @@
             page.replaceChildren(canvas);
         }
 
-        // scrolling away drops the sharp render but keeps the preview on screen
+        // Drops the sharp render of a page and leaves its preview on screen.
         function releasePage(page, index) {
             const hadFull = fullPages.delete(index);
 
-            // a render still queued for a page nobody is looking at is wasted work
+            // A render still queued for a page nobody is looking at is wasted work.
             if (requestedFull.delete(index)) {
                 worker.postMessage({ type: 'drop', index });
             }
@@ -837,7 +835,7 @@
             }
         }
 
-        // find the page closest to the viewport center for the page indicator
+        // Points the page indicator at the page closest to the viewport center.
         function updateCurrentPage() {
             const container = dom.pagesContainer;
             const center = container.scrollTop + container.clientHeight / 2;
@@ -870,9 +868,8 @@
             }
         }
 
-        // re-layout every page when the zoom changes and re-render what is visible.
-        // the canvases already on screen are left in place and stretched by css, so the
-        // page never flashes back to a spinner while the sharper render is on its way
+        // Applies a zoom, laying every page out again and re-rendering what is visible.
+        // The canvases already on screen are left in place and stretched by css, so a page never flashes back to a spinner.
         function applyZoom(nextZoom) {
             zoom = Math.min(Math.max(nextZoom, MIN_ZOOM), MAX_ZOOM);
             dom.zoomLevel.textContent = Math.round(zoom * 100) + "%";
@@ -881,7 +878,7 @@
                 applyPageSize(page, activeDocument.sizes[Number(page.dataset.index)]);
             }
 
-            // drop everything still queued at the old scale before asking for the new one
+            // Everything still queued at the old scale is dropped before the new one is requested.
             generation++;
             requestedFull.clear();
             worker.postMessage({ type: 'cancel', gen: generation });
@@ -889,13 +886,13 @@
             refreshVisiblePages();
         }
 
-        // manual zoom from the user, which turns off automatic width fitting
+        // Applies a zoom asked by the user, which turns off automatic width fitting.
         function setZoom(nextZoom) {
             fitMode = false;
             applyZoom(nextZoom);
         }
 
-        // fit to the widest page so mixed-size documents never overflow horizontally
+        // Fits the widest page, so that a document of mixed sizes never overflows horizontally.
         function fitWidth() {
             const available = dom.pagesContainer.clientWidth - 24;
 
@@ -909,7 +906,7 @@
             applyZoom(available / widest);
         }
 
-        // file sources
+        // File sources.
         async function openFromFile(file) {
             try {
                 setLoading(true, "Reading file…");
@@ -962,7 +959,7 @@
             URL.revokeObjectURL(link.href);
         }
 
-        // ui state
+        // Interface state.
         function showViewer(name, pageCount) {
             dom.fileTitle.textContent = name;
             dom.pageCount.textContent = String(pageCount);
@@ -1015,14 +1012,14 @@
             dom.debugConsoleContent.prepend(line);
         }
 
-        // wiring
+        // Binds every event.
         function bindEvents() {
             dom.dropzone.onclick = () => dom.fileInput.click();
 
             dom.fileInput.onchange = () => {
                 const file = dom.fileInput.files[0];
 
-                // reset so picking the same file again still fires the change event
+                // The value is reset so that picking the same file again still fires the change event.
                 dom.fileInput.value = "";
 
                 if (file) {
@@ -1051,7 +1048,7 @@
 
             dom.pagesContainer.onscroll = onScroll;
 
-            // ctrl + wheel zooms, like a native viewer
+            // Ctrl and wheel zoom together, like a native viewer.
             dom.pagesContainer.addEventListener('wheel', (event) => {
                 if (event.ctrlKey) {
                     event.preventDefault();
@@ -1059,7 +1056,7 @@
                 }
             }, { passive: false });
 
-            // keep fitting to width on resize and rotation unless the user zoomed manually
+            // Resizing and rotating keep fitting to width, unless the user zoomed manually.
             window.onresize = () => {
                 if (!activeDocument) {
                     return;
@@ -1105,7 +1102,7 @@
             }
         }
 
-        // accept a dropped pdf anywhere on the window, even while a document is open
+        // Accepts a pdf dropped anywhere on the window, even while a document is open.
         function bindDragAndDrop() {
             const stop = (event) => {
                 event.preventDefault();
@@ -1114,7 +1111,7 @@
 
             const hasFiles = (event) => Array.from(event.dataTransfer?.types || []).includes('Files');
 
-            // a counter keeps the overlay stable across nested dragenter and dragleave events
+            // A counter keeps the overlay stable across nested dragenter and dragleave events.
             let dragDepth = 0;
 
             window.addEventListener('dragenter', (event) => {
@@ -1161,7 +1158,7 @@
             });
         }
 
-        // theme: "system" follows prefers-color-scheme, "light" and "dark" force a scheme
+        // Applies a theme, where system follows prefers-color-scheme while light and dark force one.
         function applyTheme(choice) {
             if (choice === 'system') {
                 document.documentElement.removeAttribute('data-theme');
@@ -1190,7 +1187,7 @@
             return new URLSearchParams(window.location.search).get(name);
         }
 
-        // apply optional url parameters: url, title, debug
+        // Applies the optional url parameters, which are url, title and debug.
         function applyUrlParams() {
             const url = getUrlParam("url");
             const title = getUrlParam("title");
@@ -1232,11 +1229,11 @@
             applyUrlParams();
         }
 
-        // the script runs at the end of the body, so the dom is already available
+        // The script runs at the end of the body, so the dom is already available.
         init();
     </script>
 
-    <!-- google analytics -->
+    <!-- Google analytics. -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-J2FWK7KZMQ"></script>
     <script>
         window.dataLayer = window.dataLayer || [];

@@ -37,6 +37,20 @@ Tasks:
   - test-macos
   - archive-macos
 
+  - build-pdfium-linux
+  - patch-linux
+  - build-linux
+  - install-linux
+  - test-linux
+  - archive-linux
+
+  - build-pdfium-windows
+  - patch-windows
+  - build-windows
+  - install-windows
+  - test-windows
+  - archive-windows
+
   - build-pdfium-android
   - patch-android
   - build-android
@@ -64,12 +78,14 @@ import modules.android as android
 import modules.common as common
 import modules.config as c
 import modules.ios as ios
+import modules.linux as linux
 import modules.macos as macos
 import modules.wasm as wasm
+import modules.windows as windows
 
 
 def main(options):
-    # show all params for debug
+    # Shows every option received when debug is on.
     if ("--debug" in options and options["--debug"]) or (
         "-d" in options and options["-d"]
     ):
@@ -80,171 +96,227 @@ def main(options):
         l.m(str(options))
         l.nl()
 
-    # bind options
+    # Reads the task name from the options.
     if "<task-name>" in options:
         task = options["<task-name>"]
 
-    # validate task
+    # Rejects an empty task name.
     if not task:
         l.e("Task is invalid. Use 'python3 make.py -h' for help.")
 
     #######################
-    # Common
+    # Common tasks.
     #######################
 
-    # format
+    # Formats the source files.
     if task == "format":
         common.run_task_format()
 
-    # build depot tools
+    # Clones the depot tools.
     elif task == "build-depot-tools":
         common.run_task_build_depot_tools()
 
-    # build emsdk
+    # Installs the Emscripten SDK.
     elif task == "build-emsdk":
         common.run_task_build_emsdk()
 
     #######################
-    # iOS
+    # Tasks for iOS.
     #######################
 
-    # build pdfium - ios
+    # Clones and syncs pdfium for iOS.
     elif task == "build-pdfium-ios":
         ios.run_task_build_pdfium()
 
-    # patch - ios
+    # Patches the iOS checkout.
     elif task == "patch-ios":
         ios.run_task_patch()
 
-    # build - ios
+    # Builds the iOS libraries.
     elif task == "build-ios":
         ios.run_task_build()
 
-    # install - ios
+    # Stages the iOS libraries.
     elif task == "install-ios":
         ios.run_task_install()
 
-    # test - ios
+    # Tests the iOS libraries.
     elif task == "test-ios":
         ios.run_task_test()
 
-    # archive - ios
+    # Archives the iOS libraries.
     elif task == "archive-ios":
         ios.run_task_archive()
 
     #######################
-    # macOS
+    # Tasks for macOS.
     #######################
 
-    # build pdfium - macos
+    # Clones and syncs pdfium for macOS.
     elif task == "build-pdfium-macos":
         macos.run_task_build_pdfium()
 
-    # patch - macos
+    # Patches the macOS checkout.
     elif task == "patch-macos":
         macos.run_task_patch()
 
-    # build - macos
+    # Builds the macOS libraries.
     elif task == "build-macos":
         macos.run_task_build()
 
-    # install - macos
+    # Stages the macOS libraries.
     elif task == "install-macos":
         macos.run_task_install()
 
-    # test - macos
+    # Tests the macOS libraries.
     elif task == "test-macos":
         macos.run_task_test()
 
-    # archive - macos
+    # Archives the macOS libraries.
     elif task == "archive-macos":
         macos.run_task_archive()
 
     #######################
-    # Android
+    # Tasks for Linux.
     #######################
 
-    # build pdfium - android
+    # Clones and syncs pdfium for Linux.
+    elif task == "build-pdfium-linux":
+        linux.run_task_build_pdfium()
+
+    # Patches the Linux checkout.
+    elif task == "patch-linux":
+        linux.run_task_patch()
+
+    # Builds the Linux libraries.
+    elif task == "build-linux":
+        linux.run_task_build()
+
+    # Stages the Linux libraries.
+    elif task == "install-linux":
+        linux.run_task_install()
+
+    # Tests the Linux libraries.
+    elif task == "test-linux":
+        linux.run_task_test()
+
+    # Archives the Linux libraries.
+    elif task == "archive-linux":
+        linux.run_task_archive()
+
+    #######################
+    # Tasks for Windows.
+    #######################
+
+    # Clones and syncs pdfium for Windows.
+    elif task == "build-pdfium-windows":
+        windows.run_task_build_pdfium()
+
+    # Patches the Windows checkout.
+    elif task == "patch-windows":
+        windows.run_task_patch()
+
+    # Builds the Windows libraries.
+    elif task == "build-windows":
+        windows.run_task_build()
+
+    # Stages the Windows libraries.
+    elif task == "install-windows":
+        windows.run_task_install()
+
+    # Tests the Windows libraries.
+    elif task == "test-windows":
+        windows.run_task_test()
+
+    # Archives the Windows libraries.
+    elif task == "archive-windows":
+        windows.run_task_archive()
+
+    #######################
+    # Tasks for Android.
+    #######################
+
+    # Clones and syncs pdfium for Android.
     elif task == "build-pdfium-android":
         android.run_task_build_pdfium()
 
-    # patch - android
+    # Patches the Android checkout.
     elif task == "patch-android":
         android.run_task_patch()
 
-    # build - android
+    # Builds the Android libraries.
     elif task == "build-android":
         android.run_task_build()
 
-    # install - android
+    # Stages the Android libraries.
     elif task == "install-android":
         android.run_task_install()
 
-    # test - android
+    # Tests the Android libraries.
     elif task == "test-android":
         android.run_task_test()
 
-    # archive - android
+    # Archives the Android libraries.
     elif task == "archive-android":
         android.run_task_archive()
 
     #######################
-    # WASM
+    # Tasks for WASM.
     #######################
 
-    # build pdfium - wasm
+    # Clones and syncs pdfium for WASM.
     elif task == "build-pdfium-wasm":
         wasm.run_task_build_pdfium()
 
-    # patch - wasm
+    # Patches the WASM checkout.
     elif task == "patch-wasm":
         wasm.run_task_patch()
 
-    # build - wasm
+    # Builds the WASM libraries.
     elif task == "build-wasm":
         wasm.run_task_build()
 
-    # install - wasm
+    # Stages the WASM libraries.
     elif task == "install-wasm":
         wasm.run_task_install()
 
-    # test - wasm
+    # Tests the WASM libraries.
     elif task == "test-wasm":
         wasm.run_task_test()
 
-    # test - wasmtime
+    # Tests the WASM libraries with wasmtime.
     elif task == "test-wasmtime":
         wasm.run_task_test_wasmtime()
 
-    # generate - wasm
+    # Generates the WASM package.
     elif task == "generate-wasm":
         wasm.run_task_generate()
 
-    # publish - wasm
+    # Publishes the WASM package.
     elif task == "publish-wasm":
         wasm.run_task_publish()
 
-    # publish to web - wasm
+    # Publishes the WASM package to the web.
     elif task == "publish-to-web-wasm":
         wasm.run_task_publish_to_web()
 
-    # archive - wasm
+    # Archives the WASM libraries.
     elif task == "archive-wasm":
         wasm.run_task_archive()
 
     #######################
-    # Invalid
+    # Unknown task.
     #######################
 
-    # invalid
+    # Reports an unknown task.
     else:
         l.e("Task is invalid")
 
 
 if __name__ == "__main__":
-    # initialization
+    # Initializes the environment.
     b.init()
 
-    # main CLI entrypoint
+    # Runs the command line interface.
     args = docopt(__doc__, version="2.0.0")
     main(args)

@@ -1,4 +1,3 @@
-import glob
 import os
 import tarfile
 
@@ -14,7 +13,7 @@ import modules.pdfium as p
 
 # -----------------------------------------------------------------------------
 def run_task_build_pdfium():
-    p.get_pdfium_by_target("macos")
+    p.get_pdfium_by_target("windows")
 
 
 # -----------------------------------------------------------------------------
@@ -22,12 +21,16 @@ def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
     # Turns the library target into a shared one.
-    if c.shared_lib_macos:
-        patch.apply_shared_library("macos")
+    if c.shared_lib_windows:
+        patch.apply_shared_library("windows")
 
     # Removes the component build guards from the public headers.
-    if c.shared_lib_macos:
-        patch.apply_public_headers("macos")
+    if c.shared_lib_windows:
+        patch.apply_public_headers("windows")
+
+    # Aligns the pinned toolchain versions with the installed sdk.
+    patch.apply_windows_sdk_version("windows")
+    patch.apply_windows_ntddi_version("windows")
 
     l.ok()
 
@@ -39,9 +42,9 @@ def run_task_build():
     current_dir = f.current_dir()
 
     # Walks every configuration.
-    for config in c.configurations_macos:
+    for config in c.configurations_windows:
         # Walks every target.
-        for target in c.targets_macos:
+        for target in c.targets_windows:
             main_dir = os.path.join(
                 "build",
                 target["target_os"],
@@ -70,12 +73,13 @@ def run_task_build():
 
             args = cm.get_build_args(
                 config,
-                c.shared_lib_macos,
+                c.shared_lib_windows,
                 target["pdfium_os"],
                 target["target_cpu"],
             )
 
-            args_str = " ".join(args)
+            # The windows shell does not keep the single quotes the other targets rely on.
+            args_str = " ".join(args).replace('"', '\\"')
 
             command = [
                 "gn",
@@ -83,7 +87,7 @@ def run_task_build():
                 "out/{0}-{1}-{2}".format(
                     target["target_os"], target["target_cpu"], config
                 ),
-                "--args='{0}'".format(args_str),
+                '--args="{0}"'.format(args_str),
             ]
             r.run(" ".join(command), shell=True)
 
@@ -104,7 +108,7 @@ def run_task_build():
                 "pdfium",
                 "-v",
             ]
-            r.run(command)
+            r.run(" ".join(command), shell=True)
 
             os.chdir(current_dir)
 
@@ -116,12 +120,12 @@ def run_task_install():
     l.colored("Installing libraries...", l.YELLOW)
 
     # Walks every configuration.
-    for config in c.configurations_macos:
-        f.recreate_dir(os.path.join("build", "macos", config))
-        f.create_dir(os.path.join("build", "macos", config, "lib"))
+    for config in c.configurations_windows:
+        f.recreate_dir(os.path.join("build", "windows", config))
+        f.create_dir(os.path.join("build", "windows", config, "lib"))
 
         # Walks every target.
-        for target in c.targets_macos:
+        for target in c.targets_windows:
             source_lib_path = os.path.join(
                 "build",
                 target["target_os"],
@@ -129,7 +133,7 @@ def run_task_install():
                 "out",
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
                 "obj",
-                "libpdfium.a",
+                "pdfium.lib",
             )
 
             target_lib_path = os.path.join(
@@ -137,7 +141,8 @@ def run_task_install():
                 target["target_os"],
                 config,
                 "lib",
-                "libpdfium_{0}.a".format(target["target_cpu"]),
+                target["target_cpu"],
+                "pdfium.lib",
             )
 
             f.copy_file(source_lib_path, target_lib_path)
@@ -155,30 +160,12 @@ def run_task_install():
             for header in headers:
                 f.replace_in_file(header, '#include "public/', '#include "../')
 
-        # Merges the per architecture libraries into a universal one.
-        folder = os.path.join("build", "macos", config, "lib", "*.a")
-        files = glob.glob(folder)
-        files_str = " ".join(files)
-        lib_file_out = os.path.join("build", "macos", config, "lib", "libpdfium.a")
-
-        l.colored("Merging libraries (lipo)...", l.YELLOW)
-        command = ["lipo", "-create", files_str, "-o", lib_file_out]
-        r.run(" ".join(command), shell=True)
-
-        l.colored("File data...", l.YELLOW)
-        command = ["file", lib_file_out]
-        r.run(" ".join(command), shell=True)
-
-        l.colored("File size...", l.YELLOW)
-        command = ["ls", "-lh ", lib_file_out]
-        r.run(" ".join(command), shell=True)
-
         # Copies the public headers.
         l.colored("Copying header files...", l.YELLOW)
 
-        include_dir = os.path.join("build", "macos", "pdfium", "public")
+        include_dir = os.path.join("build", "windows", "pdfium", "public")
         include_cpp_dir = os.path.join(include_dir, "cpp")
-        target_include_dir = os.path.join("build", "macos", config, "include")
+        target_include_dir = os.path.join("build", "windows", config, "include")
         target_include_cpp_dir = os.path.join(target_include_dir, "cpp")
 
         f.recreate_dir(target_include_dir)
@@ -197,7 +184,7 @@ def run_task_test():
     build_dir = os.path.join(sample_dir, "build")
 
     # Walks every configuration.
-    for config in c.configurations_macos:
+    for config in c.configurations_windows:
         f.recreate_dir(build_dir)
 
         os.chdir(build_dir)
@@ -224,7 +211,7 @@ def run_task_test():
         )
 
         # Runs the sample.
-        command = ["./sample"]
+        command = ["sample.exe"]
         r.run(command)
 
         # Returns to the starting directory.
@@ -238,18 +225,15 @@ def run_task_archive():
     l.colored("Archiving...", l.YELLOW)
 
     current_dir = f.current_dir()
-    lib_dir = os.path.join(current_dir, "build", "macos")
-    output_filename = os.path.join(current_dir, "macos.tgz")
+    lib_dir = os.path.join(current_dir, "build", "windows")
+    output_filename = os.path.join(current_dir, "windows.tgz")
 
     tar = tarfile.open(output_filename, "w:gz")
 
-    for configuration in c.configurations_macos:
+    for configuration in c.configurations_windows:
         tar.add(
             name=os.path.join(lib_dir, configuration),
             arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-            filter=lambda x: (
-                None if "_" in x.name and not x.name.endswith(".h") else x
-            ),
         )
 
     tar.close()
