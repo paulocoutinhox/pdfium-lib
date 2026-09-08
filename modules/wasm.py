@@ -46,7 +46,8 @@ def run_task_patch():
 
     if not line_number:
         source = """} else if (target_os == "emscripten") {
-  # Because it's too hard to remove all targets from //BUILD.gn that do not work with it.
+  # Because it's too hard to remove all targets from //BUILD.gn that do not work
+  # with it.
   assert(
       false,
       "emscripten is not a supported target_os. It is available only as secondary toolchain.")
