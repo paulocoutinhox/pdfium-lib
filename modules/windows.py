@@ -20,15 +20,15 @@ def run_task_build_pdfium():
 def run_task_patch():
     l.colored("Patching files...", l.YELLOW)
 
-    # shared lib
+    # Turns the library target into a shared one.
     if c.shared_lib_windows:
         patch.apply_shared_library("windows")
 
-    # public headers
+    # Removes the component build guards from the public headers.
     if c.shared_lib_windows:
         patch.apply_public_headers("windows")
 
-    # windows sdk
+    # Aligns the pinned toolchain versions with the installed sdk.
     patch.apply_windows_sdk_version("windows")
     patch.apply_windows_ntddi_version("windows")
 
@@ -41,9 +41,9 @@ def run_task_build():
 
     current_dir = f.current_dir()
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_windows:
-        # targets
+        # Walks every target.
         for target in c.targets_windows:
             main_dir = os.path.join(
                 "build",
@@ -63,7 +63,7 @@ def run_task_build():
                 )
             )
 
-            # generating files...
+            # Generates the ninja files.
             l.colored(
                 'Generating files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -91,7 +91,7 @@ def run_task_build():
             ]
             r.run(" ".join(command), shell=True)
 
-            # compiling...
+            # Compiles the library.
             l.colored(
                 'Compiling to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -119,12 +119,12 @@ def run_task_build():
 def run_task_install():
     l.colored("Installing libraries...", l.YELLOW)
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_windows:
         f.recreate_dir(os.path.join("build", "windows", config))
         f.create_dir(os.path.join("build", "windows", config, "lib"))
 
-        # targets
+        # Walks every target.
         for target in c.targets_windows:
             source_lib_path = os.path.join(
                 "build",
@@ -147,7 +147,7 @@ def run_task_install():
 
             f.copy_file(source_lib_path, target_lib_path)
 
-            # fix include path
+            # Rewrites the public includes so they resolve outside the checkout.
             source_include_path = os.path.join(
                 "build",
                 target["target_os"],
@@ -160,7 +160,7 @@ def run_task_install():
             for header in headers:
                 f.replace_in_file(header, '#include "public/', '#include "../')
 
-        # headers
+        # Copies the public headers.
         l.colored("Copying header files...", l.YELLOW)
 
         include_dir = os.path.join("build", "windows", "pdfium", "public")
@@ -183,7 +183,7 @@ def run_task_test():
     sample_dir = os.path.join(current_dir, "sample")
     build_dir = os.path.join(sample_dir, "build")
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_windows:
         f.recreate_dir(build_dir)
 
@@ -191,7 +191,7 @@ def run_task_test():
 
         cmake_config = config.capitalize()
 
-        # generate project
+        # Generates the sample project.
         command = [
             "cmake",
             "-DPDFIUM_CONFIG={0}".format(config),
@@ -200,21 +200,21 @@ def run_task_test():
         ]
         r.run(command)
 
-        # build
+        # Builds the sample.
         command = ["cmake", "--build", ".", "--config", cmake_config]
         r.run(command)
 
-        # copy assets
+        # Copies the assets the sample opens.
         f.copy_file(
             os.path.join(sample_dir, "assets", "f1.pdf"),
             os.path.join(build_dir, "f1.pdf"),
         )
 
-        # run
+        # Runs the sample.
         command = ["sample.exe"]
         r.run(command)
 
-        # finish
+        # Returns to the starting directory.
         os.chdir(current_dir)
 
     l.ok()

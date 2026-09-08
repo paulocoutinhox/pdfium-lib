@@ -18,20 +18,16 @@ jobs:
           - { name: "Windows", os: "windows-2022", target: "windows" }
 
     env:
-      # use the visual studio already installed on the runner instead of the
-      # internal google toolchain, which is not available outside chromium
+      # Uses the visual studio installed on the runner, since the internal google toolchain is not available outside chromium.
       DEPOT_TOOLS_WIN_TOOLCHAIN: 0
 
-      # DEPOT_TOOLS_UPDATE is deliberately not set to 0 here: on windows that
-      # skips the bootstrap that installs git.bat and the bundled python, and
-      # depot tools then fails on its own internal git calls
+      # Setting DEPOT_TOOLS_UPDATE to 0 here would skip the bootstrap that installs git.bat and the bundled python, and depot tools would then fail on its own internal git calls.
 
     steps:
       - uses: actions/checkout@v4
 
-      # the depot tools bootstrap drops a python3.bat into a directory that
-      # ends up ahead of this one in PATH, so every step below calls this
-      # interpreter by path instead of relying on the name python3
+      # The depot tools bootstrap drops a python3.bat into a directory that ends up ahead of this one in PATH.
+      # Every step below calls this interpreter by path instead of relying on the name python3.
       - name: Set up Python
         id: python
         uses: actions/setup-python@v5

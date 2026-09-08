@@ -15,7 +15,7 @@ endforeach()
 # The pdfium build to link against, which decides the library directory and the runtime.
 set(PDFIUM_CONFIG "release" CACHE STRING "pdfium build configuration")
 
-# platform
+# Resolves the platform directory name.
 if(APPLE)
     set(PDFIUM_PLATFORM "macos")
 elseif(WIN32)
@@ -27,7 +27,7 @@ endif()
 set(PDFIUM_DIR "../build/${PDFIUM_PLATFORM}/${PDFIUM_CONFIG}")
 set(PDFIUM_INCLUDE_DIR "${PDFIUM_DIR}/include")
 
-# macOS ships a single universal library, while the other platforms keep one directory per architecture.
+# A single universal library is shipped on macOS, while the other platforms keep one directory per architecture.
 if(APPLE)
     set(PDFIUM_LIB_DIR "${PDFIUM_DIR}/lib")
 else()
@@ -40,7 +40,7 @@ else()
     set(PDFIUM_LIB_DIR "${PDFIUM_DIR}/lib/${PDFIUM_ARCH}")
 endif()
 
-# sources
+# Collects the sources.
 file(GLOB S_FILES_PROJECT "src/*.cpp")
 file(GLOB H_FILES_PDFIUM "${PDFIUM_INCLUDE_DIR}/*.h")
 
@@ -50,10 +50,10 @@ set(
     ${H_FILES_PDFIUM}
 )
 
-# target
+# Declares the executable.
 add_executable(${PROJECT_NAME} ${PROJ_FILES})
 
-# links
+# Links what each platform needs.
 target_link_libraries(${PROJECT_NAME} PRIVATE "pdfium")
 
 if(APPLE)
@@ -81,6 +81,6 @@ else()
     target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
-# paths
+# Points the compiler and the linker at the staged library.
 target_link_directories(${PROJECT_NAME} PRIVATE ${PDFIUM_LIB_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PDFIUM_INCLUDE_DIR})

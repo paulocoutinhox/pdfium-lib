@@ -25,12 +25,12 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
     build_dir = os.path.join("build", target)
     f.create_dir(build_dir)
 
-    # remove old data
+    # Removes the previous checkout.
     l.colored("Removing old PDFium directory...", l.YELLOW)
     target_dir = os.path.join(build_dir, "pdfium")
     f.remove_dir(target_dir)
 
-    # clone pdfium
+    # Clones pdfium with gclient.
     l.colored("Cloning PDFium with gclient...", l.YELLOW)
     config_args = [
         "gclient",
@@ -44,7 +44,7 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
 
     run_gclient(config_args, build_dir)
 
-    # append target os
+    # Appends the target os to the gclient file.
     if append_target_os:
         l.colored(
             "Appending target os ({}) to gclient file...".format(target),
@@ -66,7 +66,7 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
         build_dir,
     )
 
-    # reset and clean directories
+    # Reverts the directories a previous patch task may have changed.
     folders_to_reset = [
         "pdfium",
         "pdfium/build",

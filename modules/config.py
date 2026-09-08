@@ -1,18 +1,17 @@
-# general
+# General settings.
 debug = False
 task = ""
 
-# pdfium
+# PDFium settings.
 pdfium_git_branch = "chromium/8046"
-# ^ ref: https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/8046
-# OBS 1: don't forget change in android docker file (docker/android/Dockerfile)
-# OBS 2: don't forget change in wasm docker file (docker/wasm/Dockerfile)
+# The branch reference is https://pdfium.googlesource.com/pdfium/+/refs/heads/chromium/8046.
+# Changing it also requires changing docker/android/Dockerfile and docker/wasm/Dockerfile.
 
-# emsdk
+# Emscripten SDK settings.
 emsdk_version = "6.0.0"
-# OBS 1: don't forget change in wasm docker file (docker/wasm/Dockerfile)
+# Changing it also requires changing docker/wasm/Dockerfile.
 
-# macos
+# Settings for macOS.
 configurations_macos = ["release"]
 shared_lib_macos = False
 targets_macos = [
@@ -20,21 +19,21 @@ targets_macos = [
     {"target_os": "macos", "target_cpu": "arm64", "pdfium_os": "mac"},
 ]
 
-# linux
+# Settings for Linux.
 configurations_linux = ["release"]
 shared_lib_linux = False
 targets_linux = [
     {"target_os": "linux", "target_cpu": "x64", "pdfium_os": "linux"},
 ]
 
-# windows
+# Settings for Windows.
 configurations_windows = ["release"]
 shared_lib_windows = False
 targets_windows = [
     {"target_os": "windows", "target_cpu": "x64", "pdfium_os": "win"},
 ]
 
-# ios
+# Settings for iOS.
 configurations_ios = ["release"]
 shared_lib_ios = False
 targets_ios = [
@@ -58,7 +57,7 @@ targets_ios = [
     },
 ]
 
-# android
+# Settings for Android.
 configurations_android = ["release"]
 shared_lib_android = True
 targets_android = [
@@ -88,7 +87,7 @@ targets_android = [
     },
 ]
 
-# wasm
+# Settings for WASM.
 configurations_wasm = ["release"]
 shared_lib_wasm = False
 targets_wasm = [

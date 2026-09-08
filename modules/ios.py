@@ -23,15 +23,15 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "ios", "pdfium")
 
-    # shared lib
+    # Turns the library target into a shared one.
     if c.shared_lib_ios:
         patch.apply_shared_library("ios")
 
-    # public headers
+    # Removes the component build guards from the public headers.
     if c.shared_lib_ios:
         patch.apply_public_headers("ios")
 
-    # rules - test
+    # Removes the test rules that the standalone build does not need.
     source_file = os.path.join(source_dir, "build", "config", "ios", "rules.gni")
 
     line_content = 'data_deps += [ "//testing/iossim" ]'
@@ -45,7 +45,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: rules - test", l.PURPLE)
 
-    # core fxge
+    # Adjusts the core fxge target for iOS.
     source_file = os.path.join(source_dir, "core", "fxge", "BUILD.gn")
 
     line_content = "if (is_mac) {"
@@ -60,7 +60,7 @@ def run_task_patch():
     else:
         l.bullet("Skipped: core fxge", l.PURPLE)
 
-    # ios automatically manage certs
+    # Lets Xcode manage the signing certificates automatically.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -90,9 +90,9 @@ def run_task_build():
 
     current_dir = f.current_dir()
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_ios:
-        # targets
+        # Walks every target.
         for target in c.targets_ios:
             main_dir = os.path.join(
                 "build",
@@ -117,7 +117,7 @@ def run_task_build():
                 )
             )
 
-            # generating files...
+            # Generates the ninja files.
             l.colored(
                 'Generating files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -148,7 +148,7 @@ def run_task_build():
             ]
             r.run(" ".join(command), shell=True)
 
-            # compiling...
+            # Compiles the library.
             l.colored(
                 'Compiling to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -179,12 +179,12 @@ def run_task_build():
 def run_task_install():
     l.colored("Installing libraries...", l.YELLOW)
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_ios:
         f.recreate_dir(os.path.join("build", "ios", config))
         f.create_dir(os.path.join("build", "ios", config, "lib"))
 
-        # targets
+        # Walks every target.
         for target in c.targets_ios:
             source_lib_path = os.path.join(
                 "build",
@@ -213,7 +213,7 @@ def run_task_install():
 
             f.copy_file(source_lib_path, target_lib_path)
 
-            # fix include path
+            # Rewrites the public includes so they resolve outside the checkout.
             source_include_path = os.path.join(
                 "build",
                 target["target_os"],
@@ -226,7 +226,7 @@ def run_task_install():
             for header in headers:
                 f.replace_in_file(header, '#include "public/', '#include "../')
 
-        # universal
+        # Merges the per architecture libraries into a universal one.
         universal_libs = []
         for env in ["simulator", "device"]:
             folder = os.path.join("build", "ios", config, "lib", "*-{0}.a".format(env))
@@ -251,7 +251,7 @@ def run_task_install():
             command = ["ls", "-lh ", lib_file_out]
             r.run(" ".join(command), shell=True)
 
-        # headers
+        # Copies the public headers.
         l.colored("Copying header files...", l.YELLOW)
 
         include_dir = os.path.join("build", "ios", "pdfium", "public")
@@ -263,7 +263,7 @@ def run_task_install():
         f.copy_files(include_dir, target_include_dir, "*.h")
         f.copy_files(include_cpp_dir, target_include_cpp_dir, "*.h")
 
-        # xcframework
+        # Packs the libraries into an xcframework.
         xcframework_out = os.path.join("build", "ios", config, "pdfium.xcframework")
         command = ["xcodebuild", "-create-xcframework"]
 

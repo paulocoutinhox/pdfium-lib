@@ -78,23 +78,22 @@ def run_task_build_emsdk():
 
 # -----------------------------------------------------------------------------
 def run_task_format():
-    # check
+    # Requires black to be installed.
     try:
         subprocess.check_output(["black", "--version"])
     except OSError:
         l.e("Black is not installed, check: https://github.com/psf/black")
 
-    # start
     l.colored("Formating files...", l.YELLOW)
 
-    # make.py
+    # Formats the entry point.
     command = [
         "black",
         "make.py",
     ]
     r.run(command)
 
-    # modules
+    # Formats the modules.
     command = [
         "black",
         "modules/",
@@ -151,7 +150,7 @@ def get_build_args(
             args.append('arm_control_flow_integrity="none"')
         args.append("clang_use_chrome_plugins=false")
 
-        # static lib
+        # A static build needs the complete library.
         if not shared:
             args.append("pdf_is_complete_lib=true")
     elif target_os == "linux":
@@ -164,7 +163,7 @@ def get_build_args(
         # The chromium sysroot is not installed by a minimal checkout, so build against the host toolchain.
         args.append("use_sysroot=false")
 
-        # static lib
+        # A static build needs the complete library.
         if not shared:
             args.append("pdf_is_complete_lib=true")
 
@@ -176,7 +175,7 @@ def get_build_args(
         args.append("pdf_is_standalone=true")
         args.append("use_custom_libcxx=false")
 
-        # static lib
+        # A static build needs the complete library.
         if not shared:
             args.append("pdf_is_complete_lib=true")
     elif target_os.startswith("mac"):
@@ -187,7 +186,7 @@ def get_build_args(
         args.append("use_sysroot=false")
         args.append("use_allocator_shim=false")
 
-        # static lib
+        # A static build needs the complete library.
         if not shared:
             args.append("pdf_is_complete_lib=true")
     elif target_os.startswith("emscripten"):

@@ -26,7 +26,7 @@ def apply_public_headers(target):
     source_dir = os.path.join("build", target, "pdfium")
     public_dir = os.path.join(source_dir, "public")
 
-    # file: public/fpdfview.h (p1)
+    # Removes the first component build guard from public/fpdfview.h.
     source_file = os.path.join(public_dir, "fpdfview.h")
 
     original_content = "#if defined(COMPONENT_BUILD)\n// FPDF_EXPORT should be consistent with |export| in the pdfium_fuzzer\n// template in testing/fuzzers/BUILD.gn."
@@ -38,7 +38,7 @@ def apply_public_headers(target):
     else:
         l.bullet("Skipped: public headers (p1)", l.PURPLE)
 
-    # file: public/fpdfview.h (p2)
+    # Removes the second component build guard from public/fpdfview.h.
     source_file = os.path.join(public_dir, "fpdfview.h")
 
     original_content = "#else\n#define FPDF_EXPORT\n#endif  // defined(COMPONENT_BUILD)"

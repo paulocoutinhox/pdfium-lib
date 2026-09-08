@@ -1,6 +1,5 @@
-// pdfium runs here so that rendering never blocks the ui thread.
-// the version comes from the worker url and is forwarded to every asset it loads,
-// so publishing a new release busts the cache of the worker and of the engine together.
+// Rendering happens here so that it never blocks the ui thread.
+// The version comes from the worker url and is forwarded to every asset it loads, so a new release busts the cache of the worker and of the engine together.
 const VERSION = new URLSearchParams(self.location.search).get('v') || "";
 const VERSION_QUERY = VERSION ? "?v=" + encodeURIComponent(VERSION) : "";
 
@@ -23,18 +22,18 @@ const LAST_ERROR = {
 
 const PASSWORD_ERROR = 4;
 
-// BGRx, not BGRA: an alpha destination makes blend modes composite against the white fill
+// The destination is BGRx and not BGRA, because an alpha destination makes blend modes composite against the white fill.
 const BITMAP_BGRX = 3;
 const BYTES_PER_PIXEL = 4;
 
 let Module = null;
 const FPDF = {};
 
-// the bytes of the last open attempt, kept so a password retry does not resend them
+// The bytes of the last open attempt, kept so a password retry does not resend them.
 let sourceBytes = null;
 let activeDocument = null;
 
-// jobs waiting to be rendered, plus the generation that decides which ones are still wanted
+// The jobs waiting to be rendered, and the generation that decides which ones are still wanted.
 let queue = [];
 let generation = 0;
 let drainScheduled = false;
@@ -88,7 +87,7 @@ self.onmessage = (event) => {
     }
 };
 
-// streaming loader: pdfium reads only the blocks it needs from the source bytes
+// Opens a document, letting pdfium read only the blocks it needs from the source bytes.
 function open(message) {
     closeDocument();
 
@@ -101,7 +100,7 @@ function open(message) {
         return;
     }
 
-    // pdfium keeps calling this while the document is open, so the bytes must outlive it
+    // The bytes have to outlive the call, because pdfium keeps reading them while the document is open.
     const bytes = sourceBytes;
 
     const readBlock = (param, position, bufferPtr, size) => {
@@ -111,7 +110,7 @@ function open(message) {
 
     const readerPtr = Module.addFunction(readBlock, 'iiiii');
 
-    // build the FPDF_FILEACCESS struct: m_FileLen, m_GetBlock, m_Param
+    // Builds the FPDF_FILEACCESS struct, holding m_FileLen, m_GetBlock and m_Param.
     const fileAccessPtr = Module.wasmExports.malloc(12);
     Module.setValue(fileAccessPtr + 0, bytes.length, 'i32');
     Module.setValue(fileAccessPtr + 4, readerPtr, 'i32');
@@ -119,7 +118,7 @@ function open(message) {
 
     const handle = FPDF.LoadCustomDocument(fileAccessPtr, message.password || "");
 
-    // the struct is no longer needed once the document is created
+    // The struct is no longer needed once the document is created.
     Module.wasmExports.free(fileAccessPtr);
 
     if (!handle) {
@@ -138,7 +137,7 @@ function open(message) {
 
     const pageCount = FPDF.GetPageCount(handle);
 
-    // reject documents that opened but carry no pages
+    // Rejects a document that opened but carries no pages.
     if (pageCount <= 0) {
         FPDF.CloseDocument(handle);
         Module.removeFunction(readerPtr);
@@ -167,7 +166,7 @@ function closeDocument() {
     activeDocument = null;
 }
 
-// page sizes are cheap and do not require loading the pages themselves
+// Returns the size of every page, without loading the pages themselves.
 function readPageSizes(handle, pageCount) {
     const widthPtr = Module.wasmExports.malloc(8);
     const heightPtr = Module.wasmExports.malloc(8);
@@ -176,7 +175,7 @@ function readPageSizes(handle, pageCount) {
     for (let index = 0; index < pageCount; index++) {
         FPDF.GetPageSizeByIndex(handle, index, widthPtr, heightPtr);
 
-        // read the doubles straight from the heap, malloc keeps them 8-byte aligned
+        // The doubles are read straight from the heap, which malloc keeps 8 byte aligned.
         sizes.push({
             width: Module.HEAPF64[widthPtr >> 3],
             height: Module.HEAPF64[heightPtr >> 3],
@@ -189,7 +188,7 @@ function readPageSizes(handle, pageCount) {
     return sizes;
 }
 
-// a newer request for the same page and quality replaces the one still waiting
+// Queues a render, replacing any request still waiting for the same page and quality.
 function enqueue(job) {
     if (job.gen > generation) {
         generation = job.gen;
@@ -207,12 +206,12 @@ function scheduleDrain() {
 
     drainScheduled = true;
 
-    // a macrotask, not a microtask: it lets pending messages land between two renders,
-    // which is what makes cancelling a fast scroll or a zoom actually take effect
+    // A macrotask is used instead of a microtask so that pending messages land between two renders.
+    // That is what makes cancelling a fast scroll or a zoom take effect.
     setTimeout(drain, 0);
 }
 
-// pick the most useful job: previews before full renders, then closest to the viewport
+// Returns the most useful job, taking previews before full renders and then the closest to the viewport.
 function takeNext() {
     let best = -1;
 
@@ -261,7 +260,7 @@ async function drain() {
         const image = renderPage(job);
         const payload = { type: 'rendered', index: job.index, quality: job.quality, gen: job.gen, scale: job.scale, width: image.width, height: image.height };
 
-        // an ImageBitmap transfers without a copy and paints without touching the cpu
+        // An ImageBitmap transfers without a copy and paints without touching the cpu.
         if (typeof createImageBitmap === 'function') {
             const bitmap = await createImageBitmap(image);
             self.postMessage({ ...payload, bitmap }, [bitmap]);
@@ -295,7 +294,7 @@ function renderPage(job) {
     FPDF.Bitmap_FillRect(bitmap, 0, 0, width, height, 0xFFFFFFFF);
     FPDF.RenderPageBitmap(bitmap, page, 0, 0, width, height, 0, FPDF_FLAGS.REVERSE_BYTE_ORDER | FPDF_FLAGS.ANNOT);
 
-    // copy pixels out of the heap before releasing the native buffer
+    // The pixels are copied out of the heap before the native buffer is released.
     const pixels = new Uint8ClampedArray(Module.HEAPU8.buffer, bufferPtr, byteCount).slice();
 
     FPDF.Bitmap_Destroy(bitmap);

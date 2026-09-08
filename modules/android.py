@@ -22,15 +22,15 @@ def run_task_patch():
 
     source_dir = os.path.join("build", "android", "pdfium")
 
-    # shared lib
+    # Turns the library target into a shared one.
     if c.shared_lib_android:
         patch.apply_shared_library("android")
 
-    # public headers
+    # Removes the component build guards from the public headers.
     if c.shared_lib_android:
         patch.apply_public_headers("android")
 
-    # build config
+    # Adjusts the build configuration for Android.
     source_file = os.path.join(
         source_dir,
         "build",
@@ -57,9 +57,9 @@ def run_task_build():
 
     current_dir = f.current_dir()
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_android:
-        # targets
+        # Walks every target.
         for target in c.targets_android:
             main_dir = os.path.join(
                 "build",
@@ -79,7 +79,7 @@ def run_task_build():
                 )
             )
 
-            # generating files...
+            # Generates the ninja files.
             l.colored(
                 'Generating files to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -106,7 +106,7 @@ def run_task_build():
             ]
             r.run(" ".join(command), shell=True)
 
-            # compiling...
+            # Compiles the library.
             l.colored(
                 'Compiling to arch "{0}" and configuration "{1}"...'.format(
                     target["target_cpu"], config
@@ -134,11 +134,11 @@ def run_task_build():
 def run_task_install():
     l.colored("Installing libraries...", l.YELLOW)
 
-    # configs
+    # Walks every configuration.
     for config in c.configurations_android:
         f.recreate_dir(os.path.join("build", "android", config))
 
-        # targets
+        # Walks every target.
         for target in c.targets_android:
             out_dir = "{0}-{1}-{2}".format(
                 target["target_os"], target["target_cpu"], config
@@ -158,7 +158,7 @@ def run_task_install():
                     if os.path.isfile(pathname):
                         f.copy_file(pathname, os.path.join(target_dir, basename))
 
-            # fix include path
+            # Rewrites the public includes so they resolve outside the checkout.
             source_include_path = os.path.join(
                 "build",
                 target["target_os"],
@@ -171,7 +171,7 @@ def run_task_install():
             for header in headers:
                 f.replace_in_file(header, '#include "public/', '#include "../')
 
-        # headers
+        # Copies the public headers.
         l.colored("Copying header files...", l.YELLOW)
 
         include_dir = os.path.join("build", "android", "pdfium", "public")

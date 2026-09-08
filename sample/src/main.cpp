@@ -7,7 +7,7 @@
 
 int main(int argc, char **argv)
 {
-    // sample: https://github.com/lukas-w/pdfium/blob/master/docs/getting-started.md
+    // Adapted from https://github.com/lukas-w/pdfium/blob/master/docs/getting-started.md.
 
     std::cout << "Starting..." << std::endl;
 
@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
     if (pageCount > 0)
     {
-        // page size
+        // Reads the size of the first page.
         double_t pageWidth;
         double_t pageHeight;
 
@@ -80,7 +80,7 @@ int main(int argc, char **argv)
 
         std::cout << "First page has size: " << floor(pageWidth * 0.0352778) << "cm X " << floor(pageHeight * 0.0352778) << "cm" << std::endl;
 
-        // render page
+        // Renders the first page.
         FPDF_PAGE page = FPDF_LoadPage(doc, 0);
 
         // A heap buffer, since variable length arrays are not standard C++.
