@@ -822,6 +822,11 @@ def run_task_generate():
             )
 
             f.copy_file(
+                os.path.join(template_dir, "pdfium-worker.js"),
+                os.path.join(node_dir, "pdfium-worker.js"),
+            )
+
+            f.copy_file(
                 os.path.join(template_dir, "logo.png"),
                 os.path.join(node_dir, "logo.png"),
             )
