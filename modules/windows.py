@@ -28,6 +28,9 @@ def run_task_patch():
     if c.shared_lib_windows:
         patch.apply_public_headers("windows")
 
+    # windows sdk
+    patch.apply_windows_sdk_version("windows")
+
     l.ok()
 
 
