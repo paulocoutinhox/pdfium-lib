@@ -82,7 +82,7 @@ int main(int argc, char **argv)
 
         uint8_t buffer[(int)pageWidth * (int)pageHeight * 4];
 
-        FPDF_BITMAP createdpages = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, 4, buffer, (int)pageWidth * 4);
+        FPDF_BITMAP createdpages = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, FPDFBitmap_BGRx, buffer, (int)pageWidth * 4);
         uint background = 0xFFFFFFFF;
         FPDFBitmap_FillRect(createdpages, 0, 0, (int)pageWidth, (int)pageHeight, background);
         FPDF_RenderPageBitmap(createdpages, page, 0, 0, (int)pageWidth, (int)pageHeight, 0, FPDF_ANNOT);
