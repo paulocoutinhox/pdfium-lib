@@ -51,6 +51,7 @@ def apply_public_headers(target):
         l.bullet("Skipped: public headers (p2)", l.PURPLE)
 
 
+# -----------------------------------------------------------------------------
 # Returns the directory where the windows sdk is installed.
 def get_windows_sdk_dir():
     return os.environ.get(
@@ -59,6 +60,7 @@ def get_windows_sdk_dir():
     )
 
 
+# -----------------------------------------------------------------------------
 # Returns the newest usable windows sdk version installed, or None when there is none.
 def find_installed_windows_sdk_version(sdk_dir=None):
     if not sdk_dir:
@@ -120,6 +122,7 @@ def apply_windows_sdk_version(target):
         )
 
 
+# -----------------------------------------------------------------------------
 # Returns every windows api level the installed sdk defines, mapped to its numeric value.
 def find_installed_windows_ntddi_versions(sdk_dir=None):
     if not sdk_dir:
