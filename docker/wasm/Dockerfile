@@ -75,8 +75,8 @@ RUN pip3 install setuptools docopt pygemstones
 RUN mkdir /emsdk
 WORKDIR /emsdk
 RUN git clone https://github.com/emscripten-core/emsdk.git .
-RUN ./emsdk install 4.0.10
-RUN ./emsdk activate 4.0.10
+RUN ./emsdk install 6.0.0
+RUN ./emsdk activate 6.0.0
 ENV PATH="${PATH}:/emsdk:/emsdk/upstream/emscripten"
 
 # cache system libraries
