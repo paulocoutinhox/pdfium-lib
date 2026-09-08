@@ -52,12 +52,17 @@ def apply_public_headers(target):
 
 
 # -----------------------------------------------------------------------------
+def get_windows_sdk_dir():
+    return os.environ.get(
+        "WindowsSdkDir",
+        os.path.join("C:\\", "Program Files (x86)", "Windows Kits", "10"),
+    )
+
+
+# -----------------------------------------------------------------------------
 def find_installed_windows_sdk_version(sdk_dir=None):
     if not sdk_dir:
-        sdk_dir = os.environ.get(
-            "WindowsSdkDir",
-            os.path.join("C:\\", "Program Files (x86)", "Windows Kits", "10"),
-        )
+        sdk_dir = get_windows_sdk_dir()
 
     include_dir = os.path.join(sdk_dir, "Include")
 
@@ -113,3 +118,57 @@ def apply_windows_sdk_version(target):
         l.bullet(
             "Applied: windows sdk version {0} ({1})".format(version, name), l.GREEN
         )
+
+
+# -----------------------------------------------------------------------------
+def find_installed_windows_ntddi_versions(sdk_dir=None):
+    if not sdk_dir:
+        sdk_dir = get_windows_sdk_dir()
+
+    version = find_installed_windows_sdk_version(sdk_dir)
+
+    if not version:
+        return {}
+
+    header = os.path.join(sdk_dir, "Include", version, "shared", "sdkddkver.h")
+
+    if not os.path.isfile(header):
+        return {}
+
+    found = re.findall(
+        r"#define\s+(NTDDI_WIN\w+)\s+(0x[0-9A-Fa-f]+)", f.get_file_contents(header)
+    )
+
+    return {name: int(value, 16) for name, value in found}
+
+
+# -----------------------------------------------------------------------------
+def apply_windows_ntddi_version(target):
+    # chromium targets the ntddi level of the sdk it ships with. an older sdk
+    # does not define that name, so it expands to zero and every version guard
+    # in the windows headers hides the declarations the build needs
+    versions = find_installed_windows_ntddi_versions()
+
+    if not versions:
+        l.bullet("Skipped: windows ntddi version", l.PURPLE)
+        return
+
+    source_file = os.path.join(
+        "build", target, "pdfium", "build", "config", "win", "BUILD.gn"
+    )
+
+    found = re.search(r'"NTDDI_VERSION=(NTDDI_\w+)"', f.get_file_contents(source_file))
+
+    if not found:
+        l.bullet("Skipped: windows ntddi version", l.PURPLE)
+        return
+
+    if found.group(1) in versions:
+        l.bullet("Skipped: windows ntddi version", l.PURPLE)
+        return
+
+    newest = max(versions, key=versions.get)
+
+    f.replace_in_file(source_file, found.group(0), '"NTDDI_VERSION={0}"'.format(newest))
+
+    l.bullet("Applied: windows ntddi version {0}".format(newest), l.GREEN)

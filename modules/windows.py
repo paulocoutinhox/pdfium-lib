@@ -30,6 +30,7 @@ def run_task_patch():
 
     # windows sdk
     patch.apply_windows_sdk_version("windows")
+    patch.apply_windows_ntddi_version("windows")
 
     l.ok()
 
