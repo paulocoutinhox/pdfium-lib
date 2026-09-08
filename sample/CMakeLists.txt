@@ -4,6 +4,15 @@ project(sample)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# multi config generators put the binary under a per configuration directory,
+# so pin the output and every platform finds it in the same place
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+
+foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+    string(TOUPPER "${CONFIG}" CONFIG_UPPER)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_BINARY_DIR}")
+endforeach()
+
 # platform
 if(APPLE)
     set(PDFIUM_PLATFORM "macos")

@@ -126,39 +126,27 @@ def run_task_install():
 
         # targets
         for target in c.targets_windows:
-            out_dir = os.path.join(
+            source_lib_path = os.path.join(
                 "build",
                 target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
+                "obj",
+                "pdfium.lib",
             )
 
             # there is no fat binary on windows, so each arch keeps its own directory
-            target_lib_dir = os.path.join(
+            target_lib_path = os.path.join(
                 "build",
                 target["target_os"],
                 config,
                 "lib",
                 target["target_cpu"],
+                "pdfium.lib",
             )
 
-            # a shared build produces the dll plus its import library, a static one
-            # produces a single lib under obj
-            if c.shared_lib_windows:
-                artifacts = [
-                    (os.path.join(out_dir, "pdfium.dll"), "pdfium.dll"),
-                    (os.path.join(out_dir, "pdfium.dll.lib"), "pdfium.dll.lib"),
-                ]
-            else:
-                artifacts = [
-                    (os.path.join(out_dir, "obj", "pdfium.lib"), "pdfium.lib"),
-                ]
-
-            for source_lib_path, lib_file_name in artifacts:
-                f.copy_file(
-                    source_lib_path, os.path.join(target_lib_dir, lib_file_name)
-                )
+            f.copy_file(source_lib_path, target_lib_path)
 
             # fix include path
             source_include_path = os.path.join(
@@ -215,13 +203,8 @@ def run_task_test():
     )
 
     # run
-    # visual studio is a multi config generator, so the binary lands in a subfolder
-    sample_path = os.path.join("Release", "sample.exe")
-
-    if not f.file_exists(sample_path):
-        sample_path = "sample.exe"
-
-    r.run([sample_path])
+    command = ["sample.exe"]
+    r.run(command)
 
     # finish
     os.chdir(current_dir)

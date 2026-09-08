@@ -121,21 +121,15 @@ def run_task_install():
 
         # targets
         for target in c.targets_linux:
-            out_dir = os.path.join(
+            source_lib_path = os.path.join(
                 "build",
                 target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
+                "obj",
+                "libpdfium.a",
             )
-
-            # a shared library lands next to the binaries, a static one under obj
-            if c.shared_lib_linux:
-                lib_file_name = "libpdfium.so"
-                source_lib_path = os.path.join(out_dir, lib_file_name)
-            else:
-                lib_file_name = "libpdfium.a"
-                source_lib_path = os.path.join(out_dir, "obj", lib_file_name)
 
             # there is no fat binary on linux, so each arch keeps its own directory
             target_lib_path = os.path.join(
@@ -144,7 +138,7 @@ def run_task_install():
                 config,
                 "lib",
                 target["target_cpu"],
-                lib_file_name,
+                "libpdfium.a",
             )
 
             f.copy_file(source_lib_path, target_lib_path)
