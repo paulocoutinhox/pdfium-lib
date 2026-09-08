@@ -29,13 +29,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # the depot tools bootstrap drops a python3.bat into a directory that
+      # ends up ahead of this one in PATH, so every step below calls this
+      # interpreter by path instead of relying on the name python3
       - name: Set up Python
+        id: python
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
       - name: Upgrade PIP
-        run: python3 -m pip install --upgrade pip setuptools wheel
+        run: ${{ steps.python.outputs.python-path }} -m pip install --upgrade pip setuptools wheel
 
       - name: Install CMake
         uses: jwlawson/actions-setup-cmake@v2
@@ -49,39 +53,39 @@ jobs:
 
       - name: Verify
         run: |
-          python3 --version
+          ${{ steps.python.outputs.python-path }} --version
           cmake --version
           ninja --version
 
       - name: Python requirements
-        run: python3 -m pip install -r requirements.txt --user
+        run: ${{ steps.python.outputs.python-path }} -m pip install -r requirements.txt --user
 
       - name: Depot tools
-        run: python3 make.py build-depot-tools
+        run: ${{ steps.python.outputs.python-path }} make.py build-depot-tools
 
       - name: Environment
         run: echo "$env:GITHUB_WORKSPACE\build\depot-tools" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
       - name: PDFium
-        run: python3 make.py build-pdfium-${{ matrix.config.target }}
+        run: ${{ steps.python.outputs.python-path }} make.py build-pdfium-${{ matrix.config.target }}
 
       - name: Patch
-        run: python3 make.py patch-${{ matrix.config.target }}
+        run: ${{ steps.python.outputs.python-path }} make.py patch-${{ matrix.config.target }}
 
       - name: Patch - Check
-        run: python3 make.py patch-${{ matrix.config.target }}
+        run: ${{ steps.python.outputs.python-path }} make.py patch-${{ matrix.config.target }}
 
       - name: Build
-        run: python3 make.py build-${{ matrix.config.target }}
+        run: ${{ steps.python.outputs.python-path }} make.py build-${{ matrix.config.target }}
 
       - name: Install
-        run: python3 make.py install-${{ matrix.config.target }}
+        run: ${{ steps.python.outputs.python-path }} make.py install-${{ matrix.config.target }}
 
       - name: Test
-        run: python3 make.py test-${{ matrix.config.target }}
+        run: ${{ steps.python.outputs.python-path }} make.py test-${{ matrix.config.target }}
 
       - name: Archive
-        run: python3 make.py archive-${{ matrix.config.target }}
+        run: ${{ steps.python.outputs.python-path }} make.py archive-${{ matrix.config.target }}
 
       - name: Save
         uses: actions/upload-artifact@v4
