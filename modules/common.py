@@ -170,6 +170,11 @@ def get_build_args(
         # static lib
         if not shared:
             args.append("pdf_is_complete_lib=true")
+
+            # lld makes the compiler emit crel relocations, which only binutils
+            # 2.44 and newer can read. the archive we ship has to link with the
+            # gnu linker people already have, so keep the old relocation format
+            args.append("use_lld=false")
     elif target_os == "win":
         args.append("clang_use_chrome_plugins=false")
         args.append("pdf_is_standalone=true")

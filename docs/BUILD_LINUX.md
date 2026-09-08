@@ -39,6 +39,4 @@ targets_linux = [
 ]
 ```
 
-Obs:
-- Cross compiling needs a toolchain for the target architecture.
-- A static `arm64` build also needs `use_lld=false` in `modules/common.py`.
+Obs: cross compiling needs a toolchain for the target architecture.

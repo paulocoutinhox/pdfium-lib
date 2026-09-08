@@ -1,10 +1,20 @@
 import os
+import sys
 
 from pygemstones.io import file as f
 from pygemstones.system import runner as r
 from pygemstones.util import log as l
 
 import modules.config as c
+
+
+# -----------------------------------------------------------------------------
+def run_gclient(args, cwd):
+    # gclient is a batch file on windows and cannot be started without a shell
+    if sys.platform == "win32":
+        r.run(" ".join(args), cwd=cwd, shell=True)
+    else:
+        r.run(args, cwd=cwd)
 
 
 # -----------------------------------------------------------------------------
@@ -31,7 +41,7 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
     if not enable_v8:
         config_args.extend(["--custom-var", "checkout_configuration=minimal"])
 
-    r.run(config_args, cwd=build_dir)
+    run_gclient(config_args, build_dir)
 
     # append target os
     if append_target_os:
@@ -43,7 +53,7 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
         f.append_to_file(gclient_file, "target_os = [ '{}' ]".format(target))
 
     l.colored(f"Syncing repository with branch {c.pdfium_git_branch}...", l.YELLOW)
-    r.run(
+    run_gclient(
         [
             "gclient",
             "sync",
@@ -52,7 +62,7 @@ def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
             "--no-history",
             "--shallow",
         ],
-        cwd=build_dir,
+        build_dir,
     )
 
     # reset and clean directories
