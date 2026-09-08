@@ -83,7 +83,7 @@ int main(int argc, char **argv)
         // render page
         FPDF_PAGE page = FPDF_LoadPage(doc, 0);
 
-        // a heap buffer, since variable length arrays are not standard c++
+        // A heap buffer, since variable length arrays are not standard C++.
         std::vector<uint8_t> buffer((size_t)pageWidth * (size_t)pageHeight * 4);
 
         FPDF_BITMAP createdpages = FPDFBitmap_CreateEx((int)pageWidth, (int)pageHeight, FPDFBitmap_BGRx, buffer.data(), (int)pageWidth * 4);

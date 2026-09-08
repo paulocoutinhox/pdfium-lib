@@ -9,8 +9,9 @@ import modules.config as c
 
 
 # -----------------------------------------------------------------------------
+# Runs a gclient command, on any platform.
 def run_gclient(args, cwd):
-    # gclient is a batch file on windows and cannot be started without a shell
+    # On windows gclient is a batch file, which cannot be started without a shell.
     if sys.platform == "win32":
         r.run(" ".join(args), cwd=cwd, shell=True)
     else:

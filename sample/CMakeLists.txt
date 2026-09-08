@@ -4,7 +4,7 @@ project(sample)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# multi config generators would otherwise put the binary in a per config subfolder
+# Multi config generators would otherwise put the binary in a per config subfolder.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 
 foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
@@ -12,7 +12,7 @@ foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} "${CMAKE_BINARY_DIR}")
 endforeach()
 
-# the pdfium build to link against, which decides the directory and the runtime
+# The pdfium build to link against, which decides the library directory and the runtime.
 set(PDFIUM_CONFIG "release" CACHE STRING "pdfium build configuration")
 
 # platform
@@ -27,7 +27,7 @@ endif()
 set(PDFIUM_DIR "../build/${PDFIUM_PLATFORM}/${PDFIUM_CONFIG}")
 set(PDFIUM_INCLUDE_DIR "${PDFIUM_DIR}/include")
 
-# macos ships a single universal library, the other platforms keep one directory per arch
+# macOS ships a single universal library, while the other platforms keep one directory per architecture.
 if(APPLE)
     set(PDFIUM_LIB_DIR "${PDFIUM_DIR}/lib")
 else()
@@ -65,9 +65,8 @@ if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_CORE_GRAPHICS})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_SECURITY})
 elseif(WIN32)
-    # pdfium is built with the static crt, so anything linking against it has to
-    # use the same one or the link fails on duplicated runtime symbols. the system
-    # libraries it needs are already in the msvc defaults cmake links
+    # Linking against pdfium requires the same static runtime it was built with, or the link fails on duplicated symbols.
+    # The system libraries it needs are already in the msvc defaults cmake links.
     if(PDFIUM_CONFIG STREQUAL "debug")
         set(PDFIUM_MSVC_RUNTIME "MultiThreadedDebug")
     else()

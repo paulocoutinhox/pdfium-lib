@@ -158,22 +158,18 @@ def get_build_args(
         args.append("clang_use_chrome_plugins=false")
         args.append("pdf_is_standalone=true")
 
-        # the bundled libc++ is never linked into a static_library and its symbols
-        # carry the __Cr abi namespace, so the consumer would fail on undefined
-        # std::__Cr symbols. build against the system c++ runtime instead
+        # The bundled libc++ never reaches a static library and its symbols carry the __Cr ABI namespace, which no system runtime provides.
         args.append("use_custom_libcxx=false")
 
-        # building against the host toolchain avoids depending on the chromium
-        # sysroot, which is not installed by a minimal checkout
+        # The chromium sysroot is not installed by a minimal checkout, so build against the host toolchain.
         args.append("use_sysroot=false")
 
         # static lib
         if not shared:
             args.append("pdf_is_complete_lib=true")
 
-            # lld makes the compiler emit crel relocations, which only binutils
-            # 2.44 and newer can read. the archive we ship has to link with the
-            # gnu linker people already have, so keep the old relocation format
+            # Enabling lld makes the compiler emit crel relocations, which only binutils 2.44 and newer can read.
+            # The published archive has to link with the GNU linker people already have.
             args.append("use_lld=false")
     elif target_os == "win":
         args.append("clang_use_chrome_plugins=false")

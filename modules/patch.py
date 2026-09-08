@@ -51,7 +51,7 @@ def apply_public_headers(target):
         l.bullet("Skipped: public headers (p2)", l.PURPLE)
 
 
-# -----------------------------------------------------------------------------
+# Returns the directory where the windows sdk is installed.
 def get_windows_sdk_dir():
     return os.environ.get(
         "WindowsSdkDir",
@@ -59,7 +59,7 @@ def get_windows_sdk_dir():
     )
 
 
-# -----------------------------------------------------------------------------
+# Returns the newest usable windows sdk version installed, or None when there is none.
 def find_installed_windows_sdk_version(sdk_dir=None):
     if not sdk_dir:
         sdk_dir = get_windows_sdk_dir()
@@ -74,7 +74,7 @@ def find_installed_windows_sdk_version(sdk_dir=None):
     for name in os.listdir(include_dir):
         parts = name.split(".")
 
-        # a version only counts when it carries the headers the build looks for
+        # A version only counts when it carries the headers the build looks for.
         if not os.path.isdir(os.path.join(include_dir, name, "um")):
             continue
 
@@ -88,9 +88,9 @@ def find_installed_windows_sdk_version(sdk_dir=None):
 
 
 # -----------------------------------------------------------------------------
+# Points the pinned windows sdk version at one that is installed.
 def apply_windows_sdk_version(target):
-    # chromium pins the sdk version it ships with and hands it to vcvarsall, so
-    # a machine holding any other version fails before compiling anything
+    # Chromium pins the sdk version it ships with and hands it to vcvarsall, so any other version fails before compiling.
     version = find_installed_windows_sdk_version()
 
     if not version:
@@ -120,7 +120,7 @@ def apply_windows_sdk_version(target):
         )
 
 
-# -----------------------------------------------------------------------------
+# Returns every windows api level the installed sdk defines, mapped to its numeric value.
 def find_installed_windows_ntddi_versions(sdk_dir=None):
     if not sdk_dir:
         sdk_dir = get_windows_sdk_dir()
@@ -143,10 +143,9 @@ def find_installed_windows_ntddi_versions(sdk_dir=None):
 
 
 # -----------------------------------------------------------------------------
+# Points the pinned windows api level at one the installed sdk defines.
 def apply_windows_ntddi_version(target):
-    # chromium targets the ntddi level of the sdk it ships with. an older sdk
-    # does not define that name, so it expands to zero and every version guard
-    # in the windows headers hides the declarations the build needs
+    # An sdk that does not define the pinned level expands it to zero, and the version guards then hide the declarations the build needs.
     versions = find_installed_windows_ntddi_versions()
 
     if not versions:

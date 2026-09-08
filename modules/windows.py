@@ -78,7 +78,7 @@ def run_task_build():
                 target["target_cpu"],
             )
 
-            # the windows shell does not keep the single quotes the other targets rely on
+            # The windows shell does not keep the single quotes the other targets rely on.
             args_str = " ".join(args).replace('"', '\\"')
 
             command = [
