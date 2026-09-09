@@ -160,9 +160,6 @@ def get_build_args(
         # The bundled libc++ never reaches a static library and its symbols carry the __Cr ABI namespace, which no system runtime provides.
         args.append("use_custom_libcxx=false")
 
-        # The chromium sysroot is not installed by a minimal checkout, so build against the host toolchain.
-        args.append("use_sysroot=false")
-
         # A static build needs the complete library.
         if not shared:
             args.append("pdf_is_complete_lib=true")

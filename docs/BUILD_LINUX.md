@@ -32,16 +32,9 @@ The build produces a shared `libpdfium.so` linked against the system C++ runtime
 
 # Architectures
 
-Only `x64` is built by default. To add another one, append it to `targets_linux` in `modules/config.py`:
+`x64` and `arm64` are built, both from an x64 machine. Adding another one is an entry in `targets_linux` in `modules/config.py`.
 
-```
-targets_linux = [
-    {"target_os": "linux", "target_cpu": "x64", "pdfium_os": "linux"},
-    {"target_os": "linux", "target_cpu": "arm64", "pdfium_os": "linux"},
-]
-```
-
-Obs: cross compiling needs a toolchain for the target architecture.
+Cross compiling uses the sysroot chromium publishes for each architecture, which `build-pdfium-linux` downloads after cloning. Building against it also keeps the glibc requirement at the one Debian Bullseye ships, instead of the one on the machine that compiled it.
 
 # Packaging
 
