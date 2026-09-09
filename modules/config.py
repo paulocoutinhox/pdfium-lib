@@ -21,14 +21,14 @@ targets_macos = [
 
 # Settings for Linux.
 configurations_linux = ["release"]
-shared_lib_linux = False
+shared_lib_linux = True
 targets_linux = [
     {"target_os": "linux", "target_cpu": "x64", "pdfium_os": "linux"},
 ]
 
 # Settings for Windows.
 configurations_windows = ["release"]
-shared_lib_windows = False
+shared_lib_windows = True
 targets_windows = [
     {"target_os": "windows", "target_cpu": "x64", "pdfium_os": "win"},
 ]

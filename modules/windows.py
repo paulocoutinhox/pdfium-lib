@@ -126,26 +126,32 @@ def run_task_install():
 
         # Walks every target.
         for target in c.targets_windows:
-            source_lib_path = os.path.join(
+            out_dir = os.path.join(
                 "build",
                 target["target_os"],
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
-                "obj",
-                "pdfium.lib",
             )
 
-            target_lib_path = os.path.join(
+            target_lib_dir = os.path.join(
                 "build",
                 target["target_os"],
                 config,
                 "lib",
                 target["target_cpu"],
-                "pdfium.lib",
             )
 
-            f.copy_file(source_lib_path, target_lib_path)
+            f.copy_file(
+                os.path.join(out_dir, "pdfium.dll"),
+                os.path.join(target_lib_dir, "pdfium.dll"),
+            )
+
+            # The import library is staged under the name consumers expect next to a dll.
+            f.copy_file(
+                os.path.join(out_dir, "pdfium.dll.lib"),
+                os.path.join(target_lib_dir, "pdfium.lib"),
+            )
 
             # Rewrites the public includes so they resolve outside the checkout.
             source_include_path = os.path.join(

@@ -127,8 +127,7 @@ def run_task_install():
                 "pdfium",
                 "out",
                 "{0}-{1}-{2}".format(target["target_os"], target["target_cpu"], config),
-                "obj",
-                "libpdfium.a",
+                "libpdfium.so",
             )
 
             target_lib_path = os.path.join(
@@ -137,7 +136,7 @@ def run_task_install():
                 config,
                 "lib",
                 target["target_cpu"],
-                "libpdfium.a",
+                "libpdfium.so",
             )
 
             f.copy_file(source_lib_path, target_lib_path)

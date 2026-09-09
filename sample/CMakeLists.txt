@@ -64,23 +64,29 @@ if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_FOUNDATION})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_CORE_GRAPHICS})
     target_link_libraries(${PROJECT_NAME} PRIVATE ${FWK_SECURITY})
-elseif(WIN32)
-    # Linking against pdfium requires the same static runtime it was built with, or the link fails on duplicated symbols.
-    # The system libraries it needs are already in the msvc defaults cmake links.
-    if(PDFIUM_CONFIG STREQUAL "debug")
-        set(PDFIUM_MSVC_RUNTIME "MultiThreadedDebug")
-    else()
-        set(PDFIUM_MSVC_RUNTIME "MultiThreaded")
-    endif()
-
-    set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "${PDFIUM_MSVC_RUNTIME}")
-else()
+elseif(NOT WIN32)
     find_package(Threads REQUIRED)
 
     target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${CMAKE_DL_LIBS})
+
+    # The shared library is copied next to the executable before it runs.
+    set_target_properties(${PROJECT_NAME} PROPERTIES BUILD_RPATH "$ORIGIN")
 endif()
 
 # Points the compiler and the linker at the staged library.
 target_link_directories(${PROJECT_NAME} PRIVATE ${PDFIUM_LIB_DIR})
 target_include_directories(${PROJECT_NAME} PRIVATE ${PDFIUM_INCLUDE_DIR})
+
+# The platforms that link a shared library need it beside the executable to run.
+if(NOT APPLE)
+    set(PDFIUM_SHARED_LIBRARY "${PDFIUM_LIB_DIR}/${CMAKE_SHARED_LIBRARY_PREFIX}pdfium${CMAKE_SHARED_LIBRARY_SUFFIX}")
+
+    add_custom_command(
+        TARGET ${PROJECT_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${PDFIUM_SHARED_LIBRARY}"
+            "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
+    )
+endif()
