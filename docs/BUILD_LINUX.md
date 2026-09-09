@@ -40,7 +40,7 @@ Cross compiling uses the sysroot chromium publishes for each architecture, which
 
 The release asset `linux.tgz` expands to a single `release` directory holding `include` and `lib/<arch>`. Distribution packages can install it directly, without building anything.
 
-The library links the system C++ runtime, so it needs `libstdc++.so.6` and a glibc at least as new as the one it was built against. The published binary requires **glibc 2.35**, which covers Ubuntu 22.04 and later, Debian 12 and later, and any rolling distribution. Its soname is `libpdfium.so`, without a version suffix.
+The library links the system C++ runtime, so it needs `libstdc++.so.6` and a glibc at least as new as the one it was built against. Building against the chromium sysroot keeps that requirement low: **glibc 2.14** on `x64` and **glibc 2.17** on `arm64`, which every distribution still receiving updates satisfies. Its soname is `libpdfium.so`, without a version suffix.
 
 ## Arch Linux
 
@@ -115,7 +115,7 @@ Version: $VERSION
 Section: libs
 Priority: optional
 Architecture: amd64
-Depends: libc6 (>= 2.35), libstdc++6
+Depends: libc6 (>= 2.14), libstdc++6
 Maintainer: Your Name <your@email>
 Description: PDFium, Google's PDF rendering library
 EOF
