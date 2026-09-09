@@ -24,7 +24,8 @@ else()
     set(PDFIUM_PLATFORM "linux")
 endif()
 
-set(PDFIUM_DIR "../build/${PDFIUM_PLATFORM}/${PDFIUM_CONFIG}")
+# The path is absolute because a custom command resolves a relative one against the build directory.
+set(PDFIUM_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../build/${PDFIUM_PLATFORM}/${PDFIUM_CONFIG}")
 set(PDFIUM_INCLUDE_DIR "${PDFIUM_DIR}/include")
 
 # A single universal library is shipped on macOS, while the other platforms keep one directory per architecture.
