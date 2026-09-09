@@ -74,9 +74,13 @@ on purpose: `macos` is `mac` to gn, `windows` is `win`. Adding an architecture i
 in the list and nothing else.
 
 Build arguments belong in `get_build_args` in `modules/common.py`, never inline in a platform
-module. Static builds get `pdf_is_complete_lib=true`, and every platform that ships a static
-library also needs `use_custom_libcxx=false`, because the bundled libc++ never reaches a
-static archive and its symbols carry an ABI namespace no system runtime provides.
+module. Static builds get `pdf_is_complete_lib=true`, and every platform needs
+`use_custom_libcxx=false`, because the bundled libc++ never reaches a static archive and its
+symbols carry an ABI namespace no system runtime provides.
+
+Apple platforms ship a static library, while Android, Linux and Windows ship a shared one.
+The two are not interchangeable: `apply_public_headers` makes `FPDF_EXPORT` unconditional, so
+the staged headers declare `__declspec(dllimport)` and only work against the shared library.
 
 ## Patches
 

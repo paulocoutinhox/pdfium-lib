@@ -33,6 +33,8 @@ The sample project is here: `sample`.
 
 The libraries are installed in `build/windows/release`, with one directory per architecture inside `lib`.
 
+The build produces `pdfium.dll` and the import library `pdfium.lib`. MSVC links the import library, while MinGW links the dll directly, which works because the public API is C and carries no name decoration on x64.
+
 # Architectures
 
 Only `x64` is built by default. To add another one, append it to `targets_windows` in `modules/config.py`:

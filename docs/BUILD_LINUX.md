@@ -28,6 +28,8 @@ The sample project is here: `sample`.
 
 The libraries are installed in `build/linux/release`, with one directory per architecture inside `lib`.
 
+The build produces a shared `libpdfium.so` linked against the system C++ runtime, which is what a distribution package expects.
+
 # Architectures
 
 Only `x64` is built by default. To add another one, append it to `targets_linux` in `modules/config.py`:
