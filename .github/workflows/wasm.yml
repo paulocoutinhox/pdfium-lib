@@ -108,7 +108,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.config.target }}
-          path: ${{ matrix.config.target }}.tgz
+          path: ${{ matrix.config.target }}.zip
 
   deploy:
     name: Deploy
@@ -132,6 +132,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: wasm.tgz
-          asset_name: wasm.tgz
-          asset_content_type: application/tar+gzip
+          asset_path: wasm.zip
+          asset_name: wasm.zip
+          asset_content_type: application/zip

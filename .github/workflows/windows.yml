@@ -87,7 +87,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.config.target }}
-          path: ${{ matrix.config.target }}.tgz
+          path: ${{ matrix.config.target }}.zip
 
   # MinGW is not a build target, it is a consumer of the same artifact, so it
   # verifies the published library instead of compiling pdfium again.
@@ -105,7 +105,7 @@ jobs:
           name: artifact-windows
 
       - name: Extract
-        run: tar -xzf windows.tgz
+        run: Expand-Archive -Path windows.zip -DestinationPath .
 
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
@@ -140,7 +140,7 @@ jobs:
       - name: Extract
         run: |
           New-Item -ItemType Directory -Force -Path build\windows
-          tar -xzf windows.tgz -C build\windows
+          Expand-Archive -Path windows.zip -DestinationPath build\windows
 
       - name: Generate the sample
         run: cmake -S sample -B sample/build -DPDFIUM_CONFIG=release
@@ -176,6 +176,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: windows.tgz
-          asset_name: windows.tgz
-          asset_content_type: application/tar+gzip
+          asset_path: windows.zip
+          asset_name: windows.zip
+          asset_content_type: application/zip

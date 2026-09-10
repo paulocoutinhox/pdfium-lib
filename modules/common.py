@@ -1,5 +1,8 @@
 import os
+import shutil
 import subprocess
+import time
+import zipfile
 
 from pygemstones.io import file as f
 from pygemstones.system import runner as r
@@ -101,6 +104,41 @@ def run_task_format():
     r.run(command)
 
     l.ok()
+
+
+# -----------------------------------------------------------------------------
+# Packs directories into a zip file, keeping the unix modes and the symlinks.
+def create_archive(output_filename, sources, keep=None):
+    if os.path.exists(output_filename):
+        os.remove(output_filename)
+
+    with zipfile.ZipFile(output_filename, "w", zipfile.ZIP_DEFLATED) as archive:
+        for source_dir, arcname in sources:
+            for root, _, files in os.walk(source_dir):
+                for name in sorted(files):
+                    path = os.path.join(root, name)
+
+                    if keep and not keep(path):
+                        continue
+
+                    entry = os.path.join(arcname, os.path.relpath(path, source_dir))
+                    add_to_archive(archive, path, entry)
+
+
+# -----------------------------------------------------------------------------
+# Writes one file into an open archive, as a symlink when the source is one.
+def add_to_archive(archive, path, entry):
+    mode = os.lstat(path).st_mode
+    info = zipfile.ZipInfo(entry, time.localtime(os.path.getmtime(path))[:6])
+    info.external_attr = (mode & 0xFFFF) << 16
+    info.compress_type = zipfile.ZIP_DEFLATED
+
+    if os.path.islink(path):
+        archive.writestr(info, os.readlink(path))
+        return
+
+    with open(path, "rb") as source, archive.open(info, "w") as target:
+        shutil.copyfileobj(source, target)
 
 
 # -----------------------------------------------------------------------------

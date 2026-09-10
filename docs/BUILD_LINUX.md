@@ -38,7 +38,7 @@ Cross compiling uses the sysroot chromium publishes for each architecture, which
 
 # Packaging
 
-The release asset `linux.tgz` expands to a single `release` directory holding `include` and `lib/<arch>`. Distribution packages can install it directly, without building anything.
+The release asset `linux.zip` expands to a single `release` directory holding `include` and `lib/<arch>`. Distribution packages can install it directly, without building anything.
 
 The library links the system C++ runtime, so it needs `libstdc++.so.6` and a glibc at least as new as the one it was built against. Building against the chromium sysroot keeps that requirement low: **glibc 2.14** on `x64` and **glibc 2.17** on `arm64`, which every distribution still receiving updates satisfies. Its soname is `libpdfium.so`, without a version suffix.
 
@@ -61,7 +61,7 @@ provides=('pdfium' 'libpdfium.so')
 conflicts=('pdfium')
 
 source=(
-    "$pkgname-$pkgver.tar.gz::$url/releases/download/$pkgver/linux.tgz"
+    "$pkgname-$pkgver.zip::$url/releases/download/$pkgver/linux.zip"
     "LICENSE-$pkgver.md::https://raw.githubusercontent.com/paulocoutinhox/pdfium-lib/$pkgver/LICENSE.md"
 )
 
@@ -104,8 +104,8 @@ Nothing about the library changes, only where it is installed: these distributio
 ```bash
 VERSION=8046b
 
-curl -LO "https://github.com/paulocoutinhox/pdfium-lib/releases/download/$VERSION/linux.tgz"
-tar -xzf linux.tgz
+curl -LO "https://github.com/paulocoutinhox/pdfium-lib/releases/download/$VERSION/linux.zip"
+unzip -q linux.zip
 
 mkdir -p pdfium/DEBIAN pdfium/usr/lib/x86_64-linux-gnu pdfium/usr/include/pdfium
 

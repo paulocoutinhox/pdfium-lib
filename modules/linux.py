@@ -1,5 +1,4 @@
 import os
-import tarfile
 
 from pygemstones.io import file as f
 from pygemstones.system import runner as r
@@ -229,16 +228,13 @@ def run_task_archive():
 
     current_dir = f.current_dir()
     lib_dir = os.path.join(current_dir, "build", "linux")
-    output_filename = os.path.join(current_dir, "linux.tgz")
+    output_filename = os.path.join(current_dir, "linux.zip")
 
-    tar = tarfile.open(output_filename, "w:gz")
+    sources = [
+        (os.path.join(lib_dir, configuration), configuration)
+        for configuration in c.configurations_linux
+    ]
 
-    for configuration in c.configurations_linux:
-        tar.add(
-            name=os.path.join(lib_dir, configuration),
-            arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-        )
-
-    tar.close()
+    cm.create_archive(output_filename, sources)
 
     l.ok()
