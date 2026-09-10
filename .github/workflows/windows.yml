@@ -99,8 +99,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-          - { os: "windows-2022", arch: "x64", msystem: "MINGW64", package: "mingw-w64-x86_64-gcc" }
-          - { os: "windows-11-arm", arch: "arm64", msystem: "CLANGARM64", package: "mingw-w64-clang-aarch64-toolchain" }
+          - { os: "windows-2022", arch: "x64", msystem: "MINGW64", package: "mingw-w64-x86_64-gcc", compiler: "g++" }
+          - { os: "windows-11-arm", arch: "arm64", msystem: "CLANGARM64", package: "mingw-w64-clang-aarch64-toolchain", compiler: "clang++" }
 
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +123,7 @@ jobs:
       - name: Link the sample against the dll
         shell: msys2 {0}
         run: |
-          g++ -std=c++17 -I release/include sample/src/main.cpp release/lib/${{ matrix.config.arch }}/pdfium.dll -o sample.exe
+          ${{ matrix.config.compiler }} -std=c++17 -I release/include sample/src/main.cpp release/lib/${{ matrix.config.arch }}/pdfium.dll -o sample.exe
           cp release/lib/${{ matrix.config.arch }}/pdfium.dll .
           cp sample/assets/f1.pdf .
           ./sample.exe
