@@ -930,13 +930,19 @@ def run_task_publish_to_web():
 
 
 # -----------------------------------------------------------------------------
+# Drops the intermediate files, keeping the libraries and the headers.
+def keep_in_archive(path):
+    name = os.path.basename(path)
+    return "_" not in name or name.endswith(".h")
+
+
+# -----------------------------------------------------------------------------
 def run_task_archive():
     l.colored("Archiving...", l.YELLOW)
 
     current_dir = os.getcwd()
-    output_filename = os.path.join(current_dir, "wasm.tgz")
-
-    tar = tarfile.open(output_filename, "w:gz")
+    output_filename = os.path.join(current_dir, "wasm.zip")
+    sources = []
 
     for config in c.configurations_wasm:
         for target in c.targets_wasm:
@@ -944,17 +950,9 @@ def run_task_archive():
                 current_dir, "build", target["target_os"], target["target_cpu"], config
             )
 
-            filter_files = lambda x: (
-                None if "_" in x.name and not x.name.endswith(".h") else x
-            )
+            sources.append((lib_dir, os.path.basename(lib_dir)))
 
-            tar.add(
-                name=lib_dir,
-                arcname=os.path.basename(lib_dir),
-                filter=filter_files,
-            )
-
-            # Creates a tarball per configuration that npm install accepts.
+            # The npm tarball stays a tarball, because npm install accepts nothing else.
             per_config_tar = tarfile.open(
                 os.path.join(current_dir, f"wasm-{config}.tgz"), "w:gz"
             )
@@ -962,10 +960,12 @@ def run_task_archive():
                 name=lib_dir,
                 # The root directory has to be named package for npm install to accept it.
                 arcname="package",
-                filter=filter_files,
+                filter=lambda x: (
+                    None if "_" in x.name and not x.name.endswith(".h") else x
+                ),
             )
             per_config_tar.close()
 
-    tar.close()
+    cm.create_archive(output_filename, sources, keep_in_archive)
 
     l.ok()

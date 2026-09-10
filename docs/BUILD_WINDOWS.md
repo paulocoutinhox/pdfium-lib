@@ -37,13 +37,6 @@ The build produces `pdfium.dll` and the import library `pdfium.lib`. MSVC links 
 
 # Architectures
 
-Only `x64` is built by default. To add another one, append it to `targets_windows` in `modules/config.py`:
-
-```
-targets_windows = [
-    {"target_os": "windows", "target_cpu": "x64", "pdfium_os": "win"},
-    {"target_os": "windows", "target_cpu": "arm64", "pdfium_os": "win"},
-]
-```
+`x64` and `arm64` are built, both from an x64 machine. Adding another one is an entry in `targets_windows` in `modules/config.py`.
 
 Obs: `arm64` needs the ARM64 build tools installed in Visual Studio.

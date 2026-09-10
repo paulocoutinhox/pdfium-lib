@@ -19,6 +19,27 @@ def run_gclient(args, cwd):
 
 
 # -----------------------------------------------------------------------------
+# Installs the sysroot every target architecture is compiled against.
+def install_sysroots(target, targets):
+    l.colored("Installing sysroots...", l.YELLOW)
+
+    script = os.path.join(
+        "build",
+        target,
+        "pdfium",
+        "build",
+        "linux",
+        "sysroot_scripts",
+        "install-sysroot.py",
+    )
+
+    for item in targets:
+        r.run([sys.executable, script, "--arch={0}".format(item["target_cpu"])])
+
+    l.ok()
+
+
+# -----------------------------------------------------------------------------
 def get_pdfium_by_target(target, append_target_os=True, enable_v8=False):
     l.colored("Building PDFium...", l.YELLOW)
 

@@ -1,5 +1,4 @@
 import os
-import tarfile
 
 from pygemstones.io import file as f
 from pygemstones.system import runner as r
@@ -203,29 +202,25 @@ def run_task_test():
 
 
 # -----------------------------------------------------------------------------
+# Drops the intermediate files, keeping the libraries and the headers.
+def keep_in_archive(path):
+    name = os.path.basename(path)
+    return "_" not in name or name.endswith(".h") or name.endswith(".so")
+
+
+# -----------------------------------------------------------------------------
 def run_task_archive():
     l.colored("Archiving...", l.YELLOW)
 
-    current_dir = os.getcwd()
+    current_dir = f.current_dir()
     lib_dir = os.path.join(current_dir, "build", "android")
-    output_filename = os.path.join(current_dir, "android.tgz")
+    output_filename = os.path.join(current_dir, "android.zip")
 
-    tar = tarfile.open(output_filename, "w:gz")
+    sources = [
+        (os.path.join(lib_dir, configuration), configuration)
+        for configuration in c.configurations_android
+    ]
 
-    for configuration in c.configurations_android:
-        tar.add(
-            name=os.path.join(lib_dir, configuration),
-            arcname=os.path.basename(os.path.join(lib_dir, configuration)),
-            filter=lambda x: (
-                None
-                if "_" in x.name
-                and not x.name.endswith(".h")
-                and not x.name.endswith(".so")
-                and os.path.isfile(x.name)
-                else x
-            ),
-        )
-
-    tar.close()
+    cm.create_archive(output_filename, sources, keep_in_archive)
 
     l.ok()

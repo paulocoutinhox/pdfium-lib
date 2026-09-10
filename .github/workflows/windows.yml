@@ -87,13 +87,52 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: artifact-${{ matrix.config.target }}
-          path: ${{ matrix.config.target }}.tgz
+          path: ${{ matrix.config.target }}.zip
 
   # MinGW is not a build target, it is a consumer of the same artifact, so it
   # verifies the published library instead of compiling pdfium again.
   mingw:
-    name: MinGW
-    runs-on: windows-2022
+    name: MinGW ${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.os }}
+    needs: [build]
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: "windows-2022", arch: "x64", msystem: "MINGW64", package: "mingw-w64-x86_64-gcc", compiler: "g++" }
+          - { os: "windows-11-arm", arch: "arm64", msystem: "CLANGARM64", package: "mingw-w64-clang-aarch64-toolchain", compiler: "clang++" }
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Load
+        uses: actions/download-artifact@v4
+        with:
+          name: artifact-windows
+
+      - name: Extract
+        run: Expand-Archive -Path windows.zip -DestinationPath .
+
+      - name: Set up MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: ${{ matrix.config.msystem }}
+          update: false
+          install: ${{ matrix.config.package }}
+
+      - name: Link the sample against the dll
+        shell: msys2 {0}
+        run: |
+          ${{ matrix.config.compiler }} -std=c++17 -I release/include sample/src/main.cpp release/lib/${{ matrix.config.arch }}/pdfium.dll -o sample.exe
+          cp release/lib/${{ matrix.config.arch }}/pdfium.dll .
+          cp sample/assets/f1.pdf .
+          ./sample.exe
+
+  # The cross compiled arm64 library is only proven by running it, which needs a
+  # machine of that architecture.
+  arm64:
+    name: ARM64
+    runs-on: windows-11-arm
     needs: [build]
 
     steps:
@@ -105,27 +144,26 @@ jobs:
           name: artifact-windows
 
       - name: Extract
-        run: tar -xzf windows.tgz
-
-      - name: Set up MSYS2
-        uses: msys2/setup-msys2@v2
-        with:
-          msystem: MINGW64
-          update: false
-          install: mingw-w64-x86_64-gcc
-
-      - name: Link the sample against the dll
-        shell: msys2 {0}
         run: |
-          g++ -std=c++17 -I release/include sample/src/main.cpp release/lib/x64/pdfium.dll -o sample.exe
-          cp release/lib/x64/pdfium.dll .
-          cp sample/assets/f1.pdf .
-          ./sample.exe
+          New-Item -ItemType Directory -Force -Path build\windows
+          Expand-Archive -Path windows.zip -DestinationPath build\windows
+
+      - name: Generate the sample
+        run: cmake -S sample -B sample/build -DPDFIUM_CONFIG=release
+
+      - name: Build the sample
+        run: cmake --build sample/build --config Release
+
+      - name: Run the sample
+        run: |
+          Copy-Item sample\assets\f1.pdf sample\build\
+          cd sample\build
+          .\sample.exe
 
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    needs: [build, mingw]
+    needs: [build, mingw, arm64]
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Load
@@ -144,6 +182,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.get_release.outputs.upload_url }}
-          asset_path: windows.tgz
-          asset_name: windows.tgz
-          asset_content_type: application/tar+gzip
+          asset_path: windows.zip
+          asset_name: windows.zip
+          asset_content_type: application/zip

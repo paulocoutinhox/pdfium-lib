@@ -32,22 +32,15 @@ The build produces a shared `libpdfium.so` linked against the system C++ runtime
 
 # Architectures
 
-Only `x64` is built by default. To add another one, append it to `targets_linux` in `modules/config.py`:
+`x64` and `arm64` are built, both from an x64 machine. Adding another one is an entry in `targets_linux` in `modules/config.py`.
 
-```
-targets_linux = [
-    {"target_os": "linux", "target_cpu": "x64", "pdfium_os": "linux"},
-    {"target_os": "linux", "target_cpu": "arm64", "pdfium_os": "linux"},
-]
-```
-
-Obs: cross compiling needs a toolchain for the target architecture.
+Cross compiling uses the sysroot chromium publishes for each architecture, which `build-pdfium-linux` downloads after cloning. Building against it also keeps the glibc requirement at the one Debian Bullseye ships, instead of the one on the machine that compiled it.
 
 # Packaging
 
-The release asset `linux.tgz` expands to a single `release` directory holding `include` and `lib/<arch>`. Distribution packages can install it directly, without building anything.
+The release asset `linux.zip` expands to a single `release` directory holding `include` and `lib/<arch>`. Distribution packages can install it directly, without building anything.
 
-The library links the system C++ runtime, so it needs `libstdc++.so.6` and a glibc at least as new as the one it was built against. The published binary requires **glibc 2.35**, which covers Ubuntu 22.04 and later, Debian 12 and later, and any rolling distribution. Its soname is `libpdfium.so`, without a version suffix.
+The library links the system C++ runtime, so it needs `libstdc++.so.6` and a glibc at least as new as the one it was built against. Building against the chromium sysroot keeps that requirement low: **glibc 2.14** on `x64` and **glibc 2.17** on `arm64`, which every distribution still receiving updates satisfies. Its soname is `libpdfium.so`, without a version suffix.
 
 ## Arch Linux
 
@@ -68,7 +61,7 @@ provides=('pdfium' 'libpdfium.so')
 conflicts=('pdfium')
 
 source=(
-    "$pkgname-$pkgver.tar.gz::$url/releases/download/$pkgver/linux.tgz"
+    "$pkgname-$pkgver.zip::$url/releases/download/$pkgver/linux.zip"
     "LICENSE-$pkgver.md::https://raw.githubusercontent.com/paulocoutinhox/pdfium-lib/$pkgver/LICENSE.md"
 )
 
@@ -111,8 +104,8 @@ Nothing about the library changes, only where it is installed: these distributio
 ```bash
 VERSION=8046b
 
-curl -LO "https://github.com/paulocoutinhox/pdfium-lib/releases/download/$VERSION/linux.tgz"
-tar -xzf linux.tgz
+curl -LO "https://github.com/paulocoutinhox/pdfium-lib/releases/download/$VERSION/linux.zip"
+unzip -q linux.zip
 
 mkdir -p pdfium/DEBIAN pdfium/usr/lib/x86_64-linux-gnu pdfium/usr/include/pdfium
 
@@ -122,7 +115,7 @@ Version: $VERSION
 Section: libs
 Priority: optional
 Architecture: amd64
-Depends: libc6 (>= 2.35), libstdc++6
+Depends: libc6 (>= 2.14), libstdc++6
 Maintainer: Your Name <your@email>
 Description: PDFium, Google's PDF rendering library
 EOF
