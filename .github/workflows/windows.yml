@@ -92,9 +92,15 @@ jobs:
   # MinGW is not a build target, it is a consumer of the same artifact, so it
   # verifies the published library instead of compiling pdfium again.
   mingw:
-    name: MinGW
-    runs-on: windows-2022
+    name: MinGW ${{ matrix.config.arch }}
+    runs-on: ${{ matrix.config.os }}
     needs: [build]
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - { os: "windows-2022", arch: "x64", msystem: "MINGW64", package: "mingw-w64-x86_64-gcc" }
+          - { os: "windows-11-arm", arch: "arm64", msystem: "CLANGARM64", package: "mingw-w64-clang-aarch64-toolchain" }
 
     steps:
       - uses: actions/checkout@v4
@@ -110,15 +116,15 @@ jobs:
       - name: Set up MSYS2
         uses: msys2/setup-msys2@v2
         with:
-          msystem: MINGW64
+          msystem: ${{ matrix.config.msystem }}
           update: false
-          install: mingw-w64-x86_64-gcc
+          install: ${{ matrix.config.package }}
 
       - name: Link the sample against the dll
         shell: msys2 {0}
         run: |
-          g++ -std=c++17 -I release/include sample/src/main.cpp release/lib/x64/pdfium.dll -o sample.exe
-          cp release/lib/x64/pdfium.dll .
+          g++ -std=c++17 -I release/include sample/src/main.cpp release/lib/${{ matrix.config.arch }}/pdfium.dll -o sample.exe
+          cp release/lib/${{ matrix.config.arch }}/pdfium.dll .
           cp sample/assets/f1.pdf .
           ./sample.exe
 
